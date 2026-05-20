@@ -1,27 +1,27 @@
-import { StyleSheet, Text, View, Image, useColorScheme } from 'react-native'
 import { Stack } from 'expo-router'
-import { Colors } from "../constants/Colors"
 import { StatusBar } from 'expo-status-bar'
+import { SplashScreenController } from '../components/splashscreen-controller'
+import { useAuthContext } from '../hooks/auth-context'
+import AuthProvider from '../providers/auth-provider'
 
-const RootLayout = () => {
-    const colorScheme = useColorScheme()
-    const theme = Colors[colorScheme] ?? Colors.light
-
-    return (
-        <>
-            <StatusBar value="auto" />
-            <Stack screenOptions={{
-                headerStyle: { backgroundColor: theme.navBackground },
-                headerTintColor: theme.title,
-            }}>
-                <Stack.Screen name="index" options={{ title: 'Home' }} />
-                <Stack.Screen name="about" options={{ title: 'About' }} />
-                <Stack.Screen name="contact" options={{ title: 'Contact' }} />
-            </Stack>
-        </>
-    )
+// Separate RootNavigator so we can access the AuthContext
+function RootNavigator() {
+  const { isLoggedIn } = useAuthContext()
+  return (
+    <Stack>
+      <Stack.Protected guard={isLoggedIn}>
+        <Stack.Screen name="(dashboard)/index" options={{ title: "Home" }}/>
+      </Stack.Protected>
+      <Stack.Screen name="(auth)/login" options={{ title: "Login" }} />
+    </Stack>
+  )
 }
-
-export default RootLayout
-
-const styles = StyleSheet.create({})
+export default function RootLayout() {
+  return (
+    <AuthProvider>
+      <SplashScreenController />
+      <RootNavigator />
+      <StatusBar style="auto" />
+    </AuthProvider>
+  )
+}
