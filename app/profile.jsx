@@ -3,10 +3,10 @@ import { Link } from 'expo-router'
 import ThemedView from "../components/ThemedView"
 import ThemedText from "../components/ThemedText"
 
-const About = () => {
+const Profile = () => {
     return (
         <ThemedView style={styles.container}>
-            <ThemedText style={styles.title}>About Page</ThemedText>
+            <ThemedText style={styles.title}>Modify Profile</ThemedText>
 
             <Link href="/" style={styles.link}>
                 <ThemedText>Back Home</ThemedText>
@@ -15,7 +15,7 @@ const About = () => {
     )
 }
 
-export default About
+export default Profile
 
 const styles = StyleSheet.create({
     container: {

@@ -1,25 +1,29 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet, Image } from 'react-native'
 import { Link } from 'expo-router'
 import ThemedView from "../components/ThemedView"
 import ThemedText from "../components/ThemedText"
 import Spacer from '../components/Spacer'
+import Logo from '../assets/RepZero_logo.png'
 
 const Home = () => {
     return (
         <ThemedView style={styles.container}>
-            <ThemedText style={styles.title} title={true}>
-                The Number 1
-            </ThemedText>
+            <Image source={Logo} style={styles.img} />
+
+            <Spacer />
+            
+            <ThemedText>Welcome to</ThemedText>
 
             <Spacer height={10} />
-            <ThemedText>Reading List App</ThemedText>
+
+            <ThemedText style={styles.title} title={true}>
+                RepZero
+            </ThemedText>
+
             <Spacer />
 
-            <Link href="/about" style={styles.link}>
-                <ThemedText>About Page</ThemedText>
-            </Link>
-            <Link href="/contact" style={styles.link}>
-                <ThemedText>Contact Page</ThemedText>
+            <Link href="/profile" style={styles.link}>
+                <ThemedText>Profile</ThemedText>
             </Link>
         </ThemedView>
     )
@@ -28,11 +32,6 @@ const Home = () => {
 export default Home
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
     title: {
         fontWeight: 'bold',
         fontSize: 18
