@@ -1,61 +1,43 @@
 import { AuthContext } from '../hooks/auth-context'
 import { supabase } from '../lib/supabase'
-import { PropsWithChildren, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function AuthProvider({ children }) {
   const [claims, setClaims] = useState()
   const [profile, setProfile] = useState()
   const [isLoading, setIsLoading] = useState(true)
 
-  // Fetch the claims once, and subscribe to auth state changes
   useEffect(() => {
-    const fetchClaims = async () => {
-      setIsLoading(true)
-
-      const { data, error } = await supabase.auth.getClaims()
-
-      if (error) {
-        console.error('Error fetching claims:', error)
-      }
-
-      setClaims(data?.claims ?? null)
-      setIsLoading(false)
-    }
-
-    fetchClaims()
-
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, _session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       console.log('Auth state changed:', { event: _event })
-      const { data } = await supabase.auth.getClaims()
-      setClaims(data?.claims ?? null)
+      setIsLoading(true)
+
+      if (session) {
+        const { data } = await supabase.auth.getClaims()
+        setClaims(data?.claims ?? undefined)
+
+        if (claims) {
+          const { data } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', userClaims.sub)
+            .single()
+          setProfile(data ?? undefined)
+        }
+      } else {
+        setClaims(undefined)
+        setProfile(undefined)
+      }
+
+      setIsLoading(false)
     })
 
-    // Cleanup subscription on unmount
     return () => {
       subscription.unsubscribe()
     }
   }, [])
-
-  // Fetch the profile when the claims change
-  useEffect(() => {
-    const fetchProfile = async () => {
-      setIsLoading(true)
-
-      if (claims) {
-        const { data } = await supabase.from('profiles').select('*').eq('id', claims.sub).single()
-
-        setProfile(data)
-      } else {
-        setProfile(null)
-      }
-
-      setIsLoading(false)
-    }
-
-    fetchProfile()
-  }, [claims])
 
   return (
     <AuthContext.Provider

@@ -10,7 +10,7 @@ function RootNavigator() {
   return (
     <Stack>
       <Stack.Protected guard={isLoggedIn}>
-        <Stack.Screen name="(dashboard)/index" options={{ title: "Home" }}/>
+        <Stack.Screen name="index" options={{ title: "Home" }}/>
       </Stack.Protected>
       <Stack.Screen name="(auth)/login" options={{ title: "Login" }} />
     </Stack>

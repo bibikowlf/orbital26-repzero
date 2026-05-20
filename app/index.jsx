@@ -1,8 +1,9 @@
 import { StyleSheet, Image, View, Text } from 'react-native'
 import { Link } from 'expo-router'
-import { appStyles } from '../../styles/styles'
-import Spacer from '../../components/spacer'
-import Logo from '../../assets/RepZero_logo.png'
+import { appStyles } from '../styles/styles'
+import Spacer from '../components/spacer'
+import Logo from '../assets/RepZero_logo.png'
+import SignOutButton from '../components/signout-button'
 
 const Home = () => {
     const styles = appStyles
@@ -23,9 +24,11 @@ const Home = () => {
 
             <Spacer />
 
-            <Link href="/" style={styles.link}>  { /* add log out link*/ }
-                <Text>Log Out</Text>
+            <Link href="/" style={styles.link}>  { /* add profile link*/ }
+                <Text>Profile</Text>
             </Link>
+
+            <SignOutButton />
         </View>
     )
 }
