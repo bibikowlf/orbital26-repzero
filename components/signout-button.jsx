@@ -1,6 +1,7 @@
 import { supabase } from '../lib/supabase'
 import React from 'react'
 import { Button } from 'react-native'
+import { appStyles } from '../styles/styles'
 
 async function onSignOutButtonPress() {
   const { error } = await supabase.auth.signOut()
@@ -10,5 +11,6 @@ async function onSignOutButtonPress() {
 }
 
 export default function SignOutButton() {
-  return <Button title="Sign out" onPress={onSignOutButtonPress} />
+  const styles = appStyles
+  return <Button title="Sign out" styles={styles.button} onPress={onSignOutButtonPress} />
 }

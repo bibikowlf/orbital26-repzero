@@ -1,14 +1,21 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { Alert, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { supabase } from '../../lib/supabase'
 import { appStyles } from '../../styles/styles'
-import { router } from 'expo-router'
+import { router, useFocusEffect } from 'expo-router'
 
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const styles = appStyles
+
+  useFocusEffect(
+    useCallback(() => {
+      setEmail('')
+      setPassword('')
+    }, [])
+  )
 
   async function signInWithEmail() {
     setLoading(true)
@@ -17,9 +24,12 @@ const Login = () => {
       password: password,
     })
 
-    if (error) Alert.alert(error.message)
     setLoading(false)
-    router.navigate("/")
+    if (error) {
+      Alert.alert(error.message)
+    } else {
+      router.navigate("/")
+    }
   }
 
   async function signUpWithEmail() {
@@ -29,9 +39,12 @@ const Login = () => {
       password: password,
     })
 
-    if (error) Alert.alert(error.message)
     setLoading(false)
-    router.navigate("/")
+    if (error) {
+      Alert.alert(error.message)
+    } else {
+      router.navigate("/")
+    }
   }
 
   return (

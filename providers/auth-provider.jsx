@@ -10,28 +10,30 @@ export default function AuthProvider({ children }) {
   useEffect(() => {
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      console.log('Auth state changed:', { event: _event })
-      setIsLoading(true)
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setTimeout(async () => {
+        console.log('Auth state changed:', { event: _event })
+        setIsLoading(true)
 
-      if (session) {
-        const { data } = await supabase.auth.getClaims()
-        setClaims(data?.claims ?? undefined)
+        if (session) {
+          const { data } = await supabase.auth.getClaims()
+          setClaims(data?.claims ?? undefined)
 
-        if (claims) {
-          const { data } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', claims.sub)
-            .single()
-          setProfile(data ?? undefined)
+          if (claims) {
+            const { data } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', claims.sub)
+              .single()
+            setProfile(data ?? undefined)
+          }
+        } else {
+          setClaims(undefined)
+          setProfile(undefined)
         }
-      } else {
-        setClaims(undefined)
-        setProfile(undefined)
-      }
 
-      setIsLoading(false)
+        setIsLoading(false)        
+      })
     })
 
     return () => {
