@@ -22,7 +22,7 @@ export default function AuthProvider({ children }) {
           const { data } = await supabase
             .from('profiles')
             .select('*')
-            .eq('id', userClaims.sub)
+            .eq('id', claims.sub)
             .single()
           setProfile(data ?? undefined)
         }

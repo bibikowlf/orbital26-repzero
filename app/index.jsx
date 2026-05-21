@@ -24,11 +24,9 @@ const Home = () => {
 
             <Spacer />
 
-            <Link href="/" style={styles.link}>  { /* add profile link*/ }
+            <Link href="/profile" style={styles.link}>
                 <Text>Profile</Text>
             </Link>
-
-            <SignOutButton />
         </View>
     )
 }
