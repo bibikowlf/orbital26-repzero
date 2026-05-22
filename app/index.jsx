@@ -1,47 +1,31 @@
-import { StyleSheet } from 'react-native'
+import { Image, View, Text } from 'react-native'
 import { Link } from 'expo-router'
-import ThemedView from "../components/ThemedView"
-import ThemedText from "../components/ThemedText"
-import Spacer from '../components/Spacer'
+import { appStyles } from '../styles/styles'
+import Spacer from '../components/spacer'
+import Logo from '../assets/RepZero_logo.png'
 
-const Home = () => {
+export default function Home() {
+    const styles = appStyles
+
     return (
-        <ThemedView style={styles.container}>
-            <ThemedText style={styles.title} title={true}>
-                The Number 1
-            </ThemedText>
+        <View style={styles.container}>
+            <Image source={Logo} style={styles.image} />
+
+            <Spacer />
+            
+            <Text>Welcome to</Text>
 
             <Spacer height={10} />
-            <ThemedText>Reading List App</ThemedText>
+
+            <Text style={styles.title}>
+                RepZero
+            </Text>
+
             <Spacer />
 
-            <Link href="/about" style={styles.link}>
-                <ThemedText>About Page</ThemedText>
+            <Link href="/profile" style={styles.link}>
+                <Text>Profile</Text>
             </Link>
-            <Link href="/contact" style={styles.link}>
-                <ThemedText>Contact Page</ThemedText>
-            </Link>
-        </ThemedView>
+        </View>
     )
 }
-
-export default Home
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    title: {
-        fontWeight: 'bold',
-        fontSize: 18
-    },
-    img: {
-        marginVertical: 20
-    },
-    link: {
-        marginVertical: 10,
-        borderBottomWidth: 1
-    }
-})
