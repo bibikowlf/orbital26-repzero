@@ -15,6 +15,7 @@ export default function Profile() {
   const [username, setUsername] = useState('')
   const [height, setHeight] = useState(0)
   const [weight, setWeight] = useState(0)
+  const [year, setYear] = useState(0)
   const [gender, setGender] = useState('OTHER')
   const genders = ['OTHER', 'MALE', 'FEMALE']
   const styles = appStyles
@@ -40,6 +41,7 @@ export default function Profile() {
         setUsername(data.username)
         setHeight(data.height_cm)
         setWeight(data.weight_kg)
+        setYear(data.birth_year)
         setGender(data.gender)
       }
     } catch (error) {
@@ -51,7 +53,7 @@ export default function Profile() {
     }
   }
 
-  async function updateProfile({ username, height, weight, gender }) {
+  async function updateProfile({ username, height, weight, year, gender }) {
     try {
       setLoading(true)
 
@@ -60,6 +62,7 @@ export default function Profile() {
         username: username,
         height_cm: height,
         weight_kg: weight,
+        birth_year: year,
         gender: gender,
         updated_at: new Date(),
       }
@@ -122,6 +125,15 @@ export default function Profile() {
           style={styles.input}
         />
       </View>
+      <View style={styles.verticallySpaced}>
+        <Text style={styles.label}>Year of birth</Text>
+        <TextInput
+          value={year?.toString() ?? '0'}
+          keyboardType='numeric'
+          onChangeText={(text) => setYear(handleNumberInput(text))}
+          style={styles.input}
+        />
+      </View>
 
       <View style = {styles.verticallySpaced}>
         <Text style={styles.label}>Select gender:</Text>
@@ -146,7 +158,7 @@ export default function Profile() {
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <TouchableOpacity
           style={[styles.button, loading && styles.buttonDisabled]}
-          onPress={() => updateProfile({ username, height, weight, gender })}
+          onPress={() => updateProfile({ username, height, weight, year, gender })}
           disabled={loading}
         >
           <Text style={styles.buttonText}>{loading ? 'Loading ...' : 'Update'}</Text>

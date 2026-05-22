@@ -4,7 +4,7 @@ import { SplashScreenController } from '../components/splashscreen-controller'
 import { useAuthContext } from '../hooks/auth-context'
 import AuthProvider from '../providers/auth-provider'
 
-// Separate RootNavigator so we can access the AuthContext
+// add protected pages as children under <Stack.Protected guard={isLoggedIn} /> 
 function RootNavigator() {
   const { isLoggedIn } = useAuthContext()
   return (
