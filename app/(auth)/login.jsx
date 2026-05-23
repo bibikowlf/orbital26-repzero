@@ -27,8 +27,6 @@ const Login = () => {
     setLoading(false)
     if (error) {
       Alert.alert(error.message)
-    } else {
-      router.navigate("/")
     }
   }
 
@@ -42,8 +40,6 @@ const Login = () => {
     setLoading(false)
     if (error) {
       Alert.alert(error.message)
-    } else {
-      router.navigate("/profile")
     }
   }
 
