@@ -8,7 +8,7 @@ import LoadingScreen from '../components/loading-screen'
 
 // add protected pages as children under <Stack.Protected guard={isLoggedIn} /> 
 function RootNavigator() {
-  const { isLoading, profile, isLoggedIn } = useAuthContext()
+  const { isLoading, isLoggedIn } = useAuthContext()
   const segments = useSegments()
 
   useEffect(() => {
