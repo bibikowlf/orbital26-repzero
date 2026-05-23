@@ -17,13 +17,14 @@ export default function AuthProvider({ children }) {
 
         if (session) {
           const { data } = await supabase.auth.getClaims()
-          setClaims(data?.claims ?? undefined)
+          const newClaims = data?.claims ?? undefined
+          setClaims(newClaims)
 
-          if (claims) {
+          if (newClaims) {
             const { data } = await supabase
               .from('profiles')
               .select('*')
-              .eq('id', claims.sub)
+              .eq('id', newClaims.sub)
               .single()
             setProfile(data ?? undefined)
           }
@@ -33,7 +34,7 @@ export default function AuthProvider({ children }) {
         }
 
         setIsLoading(false)        
-      })
+      }, 0)
     })
 
     return () => {
