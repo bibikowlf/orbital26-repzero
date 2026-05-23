@@ -43,7 +43,7 @@ const Login = () => {
     if (error) {
       Alert.alert(error.message)
     } else {
-      router.navigate("/")
+      router.navigate("/profile")
     }
   }
 
