@@ -5,7 +5,7 @@ import { useAuthContext } from '../../hooks/auth-context'
 import { appStyles } from '../../styles/styles'
 import { router } from 'expo-router'
 import SignOutButton from '../../components/signout-button'
-import Spacer from '../../components/spacer'
+import Spacer from '../../components/Spacer'
 
 export default function Profile() {
   const { claims } = useAuthContext()
