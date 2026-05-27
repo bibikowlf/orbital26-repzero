@@ -54,7 +54,7 @@ export default function ChangePassword () {
       </View>
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <TouchableOpacity
-            style={[styles.button, loading && styles.buttonDisabled]}
+            style={[styles.actionButton, { backgroundColor: '#007AFF' }, loading && styles.buttonDisabled]}
             onPress={() => changePassword()}
             disabled={loading}
         >

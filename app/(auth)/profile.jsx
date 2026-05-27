@@ -14,6 +14,16 @@ const genderData = [
   { label: 'Female', value: 'Female' },
   { label: 'Other', value: 'Other' },
 ]
+const frequencyData = [
+  { label: '0', value: 0},
+  { label: '1', value: 1},
+  { label: '2', value: 2},
+  { label: '3', value: 3},
+  { label: '4', value: 4},
+  { label: '5', value: 5},
+  { label: '6', value: 6},
+  { label: '7', value: 7},
+]
 
 export default function Profile() {
   const { claims } = useAuthContext()
@@ -25,12 +35,13 @@ export default function Profile() {
   const [height, setHeight] = useState(0)
   const [weight, setWeight] = useState(0)
   const [year, setYear] = useState(0)
-  const [gender, setGender] = useState('OTHER')
+  const [gender, setGender] = useState('Other')
   const [frequency, setFrequency] = useState(0)
   const [time, setTime] = useState(0)
   const [exp, setExp] = useState('')
+  const [focus, setFocus] = useState('')
+  const [illness, setIllness] = useState('')
   const [info, setInfo] = useState('')
-  const genders = ['OTHER', 'MALE', 'FEMALE']
   const styles = appStyles
 
   useEffect(() => {
@@ -59,6 +70,8 @@ export default function Profile() {
         setFrequency(data.gym_frequency)
         setTime(data.time_per_session)
         setExp(data.gym_exp)
+        setFocus(data.focus_area)
+        setIllness(data.illness)
         setInfo(data.add_info)
       }
     } catch (error) {
@@ -70,7 +83,7 @@ export default function Profile() {
     }
   }
 
-  async function updateProfile({ username, height, weight, year, gender, frequency, time, exp, info }) {
+  async function updateProfile({ username, height, weight, year, gender, frequency, time, exp, focus, illness, info }) {
     try {
       setLoading(true)
 
@@ -84,6 +97,8 @@ export default function Profile() {
         gym_frequency: frequency,
         time_per_session: time,
         gym_exp: exp,
+        focus_area: focus,
+        illness: illness,
         add_info: info,
         updated_at: new Date(),
       }
@@ -110,6 +125,7 @@ export default function Profile() {
   return (
     <KeyboardAvoidingView behavior='padding'>
       <ScrollView style={{paddingHorizontal: 15}}>
+        {/* EMAIL */}
         <View style={styles.verticallySpaced}>
           <Text style={styles.label}>Email</Text>
           <TextInput
@@ -165,58 +181,42 @@ export default function Profile() {
         </View>
 
         {/* GENDER */}
-        <View style={localStyles.inputContainer}>
-        <Text style={localStyles.fieldLabel}>Gender</Text>
-        <Dropdown
-          style={localStyles.dropdown}
-          placeholderStyle={localStyles.placeholderStyle}
-          selectedTextStyle={localStyles.selectedTextStyle}
-          data={genderData}
-          maxHeight={200}
-          labelField="label"
-          valueField="value"
-          placeholder="Select Gender"
-          value={gender}
-          onChange={item => setGender(item.value)}
-        />
-      </View>
-       
-        {/*
-        <View style = {styles.verticallySpaced}>
-          <Text style={styles.label}>Select gender</Text>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 40 }}>
-          {genders.map((option, index) => {
-            const isSelected = gender === option;
-            return (
-              <TouchableOpacity
-                key={index}
-                style={[styles.button, isSelected && styles.buttonDisabled]}
-                onPress={() => setGender(option)}
-              >
-                <Text style={styles.buttonText}>
-                  {option}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-          </View>
-        </View>
-        */}
-
-
-        <View style={styles.verticallySpaced}>
-          <Text style={styles.label}>Number of gym sessions every week</Text>
-          <TextInput
-            value={frequency?.toString() ?? '0'}
-            keyboardType='numeric'
-            onChangeText={(text) => setFrequency(handleNumberInput(text))}
-            style={styles.input}
+        <View style={styles.inputContainer}>
+          <Text style={styles.fieldLabel}>Gender</Text>
+          <Dropdown
+            style={styles.dropdown}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            data={genderData}
+            maxHeight={200}
+            labelField="label"
+            valueField="value"
+            placeholder="Select gender"
+            value={gender}
+            onChange={item => setGender(item.value)}
           />
         </View>
 
+        {/* GYM FREQUENCY */}
+        <View style={styles.inputContainer}>
+          <Text style={styles.fieldLabel}>Number of gym sessions every week</Text>
+          <Dropdown
+            style={styles.dropdown}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            data={frequencyData}
+            maxHeight={200}
+            labelField="label"
+            valueField="value"
+            placeholder="Select number of sessions"
+            value={frequency}
+            onChange={item => setFrequency(item.value)}
+          />
+        </View>
 
+        {/* SESSION TIME */}
         <View style={styles.verticallySpaced}>
-          <Text style={styles.label}>Time for every session (minutes)</Text>
+          <Text style={styles.label}>Average time per session (minutes)</Text>
           <TextInput
             value={time?.toString() ?? '0'}
             keyboardType='numeric'
@@ -225,7 +225,7 @@ export default function Profile() {
           />
         </View>
 
-
+        {/* GYMMING EXPERIENCE */}
         <View style={styles.verticallySpaced}>
           <Text style={styles.label}>Gymming experience</Text>
           <TextInput
@@ -235,9 +235,29 @@ export default function Profile() {
           />
         </View>
 
-
+        {/* FOCUS AREA */}
         <View style={styles.verticallySpaced}>
-          <Text style={styles.label}>Additional information we should consider (illness, fitness goals...)</Text>
+          <Text style={styles.label}>Focus area</Text>
+          <TextInput
+            value={focus ?? ''}
+            onChangeText={(text) => setFocus(text)}
+            style={styles.input}
+          />
+        </View>
+
+        {/* ILLNESS */}
+        <View style={styles.verticallySpaced}>
+          <Text style={styles.label}>Any illnesses to be considered</Text>
+          <TextInput
+            value={illness ?? ''}
+            onChangeText={(text) => setIllness(text)}
+            style={styles.input}
+          />
+        </View>
+
+        {/* ADDITIONAL INFORMATION */}
+        <View style={styles.verticallySpaced}>
+          <Text style={styles.label}>Additional information</Text>
           <TextInput
             value={info ?? ''}
             onChangeText={(text) => setInfo(text)}
@@ -247,14 +267,13 @@ export default function Profile() {
 
         <View style={[styles.verticallySpaced, styles.mt20]}>
           <TouchableOpacity
-            style={[styles.button, loading && styles.buttonDisabled]}
-            onPress={() => updateProfile({ username, height, weight, year, gender, frequency, time, exp, info })}
+            style={[styles.actionButton, { backgroundColor: '#007AFF' }, loading && styles.buttonDisabled]}
+            onPress={() => updateProfile({ username, height, weight, year, gender, frequency, time, exp, focus, illness, info })}
             disabled={loading}
           >
             <Text style={styles.buttonText}>{loading ? 'Loading ...' : 'Update'}</Text>
           </TouchableOpacity>
         </View>
-
 
         <View style={styles.verticallySpaced}>
           <Button 
@@ -263,7 +282,6 @@ export default function Profile() {
             onPress={() => router.navigate("/change-password")} 
           />
         </View>
-
 
         <View style={styles.verticallySpaced}>
           <Button 
@@ -280,74 +298,3 @@ export default function Profile() {
     </KeyboardAvoidingView>
   )
 }
-
-const localStyles = StyleSheet.create({
-  actionButton: {
-    flex: 0.48,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dayContainer: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 10,
-    padding: 14,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#e9ecef',
-  },
-  dayHeader: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#000',
-    marginBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#dee2e6',
-    paddingBottom: 4,
-  },
-  exerciseRow: {
-    backgroundColor: '#fff',
-    padding: 10,
-    borderRadius: 6,
-    marginBottom: 8,
-    borderWidth: 0.5,
-    borderColor: '#ced4da',
-  },
-  exerciseName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#212529',
-  },
-  exerciseMeta: {
-    fontSize: 13,
-    color: '#495057',
-    marginTop: 2,
-  },
-  exerciseNotes: {
-    fontSize: 12,
-    color: '#6c757d',
-    fontStyle: 'italic',
-    marginTop: 4,
-  },
-  miniLabel: {
-    fontSize: 11,
-    color: '#6c757d',
-    fontWeight: '600',
-    marginBottom: 2,
-  },
-  inlineInput: {
-    borderWidth: 1,
-    borderColor: '#ced4da',
-    borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    fontSize: 14,
-    backgroundColor: '#fafafa',
-  },
-  fallbackText: {
-    color: '#868e96',
-    textAlign: 'center',
-    marginTop: 40,
-  }
-})

@@ -42,7 +42,7 @@ export default function GeneratePlan() {
   }
 
   async function handleGenerateWorkout() {
-    console.log("API KEY:", process.env.EXPO_PUBLIC_GEMINI_KEY)
+    // console.log("API KEY:", process.env.EXPO_PUBLIC_GEMINI_KEY)
     try {
       setLoading(true)
 
@@ -153,7 +153,7 @@ export default function GeneratePlan() {
 
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <TouchableOpacity 
-          style={[localStyles.actionButton, { backgroundColor: '#007AFF' }, loading && styles.buttonDisabled]}
+          style={[styles.actionButton, { backgroundColor: '#007AFF' }, loading && styles.buttonDisabled]}
           onPress={handleGenerateWorkout}
           disabled={loading}
         >
@@ -162,7 +162,7 @@ export default function GeneratePlan() {
 
         {workoutPlan.length > 0 && (
           <TouchableOpacity 
-            style={[localStyles.actionButton, { backgroundColor: isEditing ? '#34C759' : '#5856D6' }]}
+            style={[styles.actionButton, { backgroundColor: isEditing ? '#34C759' : '#5856D6' }]}
             onPress={isEditing ? handleSaveEdits : () => setIsEditing(true)}
           >
             <Text style={styles.buttonText}>{isEditing ? 'Save Customizations' : 'Modify Items'}</Text>
@@ -174,33 +174,33 @@ export default function GeneratePlan() {
 
       {workoutPlan.length > 0 ? (
         workoutPlan.map((dayItem, dayIdx) => (
-          <View key={dayIdx} style={localStyles.dayContainer}>
-            <Text style={localStyles.dayHeader}>{dayItem.day}</Text>
+          <View key={dayIdx} style={styles.dayContainer}>
+            <Text style={styles.dayHeader}>{dayItem.day}</Text>
             
             {dayItem.exercises?.map((exercise, exIdx) => (
-              <View key={exIdx} style={localStyles.exerciseRow}>
+              <View key={exIdx} style={styles.exerciseRow}>
                 {isEditing ? (
                   <View style={{ width: '100%' }}>
-                    <Text style={localStyles.miniLabel}>Exercise Name</Text>
+                    <Text style={styles.miniLabel}>Exercise Name</Text>
                     <TextInput 
-                      style={localStyles.inlineInput}
+                      style={styles.inlineInput}
                       value={exercise.name}
                       onChangeText={(val) => handleFieldChange(dayIdx, exIdx, 'name', val)}
                     />
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 }}>
                       <View style={{ width: '48%' }}>
-                        <Text style={localStyles.miniLabel}>Sets</Text>
+                        <Text style={styles.miniLabel}>Sets</Text>
                         <TextInput 
-                          style={localStyles.inlineInput}
+                          style={styles.inlineInput}
                           value={String(exercise.sets)}
                           keyboardType="numeric"
                           onChangeText={(val) => handleFieldChange(dayIdx, exIdx, 'sets', parseInt(val) || 0)}
                         />
                       </View>
                       <View style={{ width: '48%' }}>
-                        <Text style={localStyles.miniLabel}>Reps</Text>
+                        <Text style={styles.miniLabel}>Reps</Text>
                         <TextInput 
-                          style={localStyles.inlineInput}
+                          style={styles.inlineInput}
                           value={exercise.reps}
                           onChangeText={(val) => handleFieldChange(dayIdx, exIdx, 'reps', val)}
                         />
@@ -209,11 +209,11 @@ export default function GeneratePlan() {
                   </View>
                 ) : (
                   <View style={{ flex: 1 }}>
-                    <Text style={localStyles.exerciseName}>{exercise.name}</Text>
-                    <Text style={localStyles.exerciseMeta}>
+                    <Text style={styles.exerciseName}>{exercise.name}</Text>
+                    <Text style={styles.exerciseMeta}>
                       {exercise.sets} Sets x {exercise.reps} Reps
                     </Text>
-                    {exercise.notes && <Text style={localStyles.exerciseNotes}>{exercise.notes}</Text>}
+                    {exercise.notes && <Text style={styles.exerciseNotes}>{exercise.notes}</Text>}
                   </View>
                 )}
               </View>
@@ -221,80 +221,9 @@ export default function GeneratePlan() {
           </View>
         ))
       ) : (
-        <Text style={localStyles.fallbackText}>No routine active. Prompt Gemini to map out your week.</Text>
+        <Text style={styles.fallbackText}>No routine active. Prompt Gemini to map out your week.</Text>
       )}
       <Spacer />
     </ScrollView>
   )
 }
-
-const localStyles = StyleSheet.create({
-  actionButton: {
-    flex: 0.48,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dayContainer: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 10,
-    padding: 14,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#e9ecef',
-  },
-  dayHeader: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#000',
-    marginBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#dee2e6',
-    paddingBottom: 4,
-  },
-  exerciseRow: {
-    backgroundColor: '#fff',
-    padding: 10,
-    borderRadius: 6,
-    marginBottom: 8,
-    borderWidth: 0.5,
-    borderColor: '#ced4da',
-  },
-  exerciseName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#212529',
-  },
-  exerciseMeta: {
-    fontSize: 13,
-    color: '#495057',
-    marginTop: 2,
-  },
-  exerciseNotes: {
-    fontSize: 12,
-    color: '#6c757d',
-    fontStyle: 'italic',
-    marginTop: 4,
-  },
-  miniLabel: {
-    fontSize: 11,
-    color: '#6c757d',
-    fontWeight: '600',
-    marginBottom: 2,
-  },
-  inlineInput: {
-    borderWidth: 1,
-    borderColor: '#ced4da',
-    borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    fontSize: 14,
-    backgroundColor: '#fafafa',
-  },
-  fallbackText: {
-    color: '#868e96',
-    textAlign: 'center',
-    marginTop: 40,
-  }
-})
