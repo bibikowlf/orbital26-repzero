@@ -31,9 +31,9 @@ function RootNavigator() {
     <Stack>
       <Stack.Screen name="index" options={{ title: "Home" }}/>
       <Stack.Screen name="generate-plan" options={{ title: "Workout Plan" }}/>
-      <Stack.Screen name="(auth)/profile" options={{ title: "Profile" }}/>
-      <Stack.Screen name="(auth)/change-password" options={{ title: "Change Password" }}/>
-      <Stack.Screen name="(auth)/login" options={{ title: "Login" }} />
+      <Stack.Screen name="profile" options={{ title: "Profile" }}/>
+      <Stack.Screen name="change-password" options={{ title: "Change Password" }}/>
+      <Stack.Screen name="login" options={{ title: "Login" }} />
 
     </Stack>
   )

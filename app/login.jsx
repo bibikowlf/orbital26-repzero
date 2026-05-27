@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import { Alert, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import { supabase } from '../../lib/supabase'
-import { appStyles } from '../../styles/styles'
+import { supabase } from '../lib/supabase'
+import { appStyles } from '../styles/styles'
 import { router, useFocusEffect } from 'expo-router'
 
 const Login = () => {
@@ -68,7 +68,7 @@ const Login = () => {
       </View>
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <TouchableOpacity
-          style={[styles.button, loading && styles.buttonDisabled]}
+          style={[styles.actionButton, { backgroundColor: '#007AFF' }, loading && styles.buttonDisabled]}
           onPress={() => signInWithEmail()}
           disabled={loading}
         >
@@ -77,7 +77,7 @@ const Login = () => {
       </View>
       <View style={styles.verticallySpaced}>
         <TouchableOpacity
-          style={[styles.button, loading && styles.buttonDisabled]}
+          style={[styles.actionButton, { backgroundColor: '#007AFF' }, loading && styles.buttonDisabled]}
           onPress={() => signUpWithEmail()}
           disabled={loading}
         >
