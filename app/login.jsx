@@ -68,7 +68,7 @@ const Login = () => {
       </View>
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <TouchableOpacity
-          style={[styles.actionButton, { backgroundColor: '#007AFF' }, loading && styles.buttonDisabled]}
+          style={[styles.actionButton, { backgroundColor: '#007AFF', flex: 0 }, loading && styles.buttonDisabled]}
           onPress={() => signInWithEmail()}
           disabled={loading}
         >
@@ -77,7 +77,7 @@ const Login = () => {
       </View>
       <View style={styles.verticallySpaced}>
         <TouchableOpacity
-          style={[styles.actionButton, { backgroundColor: '#007AFF' }, loading && styles.buttonDisabled]}
+          style={[styles.actionButton, { backgroundColor: '#007AFF', flex: 0 }, loading && styles.buttonDisabled]}
           onPress={() => signUpWithEmail()}
           disabled={loading}
         >
