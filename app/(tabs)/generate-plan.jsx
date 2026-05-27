@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
-import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, Alert, StyleSheet, TextInput } from 'react-native'
-import { supabase } from '../lib/supabase'
-import { useAuthContext } from '../hooks/auth-context'
-import { appStyles } from '../styles/styles'
-import Spacer from '../components/spacer'
+import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, Alert, TextInput } from 'react-native'
+import { supabase } from '../../lib/supabase'
+import { useAuthContext } from '../../hooks/auth-context'
+import { appStyles } from '../../styles/styles'
+import Spacer from '../../components/spacer'
 
 export default function GeneratePlan() {
   const {claims} = useAuthContext()

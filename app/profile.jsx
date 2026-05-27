@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
-import { View, Alert, TextInput, Text, TouchableOpacity, Button, ScrollView, KeyboardAvoidingView, 
-          StyleSheet, ActivityIndicator } from 'react-native'
+import { View, Alert, TextInput, Text, TouchableOpacity, Button, ScrollView, 
+  KeyboardAvoidingView } from 'react-native'
 import { useAuthContext } from '../hooks/auth-context'
 import { appStyles } from '../styles/styles'
 import { router } from 'expo-router'
@@ -24,6 +24,11 @@ const frequencyData = [
   { label: '6', value: 6},
   { label: '7', value: 7},
 ]
+
+const yearData = [{ label: '', value: 0 }];
+for (let i = 1950; i <= 2025; i++) {
+  yearData.push({ label: String(i), value: i });
+}
 
 export default function Profile() {
   const { claims } = useAuthContext()
@@ -170,13 +175,20 @@ export default function Profile() {
         </View>
 
         {/* BIRTH YEAR */}
-        <View style={styles.verticallySpaced}>
-          <Text style={styles.label}>Year of birth</Text>
-          <TextInput
-            value={year?.toString() ?? '0'}
-            keyboardType='numeric'
-            onChangeText={(text) => setYear(handleNumberInput(text))}
-            style={styles.input}
+        <View style={styles.inputContainer}>
+          <Text style={styles.fieldLabel}>Year of birth</Text>
+          <Dropdown
+            style={styles.dropdown}
+            //mode="modal"
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            data={yearData}
+            maxHeight={200}
+            labelField="label"
+            valueField="value"
+            placeholder="Select year of birth"
+            value={year}
+            onChange={item => setYear(item.value)}
           />
         </View>
 
@@ -278,7 +290,6 @@ export default function Profile() {
         <View style={styles.verticallySpaced}>
           <Button 
             title="Change Password" 
-            styles={styles.button} 
             onPress={() => router.navigate("/change-password")} 
           />
         </View>
