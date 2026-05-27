@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Alert, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import { supabase } from '../lib/supabase'
-import { appStyles } from '../styles/styles'
+import { supabase } from '../../lib/supabase'
+import { appStyles } from '../../styles/styles'
 
 export default function ChangePassword () {
   const [password, setPassword] = useState('')
@@ -54,7 +54,7 @@ export default function ChangePassword () {
       </View>
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: '#007AFF' }, loading && styles.buttonDisabled]}
+            style={[styles.actionButton, { backgroundColor: '#007AFF', flex: 0 }, loading && styles.buttonDisabled]}
             onPress={() => changePassword()}
             disabled={loading}
         >
