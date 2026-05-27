@@ -12,5 +12,5 @@ async function onSignOutButtonPress() {
 
 export default function SignOutButton() {
   const styles = appStyles
-  return <Button title="Sign out" styles={styles.button} onPress={onSignOutButtonPress} />
+  return <Button title="Sign out" onPress={onSignOutButtonPress} />
 }

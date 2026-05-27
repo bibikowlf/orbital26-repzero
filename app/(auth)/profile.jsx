@@ -1,11 +1,19 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
-import { View, Alert, TextInput, Text, TouchableOpacity, Button, ScrollView, KeyboardAvoidingView } from 'react-native'
+import { View, Alert, TextInput, Text, TouchableOpacity, Button, ScrollView, KeyboardAvoidingView, 
+          StyleSheet, ActivityIndicator } from 'react-native'
 import { useAuthContext } from '../../hooks/auth-context'
 import { appStyles } from '../../styles/styles'
 import { router } from 'expo-router'
 import SignOutButton from '../../components/signout-button'
 import Spacer from '../../components/spacer'
+import { Dropdown } from 'react-native-element-dropdown';
+
+const genderData = [
+  { label: 'Male', value: 'Male' },
+  { label: 'Female', value: 'Female' },
+  { label: 'Other', value: 'Other' },
+]
 
 export default function Profile() {
   const { claims } = useAuthContext()
@@ -112,6 +120,7 @@ export default function Profile() {
           />
         </View>
 
+        {/* USERNAME */}
         <View style={styles.verticallySpaced}>
           <Text style={styles.label}>Username</Text>
           <TextInput
@@ -121,6 +130,8 @@ export default function Profile() {
             style={styles.input}
           />
         </View>
+
+        {/* HEIGHT */}
         <View style={styles.verticallySpaced}>
           <Text style={styles.label}>Height (cm)</Text>
           <TextInput
@@ -130,6 +141,8 @@ export default function Profile() {
             style={styles.input}
           />
         </View>
+
+        {/* WEIGHT*/}
         <View style={styles.verticallySpaced}>
           <Text style={styles.label}>Weight (kg)</Text>
           <TextInput
@@ -139,6 +152,8 @@ export default function Profile() {
             style={styles.input}
           />
         </View>
+
+        {/* BIRTH YEAR */}
         <View style={styles.verticallySpaced}>
           <Text style={styles.label}>Year of birth</Text>
           <TextInput
@@ -148,6 +163,25 @@ export default function Profile() {
             style={styles.input}
           />
         </View>
+
+        {/* GENDER */}
+        <View style={localStyles.inputContainer}>
+        <Text style={localStyles.fieldLabel}>Gender</Text>
+        <Dropdown
+          style={localStyles.dropdown}
+          placeholderStyle={localStyles.placeholderStyle}
+          selectedTextStyle={localStyles.selectedTextStyle}
+          data={genderData}
+          maxHeight={200}
+          labelField="label"
+          valueField="value"
+          placeholder="Select Gender"
+          value={gender}
+          onChange={item => setGender(item.value)}
+        />
+      </View>
+       
+        {/*
         <View style = {styles.verticallySpaced}>
           <Text style={styles.label}>Select gender</Text>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 40 }}>
@@ -167,6 +201,9 @@ export default function Profile() {
           })}
           </View>
         </View>
+        */}
+
+
         <View style={styles.verticallySpaced}>
           <Text style={styles.label}>Number of gym sessions every week</Text>
           <TextInput
@@ -176,6 +213,8 @@ export default function Profile() {
             style={styles.input}
           />
         </View>
+
+
         <View style={styles.verticallySpaced}>
           <Text style={styles.label}>Time for every session (minutes)</Text>
           <TextInput
@@ -185,6 +224,8 @@ export default function Profile() {
             style={styles.input}
           />
         </View>
+
+
         <View style={styles.verticallySpaced}>
           <Text style={styles.label}>Gymming experience</Text>
           <TextInput
@@ -193,6 +234,8 @@ export default function Profile() {
             style={styles.input}
           />
         </View>
+
+
         <View style={styles.verticallySpaced}>
           <Text style={styles.label}>Additional information we should consider (illness, fitness goals...)</Text>
           <TextInput
@@ -211,11 +254,21 @@ export default function Profile() {
             <Text style={styles.buttonText}>{loading ? 'Loading ...' : 'Update'}</Text>
           </TouchableOpacity>
         </View>
+
+
         <View style={styles.verticallySpaced}>
           <Button 
             title="Change Password" 
             styles={styles.button} 
             onPress={() => router.navigate("/change-password")} 
+          />
+        </View>
+
+
+        <View style={styles.verticallySpaced}>
+          <Button 
+            title="View AI Workout Plan" 
+            onPress={() => router.navigate("/generate-plan")} 
           />
         </View>
 
@@ -227,3 +280,74 @@ export default function Profile() {
     </KeyboardAvoidingView>
   )
 }
+
+const localStyles = StyleSheet.create({
+  actionButton: {
+    flex: 0.48,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dayContainer: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 10,
+    padding: 14,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  dayHeader: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#000',
+    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#dee2e6',
+    paddingBottom: 4,
+  },
+  exerciseRow: {
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 6,
+    marginBottom: 8,
+    borderWidth: 0.5,
+    borderColor: '#ced4da',
+  },
+  exerciseName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#212529',
+  },
+  exerciseMeta: {
+    fontSize: 13,
+    color: '#495057',
+    marginTop: 2,
+  },
+  exerciseNotes: {
+    fontSize: 12,
+    color: '#6c757d',
+    fontStyle: 'italic',
+    marginTop: 4,
+  },
+  miniLabel: {
+    fontSize: 11,
+    color: '#6c757d',
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  inlineInput: {
+    borderWidth: 1,
+    borderColor: '#ced4da',
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    fontSize: 14,
+    backgroundColor: '#fafafa',
+  },
+  fallbackText: {
+    color: '#868e96',
+    textAlign: 'center',
+    marginTop: 40,
+  }
+})
