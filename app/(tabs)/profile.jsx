@@ -179,7 +179,7 @@ export default function Profile() {
           <Text style={styles.fieldLabel}>Year of birth</Text>
           <Dropdown
             style={styles.dropdown}
-            //mode="modal"
+            mode="modal"
             placeholderStyle={styles.placeholderStyle}
             selectedTextStyle={styles.selectedTextStyle}
             data={yearData}
