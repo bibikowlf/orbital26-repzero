@@ -1,8 +1,8 @@
 import { Image, View, Text } from 'react-native'
 import { Link } from 'expo-router'
-import { appStyles } from '../styles/styles'
-import Spacer from '../components/spacer'
-import Logo from '../assets/RepZero_logo.png'
+import { appStyles } from '../../styles/styles'
+import Spacer from '../../components/spacer'
+import Logo from '../../assets/RepZero_logo.png'
 
 export default function Home() {
     const styles = appStyles
@@ -20,12 +20,6 @@ export default function Home() {
             <Text style={styles.title}>
                 RepZero
             </Text>
-
-            <Spacer />
-
-            <Link href="/profile" style={styles.link}>
-                <Text>Profile</Text>
-            </Link>
         </View>
     )
 }
