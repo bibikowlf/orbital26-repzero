@@ -41,25 +41,13 @@ export default function TabLayout() {
       {/* Profile (No Tab) */}
       <Tabs.Screen
         name="profile"
-        options={{
-          title: 'Profile',
-          href: null,
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'barbell' : 'barbell-outline'} size={24} color={color} />
-          ),
-        }}
+        options={{ title: 'Profile', href: null }}
       />
 
       {/* Change Password (No Tab) */}
       <Tabs.Screen
         name="change-password"
-        options={{
-          title: 'Change Password',
-          href: null,
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'barbell' : 'barbell-outline'} size={24} color={color} />
-          ),
-        }}
+        options={{ title: 'Change Password', href: null }}
       />
     </Tabs>
   );
