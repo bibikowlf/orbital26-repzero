@@ -27,7 +27,7 @@ function RootNavigator() {
 
   if (isLoading) {
     return (
-      <View style={[styles.container, { flex: 1, backgroundColor: #F2F2F2}]}>
+      <View style={[styles.container, { flex: 1, backgroundColor: '#F2F2F2'}]}>
         <ActivityIndicator size="large" color="#000" />
       </View>
     )
