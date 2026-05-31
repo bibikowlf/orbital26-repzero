@@ -2,7 +2,7 @@ import { Image, View, Text } from 'react-native'
 import { Link } from 'expo-router'
 import { appStyles } from '../../styles/styles'
 import Spacer from '../../components/spacer'
-import Logo from '../../assets/RepZero_logo.png'
+import Logo from '../../assets/logo_small.png'
 
 export default function Home() {
     const styles = appStyles
