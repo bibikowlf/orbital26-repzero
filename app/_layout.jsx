@@ -6,7 +6,6 @@ import AuthProvider from '../providers/auth-provider'
 import { useEffect } from 'react'
 import { View, ActivityIndicator } from 'react-native'
 import { appStyles } from '../styles/styles'
-import LoadingScreen from '../components/loading-screen'
 
 function RootNavigator() {
   const styles = appStyles
@@ -28,7 +27,7 @@ function RootNavigator() {
 
   if (isLoading) {
     return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+      <View style={[styles.container, { flex: 1, backgroundColor: #F2F2F2}]}>
         <ActivityIndicator size="large" color="#000" />
       </View>
     )
