@@ -1,7 +1,7 @@
 import { Image, View, Text } from 'react-native'
 import { appStyles } from '../styles/styles'
 import Spacer from '../components/spacer'
-import Logo from '../assets/RepZero_logo.png'
+import Logo from '../assets/logo_small.png'
 
 export default function LoadingScreen() {
     const styles = appStyles

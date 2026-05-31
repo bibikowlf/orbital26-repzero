@@ -4,9 +4,12 @@ import { SplashScreenController } from '../components/splashscreen-controller'
 import { useAuthContext } from '../hooks/auth-context'
 import AuthProvider from '../providers/auth-provider'
 import { useEffect } from 'react'
+import { View, ActivityIndicator } from 'react-native'
+import { appStyles } from '../styles/styles'
 import LoadingScreen from '../components/loading-screen'
 
 function RootNavigator() {
+  const styles = appStyles
   const { isLoading, isLoggedIn } = useAuthContext()
   const segments = useSegments()
 
@@ -24,7 +27,11 @@ function RootNavigator() {
   }, [segments, isLoading, isLoggedIn])
 
   if (isLoading) {
-    return <LoadingScreen />
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color="#000" />
+      </View>
+    )
   }
   return (
     <Stack>

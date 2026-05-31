@@ -27,6 +27,7 @@ export const appStyles = StyleSheet.create({
     borderRadius: 4,
     padding: 12,
     fontSize: 16,
+    color: '#333',
   },
   inputDisabled: {
     backgroundColor: '#f2f2f2',

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "repzero_app-1",
+    "name": "RepZero",
     "scheme": "your-app-scheme",
     "experiments": {
       "typedRoutes": true
@@ -8,7 +8,7 @@
     "slug": "repzero_app-1",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/logo.png",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
@@ -24,13 +24,20 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.bibikowolf.repzero_app1"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "5962a81f-d838-4e67-812a-f2b98193b4d0"
+      }
+    }
   }
 }

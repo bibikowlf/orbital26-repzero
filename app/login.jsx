@@ -51,6 +51,7 @@ const Login = () => {
           onChangeText={(text) => setEmail(text)}
           value={email}
           placeholder="email@address.com"
+          placeholderTextColor='#666'
           autoCapitalize="none"
           style={styles.input}
         />
@@ -62,6 +63,7 @@ const Login = () => {
           value={password}
           secureTextEntry={true}
           placeholder="Password"
+          placeholderTextColor='#666'
           autoCapitalize="none"
           style={styles.input}
         />
