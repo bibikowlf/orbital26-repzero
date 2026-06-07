@@ -17,7 +17,8 @@ export default function GeneratePlan() {
   const styles = appStyles
 
   useEffect(() => {
-    if (userId) fetchSavedPlan()
+    if (userId) 
+      fetchSavedPlan()
   }, [userId])
 
   async function fetchSavedPlan() {
@@ -31,9 +32,9 @@ export default function GeneratePlan() {
 
       if (error) 
         throw error
-      if (data?.workout_plan) {
+
+      if (data?.workout_plan) 
         setWorkoutPlan(data.workout_plan)
-      }
     } catch (error) {
       console.error("Error loading saved plan:", error)
     } finally {
@@ -55,51 +56,25 @@ export default function GeneratePlan() {
       if (profileError) 
         throw profileError
 
-      const prompt = `
-        You are an elite personal trainer. Create a customized weekly workout split based on these parameters:
-        - Gender: ${profile.gender}, Height: ${profile.height_cm}cm, Weight: ${profile.weight_kg}kg
-        - Sessions per Week: ${profile.gym_frequency}, Session Length: ${profile.time_per_session} mins
-        - Experience: ${profile.gym_exp || 'Not specified'}, Goals/Notes: ${profile.add_info || 'None'}
+      const { data: edgeData, error: edgeError } = await supabase.functions.invoke('generate-workout', {
+        body: { profile: profile },
+    });
 
-        CRITICAL: Return ONLY a valid JSON array matching this exact schema:
-        [
-          {
-            "day": "Monday: Push Day",
-            "exercises": [
-              { "name": "Bench Press", "sets": 4, "reps": "8-10", "notes": "Warm up sets first" }
-            ]
-          }
-        ]
-      `
+    if (edgeError) 
+      throw edgeError;
 
-      const apiKey = process.env.EXPO_PUBLIC_GEMINI_KEY
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: {
-              response_mime_type: "application/json"
-            }
-          })
-        }
-      )
+    const rawJsonString = edgeData?.candidates?.[0]?.content?.parts?.[0]?.text
 
-      const result = await response.json()
-      //console.log("Response status:", response.status)    
-      //console.log("Full result:", JSON.stringify(result)) 
-      if (!response.ok) 
-        throw new Error(result?.error?.message || "Gemini failure")
+    if (!rawJsonString) {
+      throw new Error("Invalid structure data returned from production processor.")
+    }
 
-      const rawJsonString = result?.candidates?.[0]?.content?.parts?.[0]?.text
-      const parsedPlan = JSON.parse(rawJsonString)
+    const parsedPlan = JSON.parse(rawJsonString)
 
-      await savePlanToDatabase(parsedPlan)
-      setWorkoutPlan(parsedPlan)
-      setIsEditing(false)
-      Alert.alert("Success", "Your routine has been generated!")
+    await savePlanToDatabase(parsedPlan)
+    setWorkoutPlan(parsedPlan)
+    setIsEditing(false)
+    Alert.alert("Success", "Your routine has been generated!")
 
     } catch (error) {
       Alert.alert("Generation Failed", error.message)
@@ -115,7 +90,8 @@ export default function GeneratePlan() {
       .update({ workout_plan: planData })
       .eq('id', userId)
 
-    if (error) throw error
+    if (error) 
+      throw error
   }
 
   const handleFieldChange = (dayIndex, exerciseIndex, field, value) => {
@@ -130,8 +106,10 @@ export default function GeneratePlan() {
       await savePlanToDatabase(workoutPlan)
       setIsEditing(false)
       Alert.alert("Saved", "Your modifications have been applied successfully!")
+
     } catch (error) {
       Alert.alert("Error saving edits", error.message)
+
     } finally {
       setLoading(false)
     }
@@ -170,7 +148,7 @@ export default function GeneratePlan() {
         )}
       </View>
 
-      <Spacer />
+      <Spacer/>
 
       {workoutPlan.length > 0 ? (
         workoutPlan.map((dayItem, dayIdx) => (
