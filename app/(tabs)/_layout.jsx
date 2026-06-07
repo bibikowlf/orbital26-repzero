@@ -38,6 +38,17 @@ export default function TabLayout() {
         }}
       />
 
+      {/* Workout Tutorial Tab */}
+      <Tabs.Screen
+        name="workout-tutorial"
+        options={{
+          title: 'Workout Tutorial',
+          tabBarIcon: ({ color }) => (
+            <Ionicons name='barbell' size={24} color={color} /> // change icon
+          ),
+        }}
+      />
+
       {/* Profile (No Tab) */}
       <Tabs.Screen
         name="profile"

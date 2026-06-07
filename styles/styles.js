@@ -171,4 +171,9 @@ export const appStyles = StyleSheet.create({
     fontSize: 16,
     color: '#212529',
   },
+  row: {
+    flexDirection: "row", 
+    alignItems: "center", 
+    marginBottom: 10,
+  },
 })
