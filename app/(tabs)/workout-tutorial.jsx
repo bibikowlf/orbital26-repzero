@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { View, Text, TextInput, FlatList, ActivityIndicator, Button, 
-  TouchableOpacity } from 'react-native'
+import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native'
 import { appStyles } from '../../styles/styles'
 import { supabase } from '../../lib/supabase'
 import Spacer from '../../components/spacer'
