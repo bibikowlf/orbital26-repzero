@@ -3,6 +3,7 @@ import { View, Text, TextInput, FlatList, ActivityIndicator, Button,
   TouchableOpacity } from 'react-native'
 import { appStyles } from '../../styles/styles'
 import { supabase } from '../../lib/supabase'
+import Spacer from '../../components/spacer'
 
 export default function WorkoutTutorial() {
   const [workouts, setWorkouts] = useState([])
@@ -85,32 +86,53 @@ export default function WorkoutTutorial() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10 }]}>
       <TextInput
-        style={styles.input}
+        style={[styles.input, { alignSelf: 'stretch' }]}
         placeholder='Search workouts'
         value={searchQuery}
         onChangeText={handleSearch}
       />
 
+      <Spacer height={10} />
+
       <View style={styles.row}>
         <TextInput
-          style={[styles.input, { flex: 1 }]}
+          style={[styles.input, { flex: 1, marginRight: 10 }]}
           placeholder='Enter new workout'
           value={newWorkout}
           onChangeText={setNewWorkout}
         />
-        <Button
-          title='Add'
+        <TouchableOpacity
+          style={[styles.button,
+            loading && styles.buttonDisabled, 
+            { width: 60 }]}
           onPress={handleAdd}
-        />
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>Add</Text>
+        </TouchableOpacity>
       </View>
 
       <FlatList
         data={filteredWorkouts}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <Text style={styles.title}>{item.name}</Text>
+          <TouchableOpacity
+            style={[styles.actionButton, 
+              loading && styles.buttonDisabled,
+              { backgroundColor: '#fff', 
+                flex: 0, 
+                alignSelf: 'stretch', 
+                borderWidth: 1, 
+                borderColor: '#ced4da', 
+                marginBottom: 8,
+                height: 80 }]}
+            // onPress={}
+            disabled={loading}
+          >
+            <Text style={styles.title}>{item.name}</Text>
+          </TouchableOpacity>
         )}
         ListEmptyComponent={<Text>No workouts found</Text>}
       />
