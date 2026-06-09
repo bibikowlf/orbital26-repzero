@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native'
 import { appStyles } from '../../styles/styles'
 import { supabase } from '../../lib/supabase'
+import { router } from 'expo-router'
 import Spacer from '../../components/spacer'
 
 export default function WorkoutTutorial() {
@@ -127,7 +128,7 @@ export default function WorkoutTutorial() {
                 borderColor: '#ced4da', 
                 marginBottom: 8,
                 height: 80 }]}
-            // onPress={}
+            onPress={() => router.navigate('/' + item.id)}
             disabled={loading}
           >
             <Text style={styles.title}>{item.name}</Text>
