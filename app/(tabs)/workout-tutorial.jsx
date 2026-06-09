@@ -54,6 +54,11 @@ export default function WorkoutTutorial() {
 
   const handleAdd = async () => {
     if (!newWorkout.trim()) return
+    const lower = newWorkout.toLowerCase()
+    if (workouts.some(item => item.name.toLowerCase() === lower)) {
+      Alert.alert('Workout already exists')
+      return
+    }
 
     try {
       setLoading(true)
