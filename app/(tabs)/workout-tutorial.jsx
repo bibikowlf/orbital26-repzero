@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native'
+import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity, Alert } from 'react-native'
 import { appStyles } from '../../styles/styles'
 import { supabase } from '../../lib/supabase'
 import { router } from 'expo-router'
@@ -34,7 +34,7 @@ export default function WorkoutTutorial() {
       }
     } catch (error) {
       if (error instanceof Error) {
-        Alertalert(error.message)
+        Alert.alert(error.message)
       }
     } finally {
       setLoading(false)
@@ -128,7 +128,7 @@ export default function WorkoutTutorial() {
                 borderColor: '#ced4da', 
                 marginBottom: 8,
                 height: 80 }]}
-            onPress={() => router.navigate('/' + item.id)}
+            onPress={() => router.navigate({ pathname: `/${item.id}`, params: {name: item.name}})}
             disabled={loading}
           >
             <Text style={styles.title}>{item.name}</Text>
