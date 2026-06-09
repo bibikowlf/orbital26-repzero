@@ -27,7 +27,6 @@ export default function WorkoutTutorial() {
       if (error) {
         throw error
       }
-
       if (data) {
         setWorkouts(data)
         setFilteredWorkouts(data)
@@ -59,14 +58,18 @@ export default function WorkoutTutorial() {
     try {
       setLoading(true)
 
-      let { data, error } = await supabase
+      const { data, error } = await supabase
         .from('workouts')
         .insert({ name: newWorkout })
         .select()
-      const updated = [...workouts, data[0]]
-      setWorkouts(updated)
-      setFilteredWorkouts(updated)
-      console.log(updated)
+      if (error) {
+        throw error
+      }
+      if (data) {
+        const updated = [...workouts, data[0]]
+        setWorkouts(updated)
+        setFilteredWorkouts(updated)
+      }
     } catch (error) {
       if (error instanceof Error) {
         Alert.alert(error.message)
