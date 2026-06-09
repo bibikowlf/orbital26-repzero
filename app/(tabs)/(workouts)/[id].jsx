@@ -15,6 +15,7 @@ export default function WorkoutTutorials() {
   const [votes, setVotes] = useState([])
   const [newTutorial, setNewTutorial] = useState('')
   const [loading, setLoading] = useState(false)
+  const [voted, setVoted] = useState(new Set())
 
   useEffect(() => {
     fetchTutorials()
@@ -55,6 +56,7 @@ export default function WorkoutTutorials() {
       if (error) throw error
       if (data) {
         setVotes(data)
+        setVoted(new Set(votes.map(item => item.comment_id)))
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -94,28 +96,43 @@ export default function WorkoutTutorials() {
     }
   }
 
-  const handleVote = async ({ commentId, vote }) => {
-    if (votes.some(item => item.comment_id === commentId)) {
-      Alert.alert('Already voted')
-      return
-    }
-
+  const handleVote = async ({ commentId }) => { // handle already voted comments too (delete vote)
     try {
       setLoading(true)
-
-      const { data, error } = await supabase
-        .from('workout_tutorial_votes')
-        .insert({
-          comment_id: commentId,
-          user_id: userId,
-          vote: vote
-        })
-        .select()
-      if (error) throw error
-      if (data) {
-        setVotes([...votes, data])
+      
+      if (voted.has(commentId)) {
+        const prevVote = votes.find(item => item.comment_id === commentId)
+        const { error } = await supabase
+          .from('workout_tutorial_votes')
+          .delete()
+          .eq('id', prevVote.id)
+        if (error) throw error
+        setVotes(prevItems => prevItems.filter(item => item.id === prevVote.id))
         setTutorials(prevItems => prevItems.map(
-          item => item.id === commentId ? { ...item, score: item.score+vote} : item))
+          item => item.id === commentId ? { ...item, score: item.score-1} : item))
+        setVoted(prevItem => {
+          prevItem.delete(commentId)
+          return prevItem
+        })
+      } else {
+        const { data, error } = await supabase
+          .from('workout_tutorial_votes')
+          .insert({
+            comment_id: commentId,
+            user_id: userId,
+            vote: 1
+          })
+          .select()
+        if (error) throw error
+        if (data) {
+          setVotes([...votes, data])
+          setTutorials(prevItems => prevItems.map(
+            item => item.id === commentId ? { ...item, score: item.score+1} : item))
+          setVoted(prevItem => {
+            prevItem.add(commentId)
+            return prevItem
+          })
+        }
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -172,9 +189,10 @@ export default function WorkoutTutorials() {
             <TouchableOpacity
               style={[styles.actionButton, 
                 loading && styles.buttonDisabled,
+                voted.has(item.id) && styles.buttonDisabled,
                 { backgroundColor: '#f89292',
                   alignSelf: 'stretch'}]}
-              onPress={() => handleVote({ commentId: item.id, vote: 1 })}
+              onPress={() => handleVote({ commentId: item.id })}
               disabled={loading}>
               <Text>Upvote</Text>
             </TouchableOpacity>
