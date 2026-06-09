@@ -12,11 +12,13 @@ export default function WorkoutTutorials() {
   const { id, name } = useLocalSearchParams()
   const styles = appStyles
   const [tutorials, setTutorials] = useState([])
+  const [votes, setVotes] = useState([])
   const [newTutorial, setNewTutorial] = useState('')
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     fetchTutorials()
+    fetchVotes()
   }, [id])
 
   const fetchTutorials = async () => {
@@ -42,6 +44,27 @@ export default function WorkoutTutorials() {
     }
   }
 
+  const fetchVotes = async () => {
+    try {
+      setLoading(true)
+
+      const { data, error } = await supabase
+        .from('workout_tutorial_votes')
+        .select('*')
+        .eq('user_id', userId)
+      if (error) throw error
+      if (data) {
+        setVotes(data)
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        Alert.alert(error.message)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleAdd = async () => {
     if (!newTutorial.trim()) return
 
@@ -56,11 +79,9 @@ export default function WorkoutTutorials() {
           workout_id: id
         })
         .select()
-      if (error) {
-        throw error
-      }
+      if (error) throw error
       if (data) {
-        const updated = [...tutorials, {...data[0], votes: 0}]
+        const updated = [...tutorials, {...data[0], score: 0}]
         setTutorials(updated)
       }
     } catch (error) {
@@ -69,6 +90,38 @@ export default function WorkoutTutorials() {
       }
     } finally {
       setNewTutorial('')
+      setLoading(false)
+    }
+  }
+
+  const handleVote = async ({ commentId, vote }) => {
+    if (votes.some(item => item.comment_id === commentId)) {
+      Alert.alert('Already voted')
+      return
+    }
+
+    try {
+      setLoading(true)
+
+      const { data, error } = await supabase
+        .from('workout_tutorial_votes')
+        .insert({
+          comment_id: commentId,
+          user_id: userId,
+          vote: vote
+        })
+        .select()
+      if (error) throw error
+      if (data) {
+        setVotes([...votes, data])
+        setTutorials(prevItems => prevItems.map(
+          item => item.id === commentId ? { ...item, score: item.score+vote} : item))
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        Alert.alert(error.message)
+      }
+    } finally {
       setLoading(false)
     }
   }
@@ -112,10 +165,19 @@ export default function WorkoutTutorials() {
               alignSelf: 'stretch', 
               borderWidth: 1, 
               borderColor: '#ced4da', 
-              marginBottom: 8,
-              height: 80 }}
+              marginBottom: 8}}
           >
-            <Text style={styles.title}>{item.content}</Text>
+            <Text>{item.content}</Text>
+            <Text>{item.score}</Text>
+            <TouchableOpacity
+              style={[styles.actionButton, 
+                loading && styles.buttonDisabled,
+                { backgroundColor: '#f89292',
+                  alignSelf: 'stretch'}]}
+              onPress={() => handleVote({ commentId: item.id, vote: 1 })}
+              disabled={loading}>
+              <Text>Upvote</Text>
+            </TouchableOpacity>
           </View>
         )}
         ListEmptyComponent={<Text>No tutorials found</Text>}
