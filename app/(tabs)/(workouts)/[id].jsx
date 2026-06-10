@@ -4,6 +4,7 @@ import { appStyles } from '../../../styles/styles'
 import { supabase } from '../../../lib/supabase'
 import { useLocalSearchParams, Stack, router, useFocusEffect } from 'expo-router'
 import { useAuthContext } from '../../../hooks/auth-context'
+import Entypo from '@expo/vector-icons/Entypo'
 
 export default function WorkoutTutorials() {
   const { claims } = useAuthContext()
@@ -177,37 +178,33 @@ export default function WorkoutTutorials() {
               borderColor: '#ced4da', 
               marginBottom: 8}}
           >
-            <Text>{item.content}</Text>
-            <Text>{item.score}</Text>
-            {item.user_id === userId && (
+            <Text style={[{ padding: 12, fontSize: 16 }]}>{item.content}</Text>
+            <View style={styles.row}>
+              <Text style={{ paddingLeft: 12, paddingRight: 4 }}>{item.score}</Text>
               <TouchableOpacity
-                style={[styles.actionButton,
-                  { backgroundColor: '#f89292',
-                    alignSelf: 'stretch'}]}
-                onPress={() => router.navigate({
-                  pathname: 'edit-tutorial', 
-                  params: {
-                    id: item.id,
-                    content: item.content,
-                    workoutId: id,
-                    workoutName: name}})}
+                style={{  }}
+                onPress={() => handleVote({ commentId: item.id })}
                 disabled={loading}>
-                <Text>Edit</Text>
+                <Entypo name='arrow-bold-up' size={16} color={voted.has(item.id) ? '#2e2c2c48' : '#000000'} />
               </TouchableOpacity>
-            )}
-            <TouchableOpacity
-              style={[styles.actionButton, 
-                loading && styles.buttonDisabled,
-                voted.has(item.id) && styles.buttonDisabled,
-                { backgroundColor: '#f89292',
-                  alignSelf: 'stretch'}]}
-              onPress={() => handleVote({ commentId: item.id })}
-              disabled={loading}>
-              <Text>Upvote</Text>
-            </TouchableOpacity>
+              {item.user_id === userId && (
+                <TouchableOpacity
+                  style={{ marginLeft: 'auto', paddingRight: 12 }}
+                  onPress={() => router.navigate({
+                    pathname: 'edit-tutorial', 
+                    params: {
+                      id: item.id,
+                      content: item.content,
+                      workoutId: id,
+                      workoutName: name}})}
+                  disabled={loading}>
+                  <Entypo name='edit' size={16} />
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
         )}
-        ListEmptyComponent={<Text>No tutorials found</Text>}
+        ListEmptyComponent={<Text style={{ fontSize: 16, padding: 12, alignSelf: 'center' }}>Add your tutorial!</Text>}
       />
     </View>
   )

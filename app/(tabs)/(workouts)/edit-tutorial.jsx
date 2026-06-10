@@ -72,7 +72,10 @@ export default function EditTutorial() {
       <TextInput
         value={tutorial}
         onChangeText={(text) => setTutorial(text)}
-        autoCapitalize="none"
+        autoCapitalize='none'
+        multiline={true}
+        textAlignVertical='top'
+        numberOfLines={10}
         style={styles.input}
       />
       <TouchableOpacity
