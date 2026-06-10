@@ -18,45 +18,31 @@ export default function WorkoutTutorials() {
   const [voted, setVoted] = useState(new Set())
 
   useEffect(() => {
-    fetchTutorials()
-    fetchVotes()
+    fetchData()
   }, [id])
 
-  const fetchTutorials = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true)
 
-      const { data, error } = await supabase
-        .from('workout_tutorials_with_votes')
-        .select('*')
-        .eq('workout_id', id)
-      if (error) {
-        throw error
+      const [tutorialsResponse, votesResponse] = await Promise.all([
+        supabase
+          .from('workout_tutorials_with_votes')
+          .select('*')
+          .eq('workout_id', id),
+        supabase
+          .from('workout_tutorial_votes')
+          .select('*')
+          .eq('user_id', userId)])
+      if (tutorialsResponse.error) throw tutorialsResponse.error
+      if (votesResponse.error) throw votesResponse.error
+      if (tutorialsResponse.data) {
+        const sortedData = [...tutorialsResponse.data].sort((a, b) => b.score - a.score)
+        setTutorials(sortedData)
       }
-      if (data) {
-        setTutorials(data)
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert(error.message)
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const fetchVotes = async () => {
-    try {
-      setLoading(true)
-
-      const { data, error } = await supabase
-        .from('workout_tutorial_votes')
-        .select('*')
-        .eq('user_id', userId)
-      if (error) throw error
-      if (data) {
-        setVotes(data)
-        setVoted(new Set(votes.map(item => item.comment_id)))
+      if (votesResponse.data) {
+        setVotes(votesResponse.data)
+        setVoted(new Set(votesResponse.data.map(item => item.comment_id)))
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -96,7 +82,7 @@ export default function WorkoutTutorials() {
     }
   }
 
-  const handleVote = async ({ commentId }) => { // handle already voted comments too (delete vote)
+  const handleVote = async ({ commentId }) => {
     try {
       setLoading(true)
       
@@ -107,12 +93,15 @@ export default function WorkoutTutorials() {
           .delete()
           .eq('id', prevVote.id)
         if (error) throw error
-        setVotes(prevItems => prevItems.filter(item => item.id === prevVote.id))
-        setTutorials(prevItems => prevItems.map(
-          item => item.id === commentId ? { ...item, score: item.score-1} : item))
+        setVotes(prevItems => prevItems.filter(item => item.id !== prevVote.id))
+        setTutorials(prevItems => {
+          const newItems = prevItems.map(item => item.id === commentId ? { ...item, score: item.score-1} : item)
+          return newItems.sort((a, b) => b.score - a.score)
+        })
         setVoted(prevItem => {
-          prevItem.delete(commentId)
-          return prevItem
+          const newItem = new Set(prevItem)
+          newItem.delete(commentId)
+          return newItem
         })
       } else {
         const { data, error } = await supabase
@@ -125,12 +114,15 @@ export default function WorkoutTutorials() {
           .select()
         if (error) throw error
         if (data) {
-          setVotes([...votes, data])
-          setTutorials(prevItems => prevItems.map(
-            item => item.id === commentId ? { ...item, score: item.score+1} : item))
+          setVotes([...votes, data[0]])
+          setTutorials(prevItems => {
+            const newItems = prevItems.map(item => item.id === commentId ? { ...item, score: item.score+1} : item)
+            return newItems.sort((a, b) => b.score - a.score)
+          })
           setVoted(prevItem => {
-            prevItem.add(commentId)
-            return prevItem
+            const newItem = new Set(prevItem)
+            newItem.add(commentId)
+            return newItem
           })
         }
       }
@@ -174,7 +166,7 @@ export default function WorkoutTutorials() {
 
       <FlatList
         data={tutorials}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View
             style={{ backgroundColor: '#fff', 
