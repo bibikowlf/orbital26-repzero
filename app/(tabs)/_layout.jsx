@@ -61,9 +61,15 @@ export default function TabLayout() {
         options={{ title: 'Change Password', href: null }}
       />
 
-      {/* Workout Tutorial Comments (No Tab) */}
+      {/* Workout Tutorials (No Tab) */}
       <Tabs.Screen
         name="(workouts)/[id]"
+        options={{ href: null }}
+      />
+
+      {/* Edit Workout Tutorial (No Tab) */}
+      <Tabs.Screen
+        name="(workouts)/edit-tutorial"
         options={{ href: null }}
       />
     </Tabs>

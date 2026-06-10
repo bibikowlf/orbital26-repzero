@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity, Alert } from 'react-native'
 import { appStyles } from '../../../styles/styles'
 import { supabase } from '../../../lib/supabase'
-import { useLocalSearchParams, Stack } from 'expo-router'
+import { useLocalSearchParams, Stack, router, useFocusEffect } from 'expo-router'
 import { useAuthContext } from '../../../hooks/auth-context'
-import Spacer from '../../../components/spacer'
 
 export default function WorkoutTutorials() {
   const { claims } = useAuthContext()
@@ -17,9 +16,11 @@ export default function WorkoutTutorials() {
   const [loading, setLoading] = useState(false)
   const [voted, setVoted] = useState(new Set())
 
-  useEffect(() => {
-    fetchData()
-  }, [id])
+  useFocusEffect(
+    useCallback(() => {
+      fetchData()
+    }, [id, userId])
+  )
 
   const fetchData = async () => {
     try {
@@ -178,6 +179,22 @@ export default function WorkoutTutorials() {
           >
             <Text>{item.content}</Text>
             <Text>{item.score}</Text>
+            {item.user_id === userId && (
+              <TouchableOpacity
+                style={[styles.actionButton,
+                  { backgroundColor: '#f89292',
+                    alignSelf: 'stretch'}]}
+                onPress={() => router.navigate({
+                  pathname: 'edit-tutorial', 
+                  params: {
+                    id: item.id,
+                    content: item.content,
+                    workoutId: id,
+                    workoutName: name}})}
+                disabled={loading}>
+                <Text>Edit</Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
               style={[styles.actionButton, 
                 loading && styles.buttonDisabled,
