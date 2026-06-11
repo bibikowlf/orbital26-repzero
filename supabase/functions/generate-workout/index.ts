@@ -1,5 +1,5 @@
 // @ts-ignore
-import "@supabase/functions-js/edge-runtime.d.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -60,10 +60,12 @@ export default {
         throw new Error(result?.error?.message || "Gemini failure")
       }
 
-      return new Response(
-        JSON.stringify(result),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+      const rawJsonString = result?.candidates?.[0]?.content?.parts?.[0]?.text
+    
+      return new Response(rawJsonString, {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      })
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
