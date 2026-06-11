@@ -40,13 +40,17 @@ export default function WorkoutTutorial() {
     }
   }
 
+  const cleanString = (s) => {
+    return s.toLowerCase().replace(/[^a-z]/g, '')
+  }
+
   const handleSearch = (query) => {
     setSearchQuery(query)
     if (query.trim() === '') {
       setFilteredWorkouts(workouts)
     } else {
       const filtered = workouts.filter((workout) =>
-        workout.name.toLowerCase().includes(query.toLowerCase())
+        cleanString(workout.name).includes(cleanString(query))
       )
       setFilteredWorkouts(filtered)
     }
@@ -54,8 +58,8 @@ export default function WorkoutTutorial() {
 
   const handleAdd = async () => {
     if (!newWorkout.trim()) return
-    const lower = newWorkout.toLowerCase()
-    if (workouts.some(item => item.name.toLowerCase() === lower)) {
+    const cleaned = cleanString(newWorkout)
+    if (workouts.some(item => cleanString(item.name) === cleaned)) {
       Alert.alert('Workout already exists')
       return
     }
