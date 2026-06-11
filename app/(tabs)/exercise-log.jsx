@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react'
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, StyleSheet } from 'react-native'
 import { supabase } from '../../lib/supabase'
 import { useAuthContext } from '../../hooks/auth-context'
+import { appStyles } from '../../styles/styles'
 
 export default function ExerciseLog() {
   const { claims } = useAuthContext()
   const userId = claims?.sub
+  const styles = appStyles
 
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split('T')[0]  // defaults to today (YYYY-MM-DD)
@@ -72,69 +74,62 @@ export default function ExerciseLog() {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Exercise Log</Text>
-      <Text style={styles.date}>{selectedDate}</Text>
+    <ScrollView
+        style={{ flex: 1, backgroundColor: '#fff' }}
+        contentContainerStyle={{ padding: 16 }}
+    >   
+      <Text style={styles.logTitle}>Exercise Log</Text>
+      <Text style={styles.logDate}>{selectedDate}</Text>
 
       {exercises.map((ex, idx) => (
         <View key={idx} style={styles.exerciseCard}>
           <TextInput
-            style={styles.input}
+            style={styles.logInput}
             placeholder="Exercise name"
+            placeholderTextColor="#888"
             value={ex.name}
             onChangeText={(val) => updateExercise(idx, 'name', val)}
           />
           
-          <View style={styles.row}>
+          <View style={styles.inputRow}>
 
-            <TextInput style={[styles.input, styles.small]} placeholder="Sets"
+            <TextInput style={[styles.logInput, styles.smallInput]} placeholder="Sets"
               value={ex.sets} keyboardType="numeric"
+              placeholderTextColor="#888"
               onChangeText={(val) => updateExercise(idx, 'sets', val)} />
 
-            <TextInput style={[styles.input, styles.small]} placeholder="Reps"
+            <TextInput style={[styles.logInput, styles.smallInput]} placeholder="Reps"
               value={ex.reps}
+              placeholderTextColor="#888"
               onChangeText={(val) => updateExercise(idx, 'reps', val)} />
 
-            <TextInput style={[styles.input, styles.small]} placeholder="kg"
+            <TextInput style={[styles.logInput, styles.smallInput]} placeholder="kg"
               value={ex.weight_kg} keyboardType="numeric"
+              placeholderTextColor="#888"
               onChangeText={(val) => updateExercise(idx, 'weight_kg', val)} />
           </View>
           <TouchableOpacity onPress={() => removeExercise(idx)}>
-            <Text style={styles.remove}>Remove</Text>
+            <Text style={styles.removeText}>Remove</Text>
           </TouchableOpacity>
         </View>
       ))}
 
-      <TouchableOpacity style={styles.addButton} onPress={addExercise}>
-        <Text style={styles.addButtonText}>+ Add Exercise</Text>
+      <TouchableOpacity style={styles.addExerciseButton} onPress={addExercise}>
+        <Text style={styles.addExerciseText}>+ Add Exercise</Text>
       </TouchableOpacity>
 
       <TextInput
-        style={[styles.input, { marginTop: 12 }]}
+        style={[styles.logInput, { marginTop: 12 }]}
         placeholder="Notes (optional)"
+        placeholderTextColor="#888"
         value={notes}
         onChangeText={setNotes}
         multiline
       />
 
-      <TouchableOpacity style={styles.saveButton} onPress={saveLog} disabled={saving}>
-        <Text style={styles.saveButtonText}>{saving ? 'Saving...' : 'Save Log'}</Text>
+      <TouchableOpacity style={styles.saveLogButton} onPress={saveLog} disabled={saving}>
+        <Text style={styles.saveLogText}>{saving ? 'Saving...' : 'Save Log'}</Text>
       </TouchableOpacity>
     </ScrollView>
   )
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: '#fff' },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 4 },
-  date: { fontSize: 14, color: '#666', marginBottom: 16 },
-  exerciseCard: { backgroundColor: '#f8f9fa', borderRadius: 8, padding: 12, marginBottom: 12 },
-  input: { borderWidth: 1, borderColor: '#ced4da', borderRadius: 6, padding: 8, marginBottom: 6, fontSize: 14 },
-  small: { flex: 1, marginHorizontal: 3 },
-  row: { flexDirection: 'row' },
-  remove: { color: 'red', fontSize: 13, marginTop: 4 },
-  addButton: { borderWidth: 1, borderColor: '#007AFF', borderRadius: 8, padding: 12, alignItems: 'center', marginBottom: 12 },
-  addButtonText: { color: '#007AFF', fontWeight: '600' },
-  saveButton: { backgroundColor: '#007AFF', borderRadius: 8, padding: 14, alignItems: 'center', marginBottom: 32 },
-  saveButtonText: { color: '#fff', fontWeight: '700', fontSize: 16 },
-})

@@ -171,4 +171,89 @@ export const appStyles = StyleSheet.create({
     fontSize: 16,
     color: '#212529',
   },
+
+  // Exercise Log screen
+  logContainer: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#fff',
+  },
+  logTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 4,
+    color: '#212529',
+  },
+  logDate: {
+    fontSize: 14,
+    color: '#6c757d',
+    marginBottom: 16,
+  },
+  exerciseCard: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  logInput: {
+    borderWidth: 1,
+    borderColor: '#ced4da',
+    borderRadius: 6,
+    padding: 8,
+    marginBottom: 6,
+    fontSize: 14,
+    color: '#212529',
+    backgroundColor: '#fff',
+  },
+  smallInput: {
+    flex: 1,
+    marginHorizontal: 3,
+  },
+  inputRow: {
+    flexDirection: 'row',
+  },
+  removeText: {
+    color: '#dc3545',
+    fontSize: 13,
+    marginTop: 4,
+  },
+  addExerciseButton: {
+    borderWidth: 1,
+    borderColor: '#007AFF',
+    borderRadius: 8,
+    padding: 12,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  addExerciseText: {
+    color: '#007AFF',
+    fontWeight: '600',
+  },
+  saveLogButton: {
+    backgroundColor: '#007AFF',
+    borderRadius: 8,
+    padding: 14,
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  saveLogText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 16,
+  },
+  /*
+ container: { flex: 1, padding: 16, backgroundColor: '#fff' },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 4 },
+  date: { fontSize: 14, color: '#666', marginBottom: 16 },
+  exerciseCard: { backgroundColor: '#7b9ec1', borderRadius: 8, padding: 12, marginBottom: 12 },
+  input: { borderWidth: 1, borderColor: '#ced4da', borderRadius: 6, padding: 8, marginBottom: 6, fontSize: 14 },
+  small: { flex: 1, marginHorizontal: 3 },
+  row: { flexDirection: 'row' },
+  remove: { color: 'red', fontSize: 13, marginTop: 4 },
+  addButton: { borderWidth: 1, borderColor: '#007AFF', borderRadius: 8, padding: 12, alignItems: 'center', marginBottom: 12 },
+  addButtonText: { color: '#007AFF', fontWeight: '600' },
+  saveButton: { backgroundColor: '#007AFF', borderRadius: 8, padding: 14, alignItems: 'center', marginBottom: 32 },
+  saveButtonText: { color: '#fff', fontWeight: '700', fontSize: 16 },*/
 })
