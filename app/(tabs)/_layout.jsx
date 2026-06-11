@@ -38,6 +38,18 @@ export default function TabLayout() {
         }}
       />
 
+      {/* Exercise Log Tab */}
+      <Tabs.Screen
+        name="exercise-log"
+        options={{
+          title: 'Exercise Log',
+          tabBarIcon: ({ color }) => (
+            <Ionicons name='journal' size={24} color={color} />
+          ),
+        }}
+      />
+
+
       {/* Profile (No Tab) */}
       <Tabs.Screen
         name="profile"

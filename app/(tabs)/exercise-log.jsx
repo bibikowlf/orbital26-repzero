@@ -4,6 +4,37 @@ import { supabase } from '../../lib/supabase'
 import { useAuthContext } from '../../hooks/auth-context'
 import { appStyles } from '../../styles/styles'
 
+// helper function to get all days for the current week, week starts on monday
+function getCurrentWeekDays() {
+  const current = new Date()
+  const dayOfWeek = current.getDay() 
+  
+  const distanceToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek
+  
+  const monday = new Date(current)
+  monday.setDate(current.getDate() + distanceToMonday)
+
+  const days = []
+  const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+
+  for (let i = 0; i < 7; i++) {
+    const nextDay = new Date(monday)
+    nextDay.setDate(monday.getDate() + i)
+    
+    const yyyy = nextDay.getFullYear()
+    const mm = String(nextDay.getMonth() + 1).padStart(2, '0')
+    const dd = String(nextDay.getDate()).padStart(2, '0')
+    const dateString = `${yyyy}-${mm}-${dd}`
+
+    days.push({
+      dateString,
+      dayNum: nextDay.getDate(),
+      label: dayLabels[i]
+    })
+  }
+  return days
+}
+
 export default function ExerciseLog() {
   const { claims } = useAuthContext()
   const userId = claims?.sub
@@ -15,6 +46,8 @@ export default function ExerciseLog() {
   const [exercises, setExercises] = useState([])
   const [notes, setNotes] = useState('')
   const [saving, setSaving] = useState(false)
+
+  const weekDays = getCurrentWeekDays()
 
   useEffect(() => {
     if (userId) fetchLog(selectedDate)
@@ -79,7 +112,29 @@ export default function ExerciseLog() {
         contentContainerStyle={{ padding: 16 }}
     >   
       <Text style={styles.logTitle}>Exercise Log</Text>
-      <Text style={styles.logDate}>{selectedDate}</Text>
+      {/*<Text style={styles.logDate}>{selectedDate}</Text>*/}
+
+      <View style={styles.calendarStrip}>
+        {weekDays.map((day) => {
+          const isSelected = day.dateString === selectedDate
+          return (
+            <TouchableOpacity
+              key={day.dateString}
+              style={[styles.calendarCard, isSelected && styles.selectedCard]}
+              onPress={() => setSelectedDate(day.dateString)}
+            >
+              <Text style={[styles.calendarLabel, isSelected && styles.selectedText]}>
+                {day.label}
+              </Text>
+              <Text style={[styles.calendarDayNum, isSelected && styles.selectedText]}>
+                {day.dayNum}
+              </Text>
+            </TouchableOpacity>
+          )
+        })}
+      </View>
+
+      <Text style={styles.date}>Active Date: {selectedDate}</Text>
 
       {exercises.map((ex, idx) => (
         <View key={idx} style={styles.exerciseCard}>

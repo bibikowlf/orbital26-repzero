@@ -243,6 +243,49 @@ export const appStyles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 16,
   },
+
+  // calender in exercise log
+  calendarStrip: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center',
+    width: '100%',
+    marginVertical: 14,
+    backgroundColor: '#f1f3f5',
+    padding: 8,
+    borderRadius: 12
+  },
+  calendarCard: { 
+    flex: 1, 
+    alignItems: 'center', 
+    paddingVertical: 10, 
+    justifyContent: 'center',
+    borderRadius: 8,
+    marginHorizontal: 2,
+    minHeight: 50
+  },
+  selectedCard: { 
+    backgroundColor: '#007AFF',
+    shadowColor: '#007AFF',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  calendarLabel: { 
+    fontSize: 11, 
+    color: '#6c757d', 
+    fontWeight: '600', 
+    marginBottom: 4 
+  },
+  calendarDayNum: { 
+    fontSize: 15, 
+    fontWeight: '700', 
+    color: '#212529' 
+  },
+  selectedText: { 
+    color: '#fff' 
+  },
   /*
  container: { flex: 1, padding: 16, backgroundColor: '#fff' },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 4 },
