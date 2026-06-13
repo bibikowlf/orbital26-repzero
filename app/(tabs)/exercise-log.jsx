@@ -64,6 +64,10 @@ export default function ExerciseLog() {
     if (userId) fetchLog(selectedDate)
   }, [userId, selectedDate])
 
+  useEffect(() => {
+    if (userId) fetchWorkoutPlan()
+  }, [userId])
+
   async function fetchLog(date) {
     const { data, error } = await supabase
       .from('workout_logs')
