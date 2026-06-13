@@ -55,6 +55,8 @@ export default function ExerciseLog() {
   const [isEditing, setIsEditing] = useState(true)
   const [hasExistingLog, setHasExistingLog] = useState(false)
 
+  const [durationMinutes, setDurationMinutes] = useState('')
+
   const weekDays = getCurrentWeekDays()
 
   const selectedDay = weekDays.find(d => d.dateString === selectedDate)?.fullName
@@ -81,11 +83,13 @@ export default function ExerciseLog() {
     if (data) {
       setExercises(data.exercises || [])
       setNotes(data.notes || '')
+      setDurationMinutes(String(data.duration_minutes || ''))
       setHasExistingLog(true)
       setIsEditing(false)
     } else {
       setExercises([])
       setNotes('')
+      setDurationMinutes('')
       setHasExistingLog(false)
       setIsEditing(true)
     }
@@ -157,8 +161,9 @@ export default function ExerciseLog() {
         .upsert({
           user_id: userId,
           log_date: selectedDate,
-          exercises,
-          notes
+          exercises: exercises.filter(ex => ex.name.trim() !== ''),
+          notes, 
+          duration_minutes: durationMinutes ? parseInt(durationMinutes) : null
         }, { onConflict: 'user_id,log_date' })
 
       if (error) 
@@ -281,6 +286,16 @@ export default function ExerciseLog() {
 
         <TextInput
           style={[styles.logInput, { marginTop: 12 }]}
+          placeholder="Total minutes spent at gym today"
+          placeholderTextColor="#888"
+          value={durationMinutes}
+          onChangeText={setDurationMinutes}
+          keyboardType="numeric"
+        />
+
+
+        <TextInput
+          style={[styles.logInput, { marginTop: 12 }]}
           placeholder="Notes (optional)"
           placeholderTextColor="#888"
           value={notes}
@@ -293,6 +308,13 @@ export default function ExerciseLog() {
         </TouchableOpacity>
       </>
       )}
+
+      {!isEditing && durationMinutes ? (
+        <View style={appStyles.notesDisplay, { marginTop: 12 }}>
+          <Text style={appStyles.notesLabel}>Minutes spent today</Text>
+          <Text style={appStyles.notesText}>{durationMinutes} minutes</Text>
+        </View>
+      ) : null}
 
       {!isEditing && notes ? (
         <View style={appStyles.notesDisplay}>
