@@ -286,6 +286,105 @@ export const appStyles = StyleSheet.create({
   selectedText: { 
     color: '#fff' 
   },
+
+  //import button in exercise log
+  importButton: {
+    borderWidth: 1,
+    borderColor: '#5856D6',
+    borderRadius: 8,
+    padding: 10,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  importButtonText: {
+    color: '#5856D6',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContainer: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    maxHeight: '80%',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  modalSubtitle: {
+    fontSize: 13,
+    color: '#666',
+    marginBottom: 16,
+  },
+  planDayCard: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  planDayTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  planDayMeta: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 6,
+  },
+  planExerciseItem: {
+    fontSize: 13,
+    color: '#495057',
+    marginBottom: 3,
+  },
+  importConfirmButton: {
+    marginTop: 12,
+    backgroundColor: '#5856D6',
+    borderRadius: 8,
+    padding: 12,
+    alignItems: 'center',
+  },
+  importConfirmText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  emptyState: {
+    padding: 24,
+    alignItems: 'center',
+  },
+  emptyStateText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  emptyStateSubtext: {
+    fontSize: 13,
+    color: '#888',
+    textAlign: 'center',
+  },
+  cancelButton: {
+    marginTop: 8,
+    padding: 14,
+    borderRadius: 8,
+    backgroundColor: '#f1f3f5',
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    color: '#333',
+    fontWeight: '600',
+  },
   /*
  container: { flex: 1, padding: 16, backgroundColor: '#fff' },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 4 },

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, StyleSheet } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, StyleSheet, Modal} from 'react-native'
 import { supabase } from '../../lib/supabase'
 import { useAuthContext } from '../../hooks/auth-context'
 import { appStyles } from '../../styles/styles'
@@ -16,7 +16,8 @@ function getCurrentWeekDays() {
 
   const days = []
   const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-
+  const fullDayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+  
   for (let i = 0; i < 7; i++) {
     const nextDay = new Date(monday)
     nextDay.setDate(monday.getDate() + i)
@@ -29,7 +30,8 @@ function getCurrentWeekDays() {
     days.push({
       dateString,
       dayNum: nextDay.getDate(),
-      label: dayLabels[i]
+      label: dayLabels[i],
+      fullName: fullDayNames[i]
     })
   }
   return days
@@ -47,7 +49,16 @@ export default function ExerciseLog() {
   const [notes, setNotes] = useState('')
   const [saving, setSaving] = useState(false)
 
+  const [workoutPlan, setWorkoutPlan] = useState([])
+  const [showImport, setshowImport] = useState(false)
+
   const weekDays = getCurrentWeekDays()
+
+  const selectedDay = weekDays.find(d => d.dateString === selectedDate)?.fullName
+
+  const matchingPlanDay = workoutPlan.find(
+    (planDay) => planDay.day?.toLowerCase().includes(selectedDay?.toLowerCase())
+  )
 
   useEffect(() => {
     if (userId) fetchLog(selectedDate)
@@ -68,6 +79,49 @@ export default function ExerciseLog() {
       setExercises([])
       setNotes('')
     }
+  }
+
+  async function fetchWorkoutPlan() {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('workout_plan')
+      .eq('id', userId)
+      .single()
+
+    if (data?.workout_plan) 
+      setWorkoutPlan(data.workout_plan)
+  }
+
+  function handleImportPress() {
+    if (!workoutPlan.length) {
+      Alert.alert('No Workout Plan', 'You have not generated a workout plan yet.')
+      return
+    }
+    setshowImport(true)
+  }
+
+  function importDay(dayItem) {
+    const imported = dayItem.exercises.map((ex) => ({
+      name: ex.name,
+      sets: String(ex.sets),
+      reps: ex.reps,
+      weight_kg: ''
+    }))
+
+    Alert.alert(
+      'Import Exercises',
+      `Import ${dayItem.exercises.length} exercises from "${dayItem.day}"? This will replace your current entries.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Import',
+          onPress: () => {
+            setExercises(imported)
+            setshowImport(false)
+          }
+        }
+      ]
+    )
   }
 
   function addExercise() {
@@ -136,6 +190,13 @@ export default function ExerciseLog() {
 
       <Text style={styles.date}>Active Date: {selectedDate}</Text>
 
+      <TouchableOpacity
+        style={appStyles.importButton}
+        onPress={handleImportPress}
+      >
+        <Text style={appStyles.importButtonText}>↓ Import from Workout Plan</Text>
+      </TouchableOpacity>
+
       {exercises.map((ex, idx) => (
         <View key={idx} style={styles.exerciseCard}>
           <TextInput
@@ -185,6 +246,60 @@ export default function ExerciseLog() {
       <TouchableOpacity style={styles.saveLogButton} onPress={saveLog} disabled={saving}>
         <Text style={styles.saveLogText}>{saving ? 'Saving...' : 'Save Log'}</Text>
       </TouchableOpacity>
+
+      <Modal
+        visible={showImport}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setshowImport(false)}
+      >
+        <View style={appStyles.modalOverlay}>
+          <View style={appStyles.modalContainer}>
+            <Text style={appStyles.modalTitle}>Import from Workout Plan</Text>
+            <Text style={appStyles.modalSubtitle}>
+              Showing plan for {selectedDay}
+            </Text>
+
+            {matchingPlanDay ? (
+              // found a matching plan day — show its exercises
+              <View style={appStyles.planDayCard}>
+                <Text style={appStyles.planDayTitle}>{matchingPlanDay.day}</Text>
+                <Text style={appStyles.planDayMeta}>
+                  {matchingPlanDay.exercises?.length} exercises
+                </Text>
+                {matchingPlanDay.exercises?.map((ex, exIdx) => (
+                  <Text key={exIdx} style={appStyles.planExerciseItem}>
+                    • {ex.name} — {ex.sets} sets x {ex.reps} reps
+                  </Text>
+                ))}
+                <TouchableOpacity
+                  style={appStyles.importConfirmButton}
+                  onPress={() => importDay(matchingPlanDay)}
+                >
+                  <Text style={appStyles.importConfirmText}>Import These Exercises</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              // no plan exists for this day
+              <View style={appStyles.emptyState}>
+                <Text style={appStyles.emptyStateText}>
+                  No workout plan exists for {selectedDay}.
+                </Text>
+                <Text style={appStyles.emptyStateSubtext}>
+                  This is a rest day or your plan does not include {selectedDay}.
+                </Text>
+              </View>
+            )}
+
+            <TouchableOpacity
+              style={appStyles.cancelButton}
+              onPress={() => setshowImport(false)}
+            >
+              <Text style={appStyles.cancelButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   )
 }
