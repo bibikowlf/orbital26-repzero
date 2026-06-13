@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react'
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, StyleSheet, Modal} from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, StyleSheet, Modal, offset } from 'react-native'
 import { supabase } from '../../lib/supabase'
 import { useAuthContext } from '../../hooks/auth-context'
 import { appStyles } from '../../styles/styles'
 
 // helper function to get all days for the current week, week starts on monday
-function getCurrentWeekDays() {
+function getCurrentWeekDays(offset = 0) {
   const current = new Date()
   const dayOfWeek = current.getDay() 
   
   const distanceToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek
   
   const monday = new Date(current)
-  monday.setDate(current.getDate() + distanceToMonday)
+  monday.setDate(monday.getDate() + distanceToMonday + (offset * 7))
 
   const days = []
   const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
@@ -47,6 +47,7 @@ export default function ExerciseLog() {
   )
   const [exercises, setExercises] = useState([])
   const [notes, setNotes] = useState('')
+  const [durationMinutes, setDurationMinutes] = useState('')
   const [saving, setSaving] = useState(false)
 
   const [workoutPlan, setWorkoutPlan] = useState([])
@@ -55,9 +56,9 @@ export default function ExerciseLog() {
   const [isEditing, setIsEditing] = useState(true)
   const [hasExistingLog, setHasExistingLog] = useState(false)
 
-  const [durationMinutes, setDurationMinutes] = useState('')
+  const [weekOffset, setWeekOffset] = useState(0)
 
-  const weekDays = getCurrentWeekDays()
+  const weekDays = getCurrentWeekDays(weekOffset)
 
   const selectedDay = weekDays.find(d => d.dateString === selectedDate)?.fullName
   const matchingPlanDay = workoutPlan.find(
@@ -187,7 +188,8 @@ export default function ExerciseLog() {
       {/*<Text style={styles.logDate}>{selectedDate}</Text>*/}
 
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <TouchableOpacity style={appStyles.arrowButton}>
+        <TouchableOpacity style={appStyles.arrowButton}
+          onPress={() => setWeekOffset(weekOffset - 1)}>
           <Text style={appStyles.arrowText}>‹</Text>
         </TouchableOpacity>
 
@@ -211,7 +213,8 @@ export default function ExerciseLog() {
         })}
       </View>
         
-      <TouchableOpacity style={appStyles.arrowButton}>
+      <TouchableOpacity style={appStyles.arrowButton}
+        onPress={() => setWeekOffset(weekOffset + 1)}>
           <Text style={appStyles.arrowText}>›</Text>
         </TouchableOpacity>
       </View>
