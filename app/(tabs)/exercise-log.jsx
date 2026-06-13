@@ -52,10 +52,12 @@ export default function ExerciseLog() {
   const [workoutPlan, setWorkoutPlan] = useState([])
   const [showImport, setshowImport] = useState(false)
 
+  const [isEditing, setIsEditing] = useState(true)
+  const [hasExistingLog, setHasExistingLog] = useState(false)
+
   const weekDays = getCurrentWeekDays()
 
   const selectedDay = weekDays.find(d => d.dateString === selectedDate)?.fullName
-
   const matchingPlanDay = workoutPlan.find(
     (planDay) => planDay.day?.toLowerCase().includes(selectedDay?.toLowerCase())
   )
@@ -79,9 +81,13 @@ export default function ExerciseLog() {
     if (data) {
       setExercises(data.exercises || [])
       setNotes(data.notes || '')
+      setHasExistingLog(true)
+      setIsEditing(false)
     } else {
       setExercises([])
       setNotes('')
+      setHasExistingLog(false)
+      setIsEditing(true)
     }
   }
 
@@ -155,7 +161,10 @@ export default function ExerciseLog() {
           notes
         }, { onConflict: 'user_id,log_date' })
 
-      if (error) throw error
+      if (error) 
+        throw error
+      setHasExistingLog(true)
+      setIsEditing(false)
       Alert.alert('Saved', 'Workout log saved!')
     } catch (error) {
       Alert.alert('Error', error.message)
@@ -194,15 +203,35 @@ export default function ExerciseLog() {
 
       <Text style={styles.date}>Active Date: {selectedDate}</Text>
 
-      <TouchableOpacity
-        style={appStyles.importButton}
-        onPress={handleImportPress}
-      >
-        <Text style={appStyles.importButtonText}>↓ Import from Workout Plan</Text>
-      </TouchableOpacity>
+      {isEditing && (
+        <TouchableOpacity
+          style={appStyles.importButton}
+          onPress={handleImportPress}
+        >
+          <Text style={appStyles.importButtonText}>↓ Import from Workout Plan</Text>
+        </TouchableOpacity>
+      )}
 
-      {exercises.map((ex, idx) => (
+      {hasExistingLog && (
+          <TouchableOpacity
+            style={[appStyles.editButton, { flex: 1, marginTop: 10, marginBottom: 16 }]}
+            onPress={() => setIsEditing(!isEditing)}
+          >
+            <Text style={appStyles.importButtonText}>
+              {isEditing ? 'Cancel Edit' : '✏️ Edit Log'}
+            </Text>
+          </TouchableOpacity>
+        )}
+
+      {exercises.length === 0 && !isEditing ? (
+        <Text style={{ color: '#888', textAlign: 'center', marginTop: 40 }}>
+          No exercises logged for this day.
+        </Text>
+      ) : (
+      exercises.map((ex, idx) => (
         <View key={idx} style={styles.exerciseCard}>
+          {isEditing ? (
+            <>
           <TextInput
             style={styles.logInput}
             placeholder="Exercise name"
@@ -231,25 +260,46 @@ export default function ExerciseLog() {
           <TouchableOpacity onPress={() => removeExercise(idx)}>
             <Text style={styles.removeText}>Remove</Text>
           </TouchableOpacity>
+          </>
+          ):(
+            <View>
+                <Text style={appStyles.viewExerciseName}>{ex.name}</Text>
+                <Text style={appStyles.viewExerciseMeta}>
+                  {ex.sets} sets × {ex.reps} reps{ex.weight_kg ? `  •  ${ex.weight_kg} kg` : ''}
+                </Text>
+              </View>
+            )}
+          </View>
+        ))
+      )}
+
+      {isEditing && (
+      <>
+        <TouchableOpacity style={styles.addExerciseButton} onPress={addExercise}>
+          <Text style={styles.addExerciseText}>+ Add Exercise</Text>
+        </TouchableOpacity>
+
+        <TextInput
+          style={[styles.logInput, { marginTop: 12 }]}
+          placeholder="Notes (optional)"
+          placeholderTextColor="#888"
+          value={notes}
+          onChangeText={setNotes}
+          multiline
+        />
+
+        <TouchableOpacity style={styles.saveLogButton} onPress={saveLog} disabled={saving}>
+          <Text style={styles.saveLogText}>{saving ? 'Saving...' : 'Save Log'}</Text>
+        </TouchableOpacity>
+      </>
+      )}
+
+      {!isEditing && notes ? (
+        <View style={appStyles.notesDisplay}>
+          <Text style={appStyles.notesLabel}>Notes</Text>
+          <Text style={appStyles.notesText}>{notes}</Text>
         </View>
-      ))}
-
-      <TouchableOpacity style={styles.addExerciseButton} onPress={addExercise}>
-        <Text style={styles.addExerciseText}>+ Add Exercise</Text>
-      </TouchableOpacity>
-
-      <TextInput
-        style={[styles.logInput, { marginTop: 12 }]}
-        placeholder="Notes (optional)"
-        placeholderTextColor="#888"
-        value={notes}
-        onChangeText={setNotes}
-        multiline
-      />
-
-      <TouchableOpacity style={styles.saveLogButton} onPress={saveLog} disabled={saving}>
-        <Text style={styles.saveLogText}>{saving ? 'Saving...' : 'Save Log'}</Text>
-      </TouchableOpacity>
+      ) : null}
 
       <Modal
         visible={showImport}
