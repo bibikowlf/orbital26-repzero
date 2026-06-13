@@ -186,6 +186,11 @@ export default function ExerciseLog() {
       <Text style={styles.logTitle}>Exercise Log</Text>
       {/*<Text style={styles.logDate}>{selectedDate}</Text>*/}
 
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <TouchableOpacity style={appStyles.arrowButton}>
+          <Text style={appStyles.arrowText}>‹</Text>
+        </TouchableOpacity>
+
       <View style={styles.calendarStrip}>
         {weekDays.map((day) => {
           const isSelected = day.dateString === selectedDate
@@ -205,8 +210,11 @@ export default function ExerciseLog() {
           )
         })}
       </View>
-
-      <Text style={styles.date}>Active Date: {selectedDate}</Text>
+        
+      <TouchableOpacity style={appStyles.arrowButton}>
+          <Text style={appStyles.arrowText}>›</Text>
+        </TouchableOpacity>
+      </View>
 
       {isEditing && (
         <TouchableOpacity

@@ -249,7 +249,8 @@ export const appStyles = StyleSheet.create({
     flexDirection: 'row', 
     justifyContent: 'space-between', 
     alignItems: 'center',
-    width: '100%',
+    //width: '100%',
+    flex: 1,
     marginVertical: 14,
     backgroundColor: '#f1f3f5',
     padding: 8,
@@ -385,6 +386,18 @@ export const appStyles = StyleSheet.create({
     color: '#333',
     fontWeight: '600',
   },
+
+  //calender arrow
+  arrowButton: {
+  padding: 8,
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+arrowText: {
+  fontSize: 28,
+  color: '#007AFF',
+  fontWeight: '300',
+},
   /*
  container: { flex: 1, padding: 16, backgroundColor: '#fff' },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 4 },
