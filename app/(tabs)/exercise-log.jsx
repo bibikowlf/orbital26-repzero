@@ -4,6 +4,29 @@ import { supabase } from '../../lib/supabase'
 import { useAuthContext } from '../../hooks/auth-context'
 import { appStyles } from '../../styles/styles'
 
+function getWeekRangeLabel(weekDays) {
+  if (!weekDays || weekDays.length === 0) return ''
+  const first = weekDays[0]
+  const last = weekDays[6]
+  const startDate = new Date(first.dateString)
+  const endDate = new Date(last.dateString)
+
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December']
+
+  const startMonth = monthNames[startDate.getMonth()]
+  const endMonth = monthNames[endDate.getMonth()]
+  const year = endDate.getFullYear()
+
+  // if week spans two months
+  if (startMonth !== endMonth) {
+    return `${startMonth} ${startDate.getDate()} – ${endMonth} ${endDate.getDate()}, ${year}`
+  }
+
+  // same month
+  return `${startMonth} ${startDate.getDate()} – ${endDate.getDate()}, ${year}`
+}
+
 // helper function to get all days for the current week, week starts on monday
 function getCurrentWeekDays(offset = 0) {
   const current = new Date()
@@ -184,8 +207,10 @@ export default function ExerciseLog() {
         style={{ flex: 1, backgroundColor: '#fff' }}
         contentContainerStyle={{ padding: 16 }}
     >   
-      <Text style={styles.logTitle}>Exercise Log</Text>
+      {/*<Text style={styles.logTitle}>Exercise Log</Text>*/}
       {/*<Text style={styles.logDate}>{selectedDate}</Text>*/}
+
+      <Text style={styles.logTitle}>{getWeekRangeLabel(weekDays)}</Text>
 
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <TouchableOpacity style={appStyles.arrowButton}
