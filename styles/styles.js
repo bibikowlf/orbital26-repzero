@@ -171,6 +171,254 @@ export const appStyles = StyleSheet.create({
     fontSize: 16,
     color: '#212529',
   },
+
+  // Exercise Log screen
+  logContainer: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#fff',
+  },
+  logTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 4,
+    color: '#212529',
+  },
+  logDate: {
+    fontSize: 14,
+    color: '#6c757d',
+    marginBottom: 16,
+  },
+  exerciseCard: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  logInput: {
+    borderWidth: 1,
+    borderColor: '#ced4da',
+    borderRadius: 6,
+    padding: 8,
+    marginBottom: 6,
+    fontSize: 14,
+    color: '#212529',
+    backgroundColor: '#fff',
+  },
+  smallInput: {
+    flex: 1,
+    marginHorizontal: 3,
+  },
+  inputRow: {
+    flexDirection: 'row',
+  },
+  removeText: {
+    color: '#dc3545',
+    fontSize: 13,
+    marginTop: 4,
+  },
+  addExerciseButton: {
+    borderWidth: 1,
+    borderColor: '#007AFF',
+    borderRadius: 8,
+    padding: 12,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  addExerciseText: {
+    color: '#007AFF',
+    fontWeight: '600',
+  },
+  saveLogButton: {
+    backgroundColor: '#007AFF',
+    borderRadius: 8,
+    padding: 14,
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  saveLogText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 16,
+  },
+
+  // calender in exercise log
+  calendarStrip: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center',
+    //width: '100%',
+    flex: 1,
+    marginVertical: 14,
+    backgroundColor: '#f1f3f5',
+    padding: 8,
+    borderRadius: 12
+  },
+  calendarCard: { 
+    flex: 1, 
+    alignItems: 'center', 
+    paddingVertical: 10, 
+    justifyContent: 'center',
+    borderRadius: 8,
+    marginHorizontal: 2,
+    minHeight: 50
+  },
+  selectedCard: { 
+    backgroundColor: '#007AFF',
+    shadowColor: '#007AFF',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  calendarLabel: { 
+    fontSize: 11, 
+    color: '#6c757d', 
+    fontWeight: '600', 
+    marginBottom: 4 
+  },
+  calendarDayNum: { 
+    fontSize: 15, 
+    fontWeight: '700', 
+    color: '#212529' 
+  },
+  selectedText: { 
+    color: '#fff' 
+  },
+
+  //import button in exercise log
+  importButton: {
+    borderWidth: 1,
+    borderColor: '#5856D6',
+    borderRadius: 8,
+    padding: 10,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  importButtonText: {
+    color: '#5856D6',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContainer: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    maxHeight: '80%',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  modalSubtitle: {
+    fontSize: 13,
+    color: '#666',
+    marginBottom: 16,
+  },
+  planDayCard: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  planDayTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  planDayMeta: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 6,
+  },
+  planExerciseItem: {
+    fontSize: 13,
+    color: '#495057',
+    marginBottom: 3,
+  },
+  importConfirmButton: {
+    marginTop: 12,
+    backgroundColor: '#5856D6',
+    borderRadius: 8,
+    padding: 12,
+    alignItems: 'center',
+  },
+  importConfirmText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  emptyState: {
+    padding: 24,
+    alignItems: 'center',
+  },
+  emptyStateText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  emptyStateSubtext: {
+    fontSize: 13,
+    color: '#888',
+    textAlign: 'center',
+  },
+  cancelButton: {
+    marginTop: 8,
+    padding: 14,
+    borderRadius: 8,
+    backgroundColor: '#f1f3f5',
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    color: '#333',
+    fontWeight: '600',
+  },
+
+  //calender arrow
+  arrowButton: {
+  padding: 8,
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+arrowText: {
+  fontSize: 28,
+  color: '#007AFF',
+  fontWeight: '300',
+},
+
+//month and year toggle
+monthCard: {
+  width: '30%',
+  padding: 12,
+  borderRadius: 8,
+  alignItems: 'center',
+  marginBottom: 10,
+  backgroundColor: '#f1f3f5',
+},
+monthCardSelected: {
+  backgroundColor: '#007AFF',
+},
+monthText: {
+  fontSize: 14,
+  fontWeight: '600',
+  color: '#333',
+},
+monthTextSelected: {
+  color: '#fff',
+},
   row: {
     flexDirection: "row", 
     alignItems: "center", 

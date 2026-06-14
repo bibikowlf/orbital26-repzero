@@ -16,6 +16,32 @@ export default function GeneratePlan() {
 
   const styles = appStyles
 
+  function handleAddExercise(dayIndex) {
+    const updatedPlan = [...workoutPlan]
+    
+    updatedPlan[dayIndex].exercises.push({
+      name: "",
+      sets: "",
+      reps: "",
+      notes: ""
+    })
+    
+    setWorkoutPlan(updatedPlan)
+    setIsEditing(true) 
+  }
+
+  function handleDeleteExercise(dayIndex, exerciseIndex) {
+    const updatedPlan = [...workoutPlan]
+    updatedPlan[dayIndex].exercises.splice(exerciseIndex, 1)
+    setWorkoutPlan(updatedPlan)
+  }
+
+  function handleUpdateExercise(dayIndex, exerciseIndex, field, value) {
+    const updatedPlan = [...workoutPlan]
+    updatedPlan[dayIndex].exercises[exerciseIndex][field] = value
+    setWorkoutPlan(updatedPlan)
+  }
+
   useEffect(() => {
     if (userId) 
       fetchSavedPlan()
@@ -184,7 +210,12 @@ export default function GeneratePlan() {
                         />
                       </View>
                     </View>
-                  </View>
+
+                    {/* Delete exercise button */}
+                    <TouchableOpacity onPress={() => handleDeleteExercise(dayIdx, exIdx)}>
+                      <Text style={styles.removeText}>Remove</Text>
+                      </TouchableOpacity>
+                  </View>                     
                 ) : (
                   <View style={{ flex: 1 }}>
                     <Text style={styles.exerciseName}>{exercise.name}</Text>
@@ -194,8 +225,18 @@ export default function GeneratePlan() {
                     {exercise.notes && <Text style={styles.exerciseNotes}>{exercise.notes}</Text>}
                   </View>
                 )}
-              </View>
+              </View>             
             ))}
+
+            {/* Add exercise button */}
+            {isEditing && (
+              <TouchableOpacity
+                style={[styles.addExerciseButton, { marginTop: 8 }]}
+                onPress={() => handleAddExercise(dayIdx)}
+              >
+                <Text style={styles.addExerciseText}>+ Add Exercise</Text>
+              </TouchableOpacity>
+            )}
           </View>
         ))
       ) : (
