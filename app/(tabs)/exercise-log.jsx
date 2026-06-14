@@ -181,6 +181,38 @@ export default function ExerciseLog() {
     setExercises(updated)
   }
 
+  async function deleteLog() {
+  Alert.alert(
+    'Delete Log',
+    'Are you sure you want to delete this log?',
+    [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            const { error } = await supabase
+              .from('workout_logs')
+              .delete()
+              .eq('user_id', userId)
+              .eq('log_date', selectedDate)
+
+            if (error) throw error
+            setExercises([])
+            setNotes('')
+            setDurationMinutes('')
+            setHasExistingLog(false)
+            setIsEditing(true)
+            Alert.alert('Deleted', 'Workout log deleted.')
+          } catch (error) {
+            Alert.alert('Error', error.message)
+          }
+        }
+      }
+    ])
+  }
+
   async function saveLog() {
     try {
       setSaving(true)
@@ -347,6 +379,11 @@ export default function ExerciseLog() {
         <TouchableOpacity style={styles.saveLogButton} onPress={saveLog} disabled={saving}>
           <Text style={styles.saveLogText}>{saving ? 'Saving...' : 'Save Log'}</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity style={[styles.saveLogButton, { backgroundColor: '#FF3B30', marginTop: 2 }]} 
+          onPress={deleteLog}>
+          <Text style={styles.saveLogText}>Delete Log</Text>
+        </TouchableOpacity>        
       </>
       )}
 
@@ -467,7 +504,7 @@ export default function ExerciseLog() {
                     todayMonday.setDate(today.getDate() + distToMon)
 
                     const targetDate = new Date(currentYear, idx, 1)
-                    const diffWeeks = Math.round(targetDate - todayMonday / (7 * 24 * 60 * 60 * 1000))
+                    const diffWeeks = Math.round((targetDate - todayMonday) / (7 * 24 * 60 * 60 * 1000))
                     setWeekOffset(diffWeeks)
                     setShowMonthPicker(false)
                   }}
