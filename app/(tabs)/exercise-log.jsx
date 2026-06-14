@@ -1,18 +1,20 @@
 import { useState, useEffect } from 'react'
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, StyleSheet, Modal, offset } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, StyleSheet, Modal, 
+  offset } from 'react-native'
 import { supabase } from '../../lib/supabase'
 import { useAuthContext } from '../../hooks/auth-context'
 import { appStyles } from '../../styles/styles'
 
+const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December']
+
 function getWeekRangeLabel(weekDays) {
-  if (!weekDays || weekDays.length === 0) return ''
+  if (!weekDays || weekDays.length === 0) 
+    return ''
   const first = weekDays[0]
   const last = weekDays[6]
   const startDate = new Date(first.dateString)
   const endDate = new Date(last.dateString)
-
-  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December']
 
   const startMonth = monthNames[startDate.getMonth()]
   const endMonth = monthNames[endDate.getMonth()]
@@ -21,10 +23,9 @@ function getWeekRangeLabel(weekDays) {
   // if week spans two months
   if (startMonth !== endMonth) {
     return `${startMonth} ${startDate.getDate()} – ${endMonth} ${endDate.getDate()}, ${year}`
+  } else {
+    return `${startMonth} ${startDate.getDate()} – ${endDate.getDate()}, ${year}`
   }
-
-  // same month
-  return `${startMonth} ${startDate.getDate()} – ${endDate.getDate()}, ${year}`
 }
 
 // helper function to get all days for the current week, week starts on monday
@@ -80,8 +81,11 @@ export default function ExerciseLog() {
   const [hasExistingLog, setHasExistingLog] = useState(false)
 
   const [weekOffset, setWeekOffset] = useState(0)
+  const [showMonthPicker, setShowMonthPicker] = useState(false)
 
   const weekDays = getCurrentWeekDays(weekOffset)
+  const currentYear = new Date(weekDays[0]?.dateString).getFullYear()
+  const currentMonth = new Date(weekDays[0]?.dateString).getMonth()
 
   const selectedDay = weekDays.find(d => d.dateString === selectedDate)?.fullName
   const matchingPlanDay = workoutPlan.find(
@@ -207,10 +211,11 @@ export default function ExerciseLog() {
         style={{ flex: 1, backgroundColor: '#fff' }}
         contentContainerStyle={{ padding: 16 }}
     >   
-      {/*<Text style={styles.logTitle}>Exercise Log</Text>*/}
-      {/*<Text style={styles.logDate}>{selectedDate}</Text>*/}
+      {/*<Text style={styles.logTitle}>{getWeekRangeLabel(weekDays)}</Text>*/}
 
-      <Text style={styles.logTitle}>{getWeekRangeLabel(weekDays)}</Text>
+      <TouchableOpacity onPress={() => setShowMonthPicker(true)}>
+        <Text style={styles.logTitle}>{getWeekRangeLabel(weekDays)} ▾</Text>
+      </TouchableOpacity>
 
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <TouchableOpacity style={appStyles.arrowButton}
@@ -412,6 +417,78 @@ export default function ExerciseLog() {
           </View>
         </View>
       </Modal>
+      <Modal
+
+      visible={showMonthPicker}
+      animationType="slide"
+      transparent={true}
+      onRequestClose={() => setShowMonthPicker(false)}
+    >
+      <View style={appStyles.modalOverlay}>
+        <View style={appStyles.modalContainer}>
+          <Text style={appStyles.modalTitle}>Jump to Month</Text>
+
+  
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+            <TouchableOpacity
+              style={appStyles.arrowButton}
+              onPress={() => {
+                setWeekOffset(weekOffset - 52)
+              }}
+            >
+              <Text style={appStyles.arrowText}>‹</Text>
+            </TouchableOpacity>
+            <Text style={{ fontSize: 18, fontWeight: '700', marginHorizontal: 20 }}>
+              {currentYear}
+            </Text>
+            <TouchableOpacity
+              style={appStyles.arrowButton}
+              onPress={() => {
+                setWeekOffset(weekOffset + 52)
+              }}
+            >
+              <Text style={appStyles.arrowText}>›</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+            {monthNames.map((month, idx) => {
+              const isCurrentMonth = idx === currentMonth
+              return (
+                <TouchableOpacity
+                  key={month}
+                  style={[appStyles.monthCard, isCurrentMonth && appStyles.monthCardSelected]}
+                  onPress={() => {
+              
+                    const today = new Date()
+                    const todayMonday = new Date(today)
+                    const temp = today.getDay()
+                    const distToMon = temp === 0 ? -6 : 1 - temp
+                    todayMonday.setDate(today.getDate() + distToMon)
+
+                    const targetDate = new Date(currentYear, idx, 1)
+                    const diffWeeks = Math.round(targetDate - todayMonday / (7 * 24 * 60 * 60 * 1000))
+                    setWeekOffset(diffWeeks)
+                    setShowMonthPicker(false)
+                  }}
+                >
+                  <Text style={[appStyles.monthText, isCurrentMonth && appStyles.monthTextSelected]}>
+                    {month.slice(0, 3)}
+                  </Text>
+                </TouchableOpacity>
+              )
+            })}
+          </View>
+
+          <TouchableOpacity
+            style={[appStyles.cancelButton, { marginTop: 16 }]}
+            onPress={() => setShowMonthPicker(false)}
+          >
+            <Text style={appStyles.cancelButtonText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>       
     </ScrollView>
   )
 }
