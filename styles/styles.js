@@ -419,4 +419,9 @@ monthText: {
 monthTextSelected: {
   color: '#fff',
 },
+  row: {
+    flexDirection: "row", 
+    alignItems: "center", 
+    marginBottom: 10,
+  },
 })

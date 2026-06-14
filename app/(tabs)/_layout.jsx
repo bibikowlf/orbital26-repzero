@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router'
 import Ionicons from '@expo/vector-icons/Ionicons'
-import Entypo from '@expo/vector-icons/Entypo';
+import Entypo from '@expo/vector-icons/Entypo'
 import ProfileButton from '../../components/profile-button'
 
 export default function TabLayout() {
@@ -50,6 +50,17 @@ export default function TabLayout() {
       />
 
 
+      {/* Workout Tutorial Tab */}
+      <Tabs.Screen
+        name="workout-tutorial"
+        options={{
+          title: 'Workout Tutorial',
+          tabBarIcon: ({ color }) => (
+            <Entypo name='book' size={24} color={color} />
+          ),
+        }}
+      />
+
       {/* Profile (No Tab) */}
       <Tabs.Screen
         name="profile"
@@ -60,6 +71,18 @@ export default function TabLayout() {
       <Tabs.Screen
         name="change-password"
         options={{ title: 'Change Password', href: null }}
+      />
+
+      {/* Workout Tutorials (No Tab) */}
+      <Tabs.Screen
+        name="(workouts)/[id]"
+        options={{ href: null }}
+      />
+
+      {/* Edit Workout Tutorial (No Tab) */}
+      <Tabs.Screen
+        name="(workouts)/edit-tutorial"
+        options={{ href: null }}
       />
     </Tabs>
   );
