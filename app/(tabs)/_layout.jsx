@@ -84,6 +84,12 @@ export default function TabLayout() {
         name="(workouts)/edit-tutorial"
         options={{ href: null }}
       />
+
+      {/* Leaderboard (Temporary Tab) */}
+      <Tabs.Screen
+        name="(community)/leaderboard"
+        options={{ title: 'Leaderboard' }}
+      />
     </Tabs>
   );
 }

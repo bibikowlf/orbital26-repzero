@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react'
-import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity, Alert } from 'react-native'
+import { View, Text, FlatList, ActivityIndicator, Alert } from 'react-native'
 import { appStyles } from '../../../styles/styles'
 import { supabase } from '../../../lib/supabase'
 import { useAuthContext } from '../../../hooks/auth-context'
-import { router } from 'expo-router'
 import Spacer from '../../../components/spacer'
 
 export default function WorkoutTutorial() {
@@ -57,12 +56,32 @@ export default function WorkoutTutorial() {
 
   return (
     <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10 }]}>
-      <Text>{rank} {minutes}</Text>
+      <Text style={[styles.title, { fontSize: 20, textAlign: 'center' }]}>
+        You're in {rank} place with {minutes} minutes!
+      </Text>
+      <Spacer />
       <FlatList
         data={users}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <Text>{item.username} {item.minutes}</Text>
+        renderItem={({ item, index }) => (
+          <View style={[styles.row, 
+            { backgroundColor: '#fff', padding: 12, 
+              borderBottomWidth: 1, borderColor: '#ced4da',
+              marginBottom: 0, justifyContent: 'space-between',
+              height: 50 }]}>
+            <Text style={[{ fontSize: 16 }, 
+              index === 0 && { color: 'gold', fontWeight: 'bold', fontSize: 18 },
+              index === 1 && { color: 'silver', fontWeight: 'bold', fontSize: 18 },
+              index === 2 && { color: '#CD7F32', fontWeight: 'bold', fontSize: 18 }]}>
+              {index + 1}       {item.username ?? 'Anonymous User'}
+            </Text>
+            <Text style={[{ fontSize: 16 }, 
+              index === 0 && { color: 'gold', fontWeight: 'bold', fontSize: 18 },
+              index === 1 && { color: 'silver', fontWeight: 'bold', fontSize: 18 },
+              index === 2 && { color: '#CD7F32', fontWeight: 'bold', fontSize: 18 }]}>
+              {item.minutes} minutes
+            </Text>
+          </View>
         )}
       />
     </View>
