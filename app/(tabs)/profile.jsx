@@ -7,7 +7,8 @@ import { appStyles } from '../../styles/styles'
 import { router } from 'expo-router'
 import SignOutButton from '../../components/signout-button'
 import Spacer from '../../components/spacer'
-import { Dropdown } from 'react-native-element-dropdown';
+import { Dropdown } from 'react-native-element-dropdown'
+import { handleNumericInput } from '../../functions/numeric-input'
 
 const genderData = [
   { label: 'Male', value: 'Male' },
@@ -120,13 +121,6 @@ export default function Profile() {
     }
   }
 
-  const handleNumberInput = (text) => {
-    const cleanedValue = text.replace(/[^0-9]/g, '')
-    const parsedValue = parseInt(cleanedValue, 10)
-
-    return isNaN(parsedValue) ? 0 : parsedValue
-  }
-
   return (
     <KeyboardAvoidingView behavior='padding'>
       <ScrollView style={{paddingHorizontal: 15}}>
@@ -158,7 +152,7 @@ export default function Profile() {
           <TextInput
             value={height?.toString() ?? '0'}
             keyboardType='numeric'
-            onChangeText={(text) => setHeight(handleNumberInput(text))}
+            onChangeText={(text) => setHeight(handleNumericInput(text))}
             style={styles.input}
           />
         </View>
@@ -169,7 +163,7 @@ export default function Profile() {
           <TextInput
             value={weight?.toString() ?? '0'}
             keyboardType='numeric'
-            onChangeText={(text) => setWeight(handleNumberInput(text))}
+            onChangeText={(text) => setWeight(handleNumericInput(text))}
             style={styles.input}
           />
         </View>
@@ -232,7 +226,7 @@ export default function Profile() {
           <TextInput
             value={time?.toString() ?? '0'}
             keyboardType='numeric'
-            onChangeText={(text) => setTime(handleNumberInput(text))}
+            onChangeText={(text) => setTime(handleNumericInput(text))}
             style={styles.input}
           />
         </View>

@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, StyleSheet, Modal, 
-  offset } from 'react-native'
+  KeyboardAvoidingView } from 'react-native'
 import { supabase } from '../../lib/supabase'
 import { useAuthContext } from '../../hooks/auth-context'
 import { appStyles } from '../../styles/styles'
+import { handleNumericInput } from '../../functions/numeric-input'
 
 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December']
@@ -239,293 +240,295 @@ export default function ExerciseLog() {
   }
 
   return (
-    <ScrollView
-        style={{ flex: 1, backgroundColor: '#fff' }}
-        contentContainerStyle={{ padding: 16 }}
-    >   
-      {/*<Text style={styles.logTitle}>{getWeekRangeLabel(weekDays)}</Text>*/}
+    <KeyboardAvoidingView behavior='padding' style={{ flex: 1 }}>
+      <ScrollView
+          style={{ flex: 1, backgroundColor: '#fff' }}
+          contentContainerStyle={{ padding: 16 }}
+      >   
+        {/*<Text style={styles.logTitle}>{getWeekRangeLabel(weekDays)}</Text>*/}
 
-      <TouchableOpacity onPress={() => setShowMonthPicker(true)}>
-        <Text style={styles.logTitle}>{getWeekRangeLabel(weekDays)} ▾</Text>
-      </TouchableOpacity>
+        <TouchableOpacity onPress={() => setShowMonthPicker(true)}>
+          <Text style={styles.logTitle}>{getWeekRangeLabel(weekDays)} ▾</Text>
+        </TouchableOpacity>
 
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <TouchableOpacity style={appStyles.arrowButton}
+            onPress={() => setWeekOffset(weekOffset - 1)}>
+            <Text style={appStyles.arrowText}>‹</Text>
+          </TouchableOpacity>
+
+        <View style={styles.calendarStrip}>
+          {weekDays.map((day) => {
+            const isSelected = day.dateString === selectedDate
+            return (
+              <TouchableOpacity
+                key={day.dateString}
+                style={[styles.calendarCard, isSelected && styles.selectedCard]}
+                onPress={() => setSelectedDate(day.dateString)}
+              >
+                <Text style={[styles.calendarLabel, isSelected && styles.selectedText]}>
+                  {day.label}
+                </Text>
+                <Text style={[styles.calendarDayNum, isSelected && styles.selectedText]}>
+                  {day.dayNum}
+                </Text>
+              </TouchableOpacity>
+            )
+          })}
+        </View>
+          
         <TouchableOpacity style={appStyles.arrowButton}
-          onPress={() => setWeekOffset(weekOffset - 1)}>
-          <Text style={appStyles.arrowText}>‹</Text>
-        </TouchableOpacity>
+          onPress={() => setWeekOffset(weekOffset + 1)}>
+            <Text style={appStyles.arrowText}>›</Text>
+          </TouchableOpacity>
+        </View>
 
-      <View style={styles.calendarStrip}>
-        {weekDays.map((day) => {
-          const isSelected = day.dateString === selectedDate
-          return (
-            <TouchableOpacity
-              key={day.dateString}
-              style={[styles.calendarCard, isSelected && styles.selectedCard]}
-              onPress={() => setSelectedDate(day.dateString)}
-            >
-              <Text style={[styles.calendarLabel, isSelected && styles.selectedText]}>
-                {day.label}
-              </Text>
-              <Text style={[styles.calendarDayNum, isSelected && styles.selectedText]}>
-                {day.dayNum}
-              </Text>
-            </TouchableOpacity>
-          )
-        })}
-      </View>
-        
-      <TouchableOpacity style={appStyles.arrowButton}
-        onPress={() => setWeekOffset(weekOffset + 1)}>
-          <Text style={appStyles.arrowText}>›</Text>
-        </TouchableOpacity>
-      </View>
-
-      {isEditing && (
-        <TouchableOpacity
-          style={appStyles.importButton}
-          onPress={handleImportPress}
-        >
-          <Text style={appStyles.importButtonText}>↓ Import from Workout Plan</Text>
-        </TouchableOpacity>
-      )}
-
-      {hasExistingLog && (
+        {isEditing && (
           <TouchableOpacity
-            style={[appStyles.editButton, { flex: 1, marginTop: 10, marginBottom: 16 }]}
-            onPress={() => setIsEditing(!isEditing)}
+            style={appStyles.importButton}
+            onPress={handleImportPress}
           >
-            <Text style={appStyles.importButtonText}>
-              {isEditing ? 'Cancel Edit' : '✏️ Edit Log'}
-            </Text>
+            <Text style={appStyles.importButtonText}>↓ Import from Workout Plan</Text>
           </TouchableOpacity>
         )}
 
-      {exercises.length === 0 && !isEditing ? (
-        <Text style={{ color: '#888', textAlign: 'center', marginTop: 40 }}>
-          No exercises logged for this day.
-        </Text>
-      ) : (
-      exercises.map((ex, idx) => (
-        <View key={idx} style={styles.exerciseCard}>
-          {isEditing ? (
-            <>
-          <TextInput
-            style={styles.logInput}
-            placeholder="Exercise name"
-            placeholderTextColor="#888"
-            value={ex.name}
-            onChangeText={(val) => updateExercise(idx, 'name', val)}
-          />
-          
-          <View style={styles.inputRow}>
+        {hasExistingLog && (
+            <TouchableOpacity
+              style={[appStyles.editButton, { flex: 1, marginTop: 10, marginBottom: 16 }]}
+              onPress={() => setIsEditing(!isEditing)}
+            >
+              <Text style={appStyles.importButtonText}>
+                {isEditing ? 'Cancel Edit' : '✏️ Edit Log'}
+              </Text>
+            </TouchableOpacity>
+          )}
 
-            <TextInput style={[styles.logInput, styles.smallInput]} placeholder="Sets"
-              value={ex.sets} keyboardType="numeric"
+        {exercises.length === 0 && !isEditing ? (
+          <Text style={{ color: '#888', textAlign: 'center', marginTop: 40 }}>
+            No exercises logged for this day.
+          </Text>
+        ) : (
+        exercises.map((ex, idx) => (
+          <View key={idx} style={styles.exerciseCard}>
+            {isEditing ? (
+              <>
+            <TextInput
+              style={styles.logInput}
+              placeholder="Exercise name"
               placeholderTextColor="#888"
-              onChangeText={(val) => updateExercise(idx, 'sets', val)} />
+              value={ex.name}
+              onChangeText={(val) => updateExercise(idx, 'name', val)}
+            />
+            
+            <View style={styles.inputRow}>
 
-            <TextInput style={[styles.logInput, styles.smallInput]} placeholder="Reps"
-              value={ex.reps}
-              placeholderTextColor="#888"
-              onChangeText={(val) => updateExercise(idx, 'reps', val)} />
+              <TextInput style={[styles.logInput, styles.smallInput]} placeholder="Sets"
+                value={ex.sets} keyboardType="numeric"
+                placeholderTextColor="#888"
+                onChangeText={(val) => updateExercise(idx, 'sets', String(handleNumericInput(val)))} />
 
-            <TextInput style={[styles.logInput, styles.smallInput]} placeholder="kg"
-              value={ex.weight_kg} keyboardType="numeric"
-              placeholderTextColor="#888"
-              onChangeText={(val) => updateExercise(idx, 'weight_kg', val)} />
-          </View>
-          <TouchableOpacity onPress={() => removeExercise(idx)}>
-            <Text style={styles.removeText}>Remove</Text>
+              <TextInput style={[styles.logInput, styles.smallInput]} placeholder="Reps"
+                value={ex.reps} keyboardType='numeric'
+                placeholderTextColor="#888"
+                onChangeText={(val) => updateExercise(idx, 'reps', String(handleNumericInput(val)))} />
+
+              <TextInput style={[styles.logInput, styles.smallInput]} placeholder="kg"
+                value={ex.weight_kg} keyboardType="numeric"
+                placeholderTextColor="#888"
+                onChangeText={(val) => updateExercise(idx, 'weight_kg', String(handleNumericInput(val)))} />
+            </View>
+            <TouchableOpacity onPress={() => removeExercise(idx)}>
+              <Text style={styles.removeText}>Remove</Text>
+            </TouchableOpacity>
+            </>
+            ):(
+              <View>
+                  <Text style={appStyles.viewExerciseName}>{ex.name}</Text>
+                  <Text style={appStyles.viewExerciseMeta}>
+                    {ex.sets} sets × {ex.reps} reps{ex.weight_kg ? `  •  ${ex.weight_kg} kg` : ''}
+                  </Text>
+                </View>
+              )}
+            </View>
+          ))
+        )}
+
+        {isEditing && (
+        <>
+          <TouchableOpacity style={styles.addExerciseButton} onPress={addExercise}>
+            <Text style={styles.addExerciseText}>+ Add Exercise</Text>
           </TouchableOpacity>
-          </>
-          ):(
-            <View>
-                <Text style={appStyles.viewExerciseName}>{ex.name}</Text>
-                <Text style={appStyles.viewExerciseMeta}>
-                  {ex.sets} sets × {ex.reps} reps{ex.weight_kg ? `  •  ${ex.weight_kg} kg` : ''}
-                </Text>
-              </View>
-            )}
+
+          <TextInput
+            style={[styles.logInput, { marginTop: 12 }]}
+            placeholder="Total minutes spent at gym today"
+            placeholderTextColor="#888"
+            value={durationMinutes}
+            onChangeText={(val) => setDurationMinutes(String(handleNumericInput(val)))}
+            keyboardType="numeric"
+          />
+
+
+          <TextInput
+            style={[styles.logInput, { marginTop: 12 }]}
+            placeholder="Notes (optional)"
+            placeholderTextColor="#888"
+            value={notes}
+            onChangeText={setNotes}
+            multiline
+          />
+
+          <TouchableOpacity style={styles.saveLogButton} onPress={saveLog} disabled={saving}>
+            <Text style={styles.saveLogText}>{saving ? 'Saving...' : 'Save Log'}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={[styles.saveLogButton, { backgroundColor: '#FF3B30', marginTop: 2 }]} 
+            onPress={deleteLog}>
+            <Text style={styles.saveLogText}>Delete Log</Text>
+          </TouchableOpacity>        
+        </>
+        )}
+
+        {!isEditing && durationMinutes ? (
+          <View style={appStyles.notesDisplay, { marginTop: 12 }}>
+            <Text style={appStyles.notesLabel}>Minutes spent today</Text>
+            <Text style={appStyles.notesText}>{durationMinutes} minutes</Text>
           </View>
-        ))
-      )}
+        ) : null}
 
-      {isEditing && (
-      <>
-        <TouchableOpacity style={styles.addExerciseButton} onPress={addExercise}>
-          <Text style={styles.addExerciseText}>+ Add Exercise</Text>
-        </TouchableOpacity>
+        {!isEditing && notes ? (
+          <View style={appStyles.notesDisplay}>
+            <Text style={appStyles.notesLabel}>Notes</Text>
+            <Text style={appStyles.notesText}>{notes}</Text>
+          </View>
+        ) : null}
 
-        <TextInput
-          style={[styles.logInput, { marginTop: 12 }]}
-          placeholder="Total minutes spent at gym today"
-          placeholderTextColor="#888"
-          value={durationMinutes}
-          onChangeText={setDurationMinutes}
-          keyboardType="numeric"
-        />
+        <Modal
+          visible={showImport}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setshowImport(false)}
+        >
+          <View style={appStyles.modalOverlay}>
+            <View style={appStyles.modalContainer}>
+              <Text style={appStyles.modalTitle}>Import from Workout Plan</Text>
+              <Text style={appStyles.modalSubtitle}>
+                Showing plan for {selectedDay}
+              </Text>
 
+              {matchingPlanDay ? (
+                // found a matching plan day — show its exercises
+                <View style={appStyles.planDayCard}>
+                  <Text style={appStyles.planDayTitle}>{matchingPlanDay.day}</Text>
+                  <Text style={appStyles.planDayMeta}>
+                    {matchingPlanDay.exercises?.length} exercises
+                  </Text>
+                  {matchingPlanDay.exercises?.map((ex, exIdx) => (
+                    <Text key={exIdx} style={appStyles.planExerciseItem}>
+                      • {ex.name} — {ex.sets} sets x {ex.reps} reps
+                    </Text>
+                  ))}
+                  <TouchableOpacity
+                    style={appStyles.importConfirmButton}
+                    onPress={() => importDay(matchingPlanDay)}
+                  >
+                    <Text style={appStyles.importConfirmText}>Import These Exercises</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                // no plan exists for this day
+                <View style={appStyles.emptyState}>
+                  <Text style={appStyles.emptyStateText}>
+                    No workout plan exists for {selectedDay}.
+                  </Text>
+                  <Text style={appStyles.emptyStateSubtext}>
+                    This is a rest day or your plan does not include {selectedDay}.
+                  </Text>
+                </View>
+              )}
 
-        <TextInput
-          style={[styles.logInput, { marginTop: 12 }]}
-          placeholder="Notes (optional)"
-          placeholderTextColor="#888"
-          value={notes}
-          onChangeText={setNotes}
-          multiline
-        />
+              <TouchableOpacity
+                style={appStyles.cancelButton}
+                onPress={() => setshowImport(false)}
+              >
+                <Text style={appStyles.cancelButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+        <Modal
 
-        <TouchableOpacity style={styles.saveLogButton} onPress={saveLog} disabled={saving}>
-          <Text style={styles.saveLogText}>{saving ? 'Saving...' : 'Save Log'}</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={[styles.saveLogButton, { backgroundColor: '#FF3B30', marginTop: 2 }]} 
-          onPress={deleteLog}>
-          <Text style={styles.saveLogText}>Delete Log</Text>
-        </TouchableOpacity>        
-      </>
-      )}
-
-      {!isEditing && durationMinutes ? (
-        <View style={appStyles.notesDisplay, { marginTop: 12 }}>
-          <Text style={appStyles.notesLabel}>Minutes spent today</Text>
-          <Text style={appStyles.notesText}>{durationMinutes} minutes</Text>
-        </View>
-      ) : null}
-
-      {!isEditing && notes ? (
-        <View style={appStyles.notesDisplay}>
-          <Text style={appStyles.notesLabel}>Notes</Text>
-          <Text style={appStyles.notesText}>{notes}</Text>
-        </View>
-      ) : null}
-
-      <Modal
-        visible={showImport}
+        visible={showMonthPicker}
         animationType="slide"
         transparent={true}
-        onRequestClose={() => setshowImport(false)}
+        onRequestClose={() => setShowMonthPicker(false)}
       >
         <View style={appStyles.modalOverlay}>
           <View style={appStyles.modalContainer}>
-            <Text style={appStyles.modalTitle}>Import from Workout Plan</Text>
-            <Text style={appStyles.modalSubtitle}>
-              Showing plan for {selectedDay}
-            </Text>
+            <Text style={appStyles.modalTitle}>Jump to Month</Text>
 
-            {matchingPlanDay ? (
-              // found a matching plan day — show its exercises
-              <View style={appStyles.planDayCard}>
-                <Text style={appStyles.planDayTitle}>{matchingPlanDay.day}</Text>
-                <Text style={appStyles.planDayMeta}>
-                  {matchingPlanDay.exercises?.length} exercises
-                </Text>
-                {matchingPlanDay.exercises?.map((ex, exIdx) => (
-                  <Text key={exIdx} style={appStyles.planExerciseItem}>
-                    • {ex.name} — {ex.sets} sets x {ex.reps} reps
-                  </Text>
-                ))}
-                <TouchableOpacity
-                  style={appStyles.importConfirmButton}
-                  onPress={() => importDay(matchingPlanDay)}
-                >
-                  <Text style={appStyles.importConfirmText}>Import These Exercises</Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              // no plan exists for this day
-              <View style={appStyles.emptyState}>
-                <Text style={appStyles.emptyStateText}>
-                  No workout plan exists for {selectedDay}.
-                </Text>
-                <Text style={appStyles.emptyStateSubtext}>
-                  This is a rest day or your plan does not include {selectedDay}.
-                </Text>
-              </View>
-            )}
+    
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+              <TouchableOpacity
+                style={appStyles.arrowButton}
+                onPress={() => {
+                  setWeekOffset(weekOffset - 52)
+                }}
+              >
+                <Text style={appStyles.arrowText}>‹</Text>
+              </TouchableOpacity>
+              <Text style={{ fontSize: 18, fontWeight: '700', marginHorizontal: 20 }}>
+                {currentYear}
+              </Text>
+              <TouchableOpacity
+                style={appStyles.arrowButton}
+                onPress={() => {
+                  setWeekOffset(weekOffset + 52)
+                }}
+              >
+                <Text style={appStyles.arrowText}>›</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+              {monthNames.map((month, idx) => {
+                const isCurrentMonth = idx === currentMonth
+                return (
+                  <TouchableOpacity
+                    key={month}
+                    style={[appStyles.monthCard, isCurrentMonth && appStyles.monthCardSelected]}
+                    onPress={() => {
+                
+                      const today = new Date()
+                      const todayMonday = new Date(today)
+                      const temp = today.getDay()
+                      const distToMon = temp === 0 ? -6 : 1 - temp
+                      todayMonday.setDate(today.getDate() + distToMon)
+
+                      const targetDate = new Date(currentYear, idx, 1)
+                      const diffWeeks = Math.round((targetDate - todayMonday) / (7 * 24 * 60 * 60 * 1000))
+                      setWeekOffset(diffWeeks)
+                      setShowMonthPicker(false)
+                    }}
+                  >
+                    <Text style={[appStyles.monthText, isCurrentMonth && appStyles.monthTextSelected]}>
+                      {month.slice(0, 3)}
+                    </Text>
+                  </TouchableOpacity>
+                )
+              })}
+            </View>
 
             <TouchableOpacity
-              style={appStyles.cancelButton}
-              onPress={() => setshowImport(false)}
+              style={[appStyles.cancelButton, { marginTop: 16 }]}
+              onPress={() => setShowMonthPicker(false)}
             >
               <Text style={appStyles.cancelButtonText}>Close</Text>
             </TouchableOpacity>
           </View>
         </View>
-      </Modal>
-      <Modal
-
-      visible={showMonthPicker}
-      animationType="slide"
-      transparent={true}
-      onRequestClose={() => setShowMonthPicker(false)}
-    >
-      <View style={appStyles.modalOverlay}>
-        <View style={appStyles.modalContainer}>
-          <Text style={appStyles.modalTitle}>Jump to Month</Text>
-
-  
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-            <TouchableOpacity
-              style={appStyles.arrowButton}
-              onPress={() => {
-                setWeekOffset(weekOffset - 52)
-              }}
-            >
-              <Text style={appStyles.arrowText}>‹</Text>
-            </TouchableOpacity>
-            <Text style={{ fontSize: 18, fontWeight: '700', marginHorizontal: 20 }}>
-              {currentYear}
-            </Text>
-            <TouchableOpacity
-              style={appStyles.arrowButton}
-              onPress={() => {
-                setWeekOffset(weekOffset + 52)
-              }}
-            >
-              <Text style={appStyles.arrowText}>›</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-            {monthNames.map((month, idx) => {
-              const isCurrentMonth = idx === currentMonth
-              return (
-                <TouchableOpacity
-                  key={month}
-                  style={[appStyles.monthCard, isCurrentMonth && appStyles.monthCardSelected]}
-                  onPress={() => {
-              
-                    const today = new Date()
-                    const todayMonday = new Date(today)
-                    const temp = today.getDay()
-                    const distToMon = temp === 0 ? -6 : 1 - temp
-                    todayMonday.setDate(today.getDate() + distToMon)
-
-                    const targetDate = new Date(currentYear, idx, 1)
-                    const diffWeeks = Math.round((targetDate - todayMonday) / (7 * 24 * 60 * 60 * 1000))
-                    setWeekOffset(diffWeeks)
-                    setShowMonthPicker(false)
-                  }}
-                >
-                  <Text style={[appStyles.monthText, isCurrentMonth && appStyles.monthTextSelected]}>
-                    {month.slice(0, 3)}
-                  </Text>
-                </TouchableOpacity>
-              )
-            })}
-          </View>
-
-          <TouchableOpacity
-            style={[appStyles.cancelButton, { marginTop: 16 }]}
-            onPress={() => setShowMonthPicker(false)}
-          >
-            <Text style={appStyles.cancelButtonText}>Close</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>       
-    </ScrollView>
+      </Modal>       
+      </ScrollView>
+    </KeyboardAvoidingView>
   )
 }
