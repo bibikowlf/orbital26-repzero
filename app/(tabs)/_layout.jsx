@@ -16,17 +16,6 @@ export default function TabLayout() {
         },
       }}
     >
-      {/* Home Tab */}
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => (
-            <Entypo name='home' size={24} color={color} />
-          ),
-        }}
-      />
-
       {/* Workout Plan Tab */}
       <Tabs.Screen
         name="generate-plan"
@@ -36,6 +25,12 @@ export default function TabLayout() {
             <Ionicons name='barbell' size={24} color={color} />
           ),
         }}
+      />
+
+      {/* Index (No Tab) */}
+      <Tabs.Screen
+        name="index"
+        options={{ href: null }}
       />
 
       {/* Exercise Log Tab */}
