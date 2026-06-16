@@ -44,7 +44,6 @@ export default function TabLayout() {
         }}
       />
 
-
       {/* Workout Tutorial Tab */}
       <Tabs.Screen
         name="workout-tutorial"
@@ -52,6 +51,17 @@ export default function TabLayout() {
           title: 'Workout Tutorial',
           tabBarIcon: ({ color }) => (
             <Entypo name='book' size={24} color={color} />
+          ),
+        }}
+      />
+
+      {/* Community Tab */}
+      <Tabs.Screen
+        name="community"
+        options={{
+          title: 'Community',
+          tabBarIcon: ({ color }) => (
+            <Entypo name="users" size={24} color={color} />
           ),
         }}
       />
