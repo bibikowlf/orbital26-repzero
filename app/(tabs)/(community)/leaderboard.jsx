@@ -62,7 +62,8 @@ export default function WorkoutTutorial() {
         You're in {rank} place with {minutes} minutes!
       </Text>
       <Spacer height={10} />
-      <View style={[styles.row, { justifyContent: 'space-between', padding: 12, alignItems: 'flex-end' }]}>
+      <View style={[styles.row, 
+        { justifyContent: 'center', gap: 10, padding: 12, alignItems: 'flex-end' }]}>
         {topThree.map((user) => {
           const config = { 
             color: user.idx === 1 ? 'gold' : user.idx === 2 ? 'silver' : '#CD7F32',
