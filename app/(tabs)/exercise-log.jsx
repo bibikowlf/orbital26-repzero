@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, StyleSheet, Modal, 
   KeyboardAvoidingView } from 'react-native'
 import { supabase } from '../../lib/supabase'
 import { useAuthContext } from '../../hooks/auth-context'
 import { appStyles } from '../../styles/styles'
 import { handleNumericInput } from '../../functions/numeric-input'
+import { useFocusEffect } from 'expo-router'
 
 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December']
@@ -97,9 +98,11 @@ export default function ExerciseLog() {
     if (userId) fetchLog(selectedDate)
   }, [userId, selectedDate])
 
-  useEffect(() => {
-    if (userId) fetchWorkoutPlan()
-  }, [userId])
+  useFocusEffect(
+    useCallback(() => {
+      if (userId) fetchWorkoutPlan()
+    }, [userId])
+  )
 
   async function fetchLog(date) {
     const { data, error } = await supabase
@@ -215,29 +218,38 @@ export default function ExerciseLog() {
   }
 
   async function saveLog() {
+    
+    const validExercises = exercises.filter(ex => ex.name.trim() !== '' && ex.sets !== '' && ex.reps !== '')
+    if (validExercises.length === 0) {
+      Alert.alert('No Exercises', 'Please add at least one exercise with a name, sets, and reps before saving.')
+      return
+    }
+
     try {
       setSaving(true)
-      const { error } = await supabase
-        .from('workout_logs')
-        .upsert({
-          user_id: userId,
-          log_date: selectedDate,
-          exercises: exercises.filter(ex => ex.name.trim() !== ''),
-          notes, 
-          duration_minutes: durationMinutes ? parseInt(durationMinutes) : null
-        }, { onConflict: 'user_id,log_date' })
-
-      if (error) 
-        throw error
-      setHasExistingLog(true)
+      if (validExercises.length > 0) {
+        const { error } = await supabase
+          .from('workout_logs')
+          .upsert({
+            user_id: userId,
+            log_date: selectedDate,
+            exercises: validExercises,
+            notes,
+            duration_minutes: durationMinutes ? parseInt(durationMinutes) : null
+          }, { onConflict: 'user_id,log_date' })
+        if (error) 
+          throw error
+        setHasExistingLog(true)
+      }
+      setExercises(validExercises)
       setIsEditing(false)
       Alert.alert('Saved', 'Workout log saved!')
-    } catch (error) {
-      Alert.alert('Error', error.message)
-    } finally {
-      setSaving(false)
-    }
-  }
+      } catch (error) {
+        Alert.alert('Error', error.message)
+      } finally {
+        setSaving(false)
+      }
+    }    
 
   return (
     <KeyboardAvoidingView behavior='padding' style={{ flex: 1 }}>
@@ -390,7 +402,7 @@ export default function ExerciseLog() {
         )}
 
         {!isEditing && durationMinutes ? (
-          <View style={appStyles.notesDisplay, { marginTop: 12 }}>
+          <View style={[appStyles.notesDisplay, { marginTop: 12 }]}>
             <Text style={appStyles.notesLabel}>Minutes spent today</Text>
             <Text style={appStyles.notesText}>{durationMinutes} minutes</Text>
           </View>
