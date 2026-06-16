@@ -39,7 +39,7 @@ export default function TabLayout() {
         options={{
           title: 'Exercise Log',
           tabBarIcon: ({ color }) => (
-            <Ionicons name='journal' size={24} color={color} />
+            <Entypo name="calendar" size={24} color={color} />
           ),
         }}
       />
