@@ -389,10 +389,10 @@ export const appStyles = StyleSheet.create({
 
   //calender arrow
   arrowButton: {
-  padding: 8,
-  justifyContent: 'center',
-  alignItems: 'center',
-},
+    padding: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 arrowText: {
   fontSize: 28,
   color: '#007AFF',
@@ -419,9 +419,127 @@ monthText: {
 monthTextSelected: {
   color: '#fff',
 },
-  row: {
-    flexDirection: "row", 
-    alignItems: "center", 
-    marginBottom: 10,
-  },
+row: {
+  flexDirection: "row", 
+  alignItems: "center", 
+  marginBottom: 10,
+},
+
+//community - events log
+
+card: {
+  backgroundColor: '#fff',
+  borderRadius: 12,
+  padding: 16,
+  marginBottom: 14,
+  borderWidth: 1,
+  borderColor: '#e9ecef',
+  shadowColor: '#000',
+  shadowOpacity: 0.05,
+  shadowRadius: 4,
+  elevation: 2,
+},
+
+cardHeader: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginBottom: 8,
+},
+
+categoryBadge: {
+  borderRadius: 6,
+  paddingHorizontal: 8,
+  paddingVertical: 3,
+},
+
+categoryText: {
+  color: '#fff',
+  fontSize: 11,
+  fontWeight: '700',
+},
+
+spotsText: {
+  fontSize: 12,
+  color: '#888',
+},
+
+title: {
+  fontSize: 16,
+  fontWeight: '700',
+  color: '#212529',
+  marginBottom: 4,
+},
+
+description: {
+  fontSize: 13,
+  color: '#666',
+  marginBottom: 10,
+},
+
+metaRow: {
+  marginBottom: 3,
+},
+
+metaText: {
+  fontSize: 12,
+  color: '#495057',
+},
+
+cardFooter: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginTop: 12,
+},
+
+hostText: {
+  fontSize: 12,
+  color: '#888',
+},
+
+rsvpBadge: {
+  borderWidth: 1.5,
+  borderColor: '#007AFF',
+  borderRadius: 8,
+  paddingHorizontal: 14,
+  paddingVertical: 6,
+},
+
+rsvpBadgeActive: {
+  backgroundColor: '#007AFF',
+},
+
+rsvpBadgeText: {
+  fontSize: 13,
+  fontWeight: '600',
+  color: '#007AFF',
+},
+
+rsvpBadgeTextActive: {
+  color: '#fff',
+},
+
+fab: {
+  position: 'absolute',
+  bottom: 24,
+  right: 24,
+  backgroundColor: '#007AFF',
+  width: 56,
+  height: 56,
+  borderRadius: 28,
+  justifyContent: 'center',
+  alignItems: 'center',
+  shadowColor: '#000',
+  shadowOpacity: 0.2,
+  shadowRadius: 6,
+  elevation: 5,
+},
+
+fabText: {
+  color: '#fff',
+  fontSize: 28,
+  fontWeight: '300',
+  lineHeight: 32,
+},  
 })
