@@ -42,6 +42,14 @@ const MOCK_EVENTS = [
   },
 ]
 
+const CATEGORY_COLORS = {
+  Cardio: '#FF9500',
+  Strength: '#5856D6',
+  Flexibility: '#cb21d4',
+  Social: '#34C759',
+  default: '#0048ff',
+}
+
 export default function Events() {
   const router = useRouter()
   const [events] = useState(MOCK_EVENTS)
@@ -53,7 +61,10 @@ export default function Events() {
           <TouchableOpacity
             key={event.id}
             style={appStyles.card}
-            onPress={() => router.push({ pathname: '/(tabs)/(community)/event-detail', params: { id: event.id } })}
+            onPress={() => router.push({ 
+              pathname: '/(tabs)/(community)/event-detail', 
+              params: { id: event.id } 
+            })}
           >
             <Text>{event.title}</Text>
             <Text>{event.category}</Text>
