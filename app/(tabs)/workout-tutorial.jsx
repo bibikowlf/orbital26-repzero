@@ -57,7 +57,10 @@ export default function WorkoutTutorial() {
   }
 
   const handleAdd = async () => {
-    if (!newWorkout.trim()) return
+    if (!newWorkout.trim()) {
+      Alert.alert('Cannot add empty workout')
+      return
+    }
     const cleaned = cleanString(newWorkout)
     if (workouts.some(item => cleanString(item.name) === cleaned)) {
       Alert.alert('Workout already exists')

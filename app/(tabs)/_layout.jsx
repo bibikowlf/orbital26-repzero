@@ -85,6 +85,18 @@ export default function TabLayout() {
         name="(community)/leaderboard"
         options={{ title: 'Leaderboard' }}
       />
+
+      {/* Discussion Forum (Temporary Tab) */}
+      <Tabs.Screen
+        name="(community)/discussion-forum"
+        options={{ title: 'Discussion Forum' }}
+      />
+
+      {/* Add Post (No Tab) */}
+      <Tabs.Screen
+        name="(community)/add-post"
+        options={{ href: null }}
+      />
     </Tabs>
   );
 }
