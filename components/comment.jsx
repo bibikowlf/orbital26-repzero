@@ -8,9 +8,12 @@ export default function Comment({ comment, depth, onReplyPress }) {
   return (
     <View style={{ marginLeft: indentation }}>
       <Text>{comment.content}</Text>
-      {comment.replies && comment.replies.map(reply => {
+      <TouchableOpacity onPress={onReplyPress}>
+        <Entypo name='reply' size={16} />
+      </TouchableOpacity>
+      {comment.replies && comment.replies.map(reply => (
         <Comment key={reply.id} comment={reply} depth={depth + 1} onReplyPress={onReplyPress} />
-      })}
+      ))}
     </View>
   )
 }

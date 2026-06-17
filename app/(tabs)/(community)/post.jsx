@@ -38,7 +38,7 @@ export default function Post() {
   const [votes, setVotes] = useState(null)
   const [replyingTo, setReplyingTo] = useState(null)
   const [newComment, setNewComment] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     fetchData()
@@ -91,7 +91,7 @@ export default function Post() {
           content: newComment,
           user_id: userId,
           post_id: post.id,
-          parent_id: replyingTo
+          parent_id: replyingTo?.id
         })
         .select()
       if (error) throw error
@@ -174,6 +174,9 @@ export default function Post() {
       <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10 }]}>
         <Stack.Screen options={{ title: 'Discussion Forum', headerBackVisible: false, headerTitleAlign: 'center' }}/>
         <Text>{post.content}</Text>
+        {replyingTo && (
+          <Text>Replying to {replyingTo.username}</Text>
+        )}
         <TextInput 
           value={newComment}
           onChangeText={(text) => setNewComment(text)}
@@ -194,9 +197,7 @@ export default function Post() {
           data={commentTree}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <Comment comment={item} depth={0} onReplyPress={() => {
-
-            }}/>
+            <Comment comment={item} depth={0} onReplyPress={() => setReplyingTo(item)}/>
           )}
         />
       </View>

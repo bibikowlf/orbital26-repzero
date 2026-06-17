@@ -182,7 +182,6 @@ export default function WorkoutTutorials() {
             <View style={styles.row}>
               <Text style={{ paddingLeft: 12, paddingRight: 4 }}>{item.score}</Text>
               <TouchableOpacity
-                style={{  }}
                 onPress={() => handleVote({ commentId: item.id })}
                 disabled={loading}>
                 <Entypo name='arrow-bold-up' size={16} color={voted.has(item.id) ? '#2e2c2c48' : '#000000'} />
