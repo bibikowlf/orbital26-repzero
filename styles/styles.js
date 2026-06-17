@@ -561,4 +561,18 @@ input: {
   fontSize: 14, 
   color: '#212529' 
 },
+
+submitButton: { 
+  marginTop: 24, 
+  backgroundColor: '#007AFF', 
+  borderRadius: 8, 
+  padding: 14, 
+  alignItems: 'center' 
+},
+
+submitText: { 
+  color: '#fff', 
+  fontWeight: '700', 
+  fontSize: 15 
+},
 })
