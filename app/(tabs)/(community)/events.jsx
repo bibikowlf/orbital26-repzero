@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native'
 import { useRouter } from 'expo-router'
 import { appStyles } from '../../../styles/styles'
@@ -91,7 +91,7 @@ export default function Events() {
           </Text>
         ) : events.length === 0 ? (
           <Text style={{ textAlign: 'center', marginTop: 40, color: '#888' }}>
-            No events yet. Be the first to post one!
+            No events yet. Be the first one to post!
           </Text>
         ) : (
           events.map((event) => {

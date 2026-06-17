@@ -69,13 +69,13 @@ export default function TabLayout() {
       {/* Create Event (No Tab) */}
       <Tabs.Screen
         name="(community)/create-event"
-        options={{ href: null }}
+        options={{ title: 'Create Event', href: null }}
       />
 
       {/* Event Details (No Tab) */}
       <Tabs.Screen
         name="(community)/event-detail"
-        options={{ href: null }}
+        options={{ title: 'Event Details', href: null }}
       />
 
       {/* Profile (No Tab) */}

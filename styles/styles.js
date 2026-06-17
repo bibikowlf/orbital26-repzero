@@ -542,4 +542,23 @@ fabText: {
   fontWeight: '300',
   lineHeight: 32,
 },  
+
+// create-event
+
+label: { 
+  fontSize: 13, 
+  fontWeight: '600', 
+  color: '#333', 
+  marginBottom: 6, 
+  marginTop: 14 
+},
+
+input: { 
+  borderWidth: 1, 
+  borderColor: '#ccc', 
+  borderRadius: 8, 
+  padding: 10, 
+  fontSize: 14, 
+  color: '#212529' 
+},
 })
