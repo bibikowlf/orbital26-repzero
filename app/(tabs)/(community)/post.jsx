@@ -108,58 +108,38 @@ export default function Post() {
     }
   }
 
-  /*const handleVote = async ({ commentId }) => {
+  const handleVote = async ({ comment }) => {
     try {
       setLoading(true)
       
-      if (voted.has(commentId)) {
-        const prevVote = votes.find(item => item.comment_id === commentId)
+      if (comment.voted) {
         const { error } = await supabase
-          .from('workout_tutorial_votes')
+          .from('comment_votes')
           .delete()
-          .eq('id', prevVote.id)
+          .eq('id', comment.voted)
         if (error) throw error
-        setVotes(prevItems => prevItems.filter(item => item.id !== prevVote.id))
-        setTutorials(prevItems => {
-          const newItems = prevItems.map(item => item.id === commentId ? { ...item, score: item.score-1} : item)
-          return newItems.sort((a, b) => b.score - a.score)
-        })
-        setVoted(prevItem => {
-          const newItem = new Set(prevItem)
-          newItem.delete(commentId)
-          return newItem
-        })
+        setVotes(prevItems => prevItems.filter(item => item.id !== comment.voted))
+        setComments(prevItems => prevItems.map(item => item.id === comment.id ? { ...item, score: item.score-1} : item))
       } else {
         const { data, error } = await supabase
-          .from('workout_tutorial_votes')
+          .from('comment_votes')
           .insert({
-            comment_id: commentId,
-            user_id: userId,
-            vote: 1
+            comment_id: comment.id,
+            user_id: userId
           })
           .select()
         if (error) throw error
         if (data) {
-          setVotes([...votes, data[0]])
-          setTutorials(prevItems => {
-            const newItems = prevItems.map(item => item.id === commentId ? { ...item, score: item.score+1} : item)
-            return newItems.sort((a, b) => b.score - a.score)
-          })
-          setVoted(prevItem => {
-            const newItem = new Set(prevItem)
-            newItem.add(commentId)
-            return newItem
-          })
+          setVotes(prevItems => [...prevItems, data[0]])
+          setComments(prevItems => prevItems.map(item => item.id === comment.id ? { ...item, score: item.score+1} : item))
         }
       }
     } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert(error.message)
-      }
+      if (error instanceof Error) Alert.alert(error.message)
     } finally {
       setLoading(false)
     }
-  }*/
+  }
 
   if (loading) {
     return (
@@ -197,7 +177,10 @@ export default function Post() {
           data={commentTree}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <Comment comment={item} depth={0} onReplyPress={() => setReplyingTo(item)}/>
+            <Comment 
+              comment={item} depth={0} 
+              onReplyPress={() => setReplyingTo(item)} 
+              onVotePress={(comment) => handleVote({ comment: comment })}/>
           )}
         />
       </View>
