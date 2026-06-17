@@ -1,0 +1,79 @@
+import { useState } from 'react'
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native'
+import { useRouter } from 'expo-router'
+import { appStyles } from '../../../styles/styles'
+
+const MOCK_EVENTS = [
+  {
+    id: '1',
+    title: 'Morning Run at East Coast Park',
+    description: '5k along the beach',
+    location: 'ECP, Singapore',
+    event_date: '2025-06-20T07:00:00+08:00',
+    category: 'Cardio',
+    max_attendees: 20,
+    creator_username: 'test1',
+    rsvp_count: 5,
+    user_rsvp: null,
+  },
+  {
+    id: '2',
+    title: 'Push Day @ Gym',
+    description: 'push day',
+    location: 'Yio Chu Kang Sports Centre',
+    event_date: '2025-06-22T10:00:00+08:00',
+    category: 'Strength',
+    max_attendees: 6,
+    creator_username: 'test2',
+    rsvp_count: 3,
+    user_rsvp: 'going',
+  },
+  {
+    id: '3',
+    title: 'Yoga in the Park',
+    description: 'friendly yoga',
+    location: 'Botanic Gardens',
+    event_date: '2025-06-25T08:00:00+08:00',
+    category: 'Flexibility',
+    max_attendees: 15,
+    creator_username: 'test3',
+    rsvp_count: 8,
+    user_rsvp: null,
+  },
+]
+
+export default function Events() {
+  const router = useRouter()
+  const [events] = useState(MOCK_EVENTS)
+
+  return (
+    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+      <ScrollView contentContainerStyle={{ padding: 16 }}>
+        {events.map((event) => (
+          <TouchableOpacity
+            key={event.id}
+            style={appStyles.card}
+            onPress={() => router.push({ pathname: '/(tabs)/(community)/event-detail', params: { id: event.id } })}
+          >
+            <Text>{event.title}</Text>
+            <Text>{event.category}</Text>
+            <Text>{event.location}</Text>
+            <Text>{event.event_date}</Text>
+            <Text>{event.rsvp_count} going</Text>
+            <Text>by @{event.creator_username}</Text>
+            <TouchableOpacity>
+              <Text>RSVP</Text>
+            </TouchableOpacity>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      <TouchableOpacity
+        style={appStyles.fab}
+        onPress={() => router.push('/(tabs)/(community)/create-event')}
+      >
+        <Text>+</Text>
+      </TouchableOpacity>
+    </View>
+  )
+}
