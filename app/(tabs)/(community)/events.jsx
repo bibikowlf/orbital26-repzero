@@ -82,7 +82,8 @@ export default function Events() {
               )}
             </View>
 
-            <Text>{event.title}</Text>
+            <Text style={appStyles.title}>{event.title}</Text>
+            <Text style={appStyles.description} numberOfLines={2}>{event.description}</Text>
 
             <Text>{event.location}</Text>
             <Text>{event.event_date}</Text>
