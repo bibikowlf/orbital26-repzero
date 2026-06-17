@@ -67,11 +67,21 @@ export default function Events() {
             })}
           >
             <Text>{event.title}</Text>
-            <Text>{event.category}</Text>
+
+            <View style={appStyles.cardHeader}>
+              <View style={[appStyles.categoryBadge, { backgroundColor: CATEGORY_COLORS[event.category] || CATEGORY_COLORS.default }]}>
+                <Text style={appStyles.categoryText}>{event.category}</Text>
+              </View>
+            </View>
+
             <Text>{event.location}</Text>
+
             <Text>{event.event_date}</Text>
+
             <Text>{event.rsvp_count} going</Text>
+
             <Text>by @{event.creator_username}</Text>
+
             <TouchableOpacity>
               <Text>RSVP</Text>
             </TouchableOpacity>
