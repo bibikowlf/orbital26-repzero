@@ -104,6 +104,7 @@ export default function DiscussionForum() {
             disabled={loading}
           >
             <Text style={[styles.title, {marginLeft: 10}]}>{item.title}</Text>
+            <Text style={{ marginLeft: 10 }}>{item.score} {item.score > 1 ? 'upvotes': 'upvote'}</Text>
           </TouchableOpacity>
         )}
       />

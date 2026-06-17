@@ -38,6 +38,7 @@ export default function Post() {
   const [votes, setVotes] = useState(null)
   const [replyingTo, setReplyingTo] = useState(null)
   const [newComment, setNewComment] = useState('')
+  const [votedPost, setVotedPost] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -48,7 +49,7 @@ export default function Post() {
     try {
       setLoading(true)
 
-      const [commentsResponse, votesResponse, postResponse] = await Promise.all([
+      const [commentsResponse, votesResponse, postResponse, postVoteResponse] = await Promise.all([
         supabase
           .from('comments_with_votes')
           .select('*')
@@ -60,13 +61,20 @@ export default function Post() {
         supabase
           .from('posts_with_votes')
           .select('*')
-          .eq('id', postId)])
+          .eq('id', postId),
+        supabase
+          .from('post_votes')
+          .select('*')
+          .eq('post_id', postId)
+          .eq('user_id', userId)])
       if (commentsResponse.error) throw commentsResponse.error
       if (votesResponse.error) throw votesResponse.error
       if (postResponse.error) throw postResponse.error
+      if (postVoteResponse.error) throw postVoteResponse.error
       if (commentsResponse.data) setComments(commentsResponse.data)
       if (votesResponse.data) setVotes(votesResponse.data)
       if (postResponse.data) setPost(postResponse.data[0])
+      if (postVoteResponse.data && postVoteResponse.data[0]) setVotedPost(postVoteResponse.data[0].id)
     } catch (error) {
       if (error instanceof Error) Alert.alert(error.message)
     } finally {
@@ -104,6 +112,39 @@ export default function Post() {
     } finally {
       setNewComment('')
       setReplyingTo(null)
+      setLoading(false)
+    }
+  }
+
+  const handleVotePost = async () => {
+    try {
+      setLoading(true)
+      
+      if (votedPost) {
+        const { error } = await supabase
+          .from('post_votes')
+          .delete()
+          .eq('id', votedPost)
+        if (error) throw error
+        setVotedPost(null)
+        setPost({ ...post, score: post.score-1 })
+      } else {
+        const { data, error } = await supabase
+          .from('post_votes')
+          .insert({
+            post_id: postId,
+            user_id: userId
+          })
+          .select()
+        if (error) throw error
+        if (data) {
+          setVotedPost(data[0].id)
+          setPost({ ...post, score: post.score+1 })
+        }
+      }
+    } catch (error) {
+      if (error instanceof Error) Alert.alert(error.message)
+    } finally {
       setLoading(false)
     }
   }
@@ -154,6 +195,28 @@ export default function Post() {
       <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10 }]}>
         <Stack.Screen options={{ title: 'Discussion Forum', headerBackVisible: false, headerTitleAlign: 'center' }}/>
         <Text>{post.content}</Text>
+        <View style={styles.row}>
+          <Text style={{ paddingLeft: 12, paddingRight: 4 }}>{post.score}</Text>
+          <TouchableOpacity
+            onPress={handleVotePost}
+            disabled={loading}>
+            <Entypo name='arrow-bold-up' size={16} color={votedPost ? '#2e2c2c48' : '#000000'} />
+          </TouchableOpacity>
+          {/*post.user_id === userId && (
+            <TouchableOpacity
+              style={{ marginLeft: 'auto', paddingRight: 12 }}
+              onPress={() => router.navigate({
+                pathname: 'edit-tutorial', 
+                params: {
+                  id: item.id,
+                  content: item.content,
+                  workoutId: id,
+                  workoutName: name}})}
+              disabled={loading}>
+              <Entypo name='edit' size={16} />
+            </TouchableOpacity>
+          )*/}
+        </View>
         {replyingTo && (
           <Text>Replying to {replyingTo.username}</Text>
         )}
