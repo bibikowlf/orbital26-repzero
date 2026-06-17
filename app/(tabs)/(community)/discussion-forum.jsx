@@ -100,13 +100,12 @@ export default function DiscussionForum() {
                 borderColor: '#ced4da', 
                 marginBottom: 8,
                 height: 80 }]}
-            onPress={() => router.navigate('discussion-forum'/*pathname: '', params: {name: item.name}*/)} // navigate to post screen
+            onPress={() => router.navigate({ pathname: '/post', params: {postId: item.id} })}
             disabled={loading}
           >
             <Text style={[styles.title, {marginLeft: 10}]}>{item.title}</Text>
           </TouchableOpacity>
         )}
-        ListEmptyComponent={<Text>No posts found</Text>}
       />
     </View>
   )

@@ -204,7 +204,6 @@ export default function WorkoutTutorials() {
             </View>
           </View>
         )}
-        ListEmptyComponent={<Text style={{ fontSize: 16, padding: 12, alignSelf: 'center' }}>Add your tutorial!</Text>}
       />
     </View>
   )

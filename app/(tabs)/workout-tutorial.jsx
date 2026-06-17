@@ -149,7 +149,6 @@ export default function WorkoutTutorial() {
             <Text style={styles.title}>{item.name}</Text>
           </TouchableOpacity>
         )}
-        ListEmptyComponent={<Text>No workouts found</Text>}
       />
     </View>
   )

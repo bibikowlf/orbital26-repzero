@@ -97,6 +97,12 @@ export default function TabLayout() {
         name="(community)/add-post"
         options={{ href: null }}
       />
+
+      {/* Post (No Tab) */}
+      <Tabs.Screen
+        name="(community)/post"
+        options={{ href: null }}
+      />
     </Tabs>
   );
 }
