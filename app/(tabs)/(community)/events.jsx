@@ -100,13 +100,18 @@ export default function Events() {
                 <Text style={appStyles.metaText}>📍 {event.location}</Text>
                 </View>
 
-            <Text>{event.rsvp_count} going</Text>
-            <Text>by @{event.creator_username}</Text>
+            <View style={appStyles.cardFooter}>
+              <Text style={appStyles.hostText}>
+                by @{event.creator_username} · {event.rsvp_count} going
+              </Text>
 
-            <TouchableOpacity>
-              <Text>RSVP</Text>
-            </TouchableOpacity>
-          </TouchableOpacity>
+              <TouchableOpacity style={[appStyles.rsvpBadge, event.user_rsvp === 'going' && appStyles.rsvpBadgeActive]}>
+                <Text style={[appStyles.rsvpBadgeText, event.user_rsvp === 'going' && appStyles.rsvpBadgeTextActive]}>
+                  {event.user_rsvp === 'going' ? '✓ Going' : 'RSVP'}
+                </Text>
+              </TouchableOpacity>
+            </View> 
+          </TouchableOpacity> 
         )
       })}
     </ScrollView>
