@@ -55,9 +55,13 @@ export default function Events() {
   const [events] = useState(MOCK_EVENTS)
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#fff' }}>
-      <ScrollView contentContainerStyle={{ padding: 16 }}>
-        {events.map((event) => (
+  <View style={{ flex: 1, backgroundColor: '#fff' }}>
+    <ScrollView contentContainerStyle={{ padding: 16 }}>
+      {events.map((event) => {
+
+        const spotsLeft = event.max_attendees ? event.max_attendees - event.rsvp_count : null;
+        
+        return (
           <TouchableOpacity
             key={event.id}
             style={appStyles.card}
@@ -66,28 +70,32 @@ export default function Events() {
               params: { id: event.id } 
             })}
           >
-            <Text>{event.title}</Text>
-
-            <View style={appStyles.cardHeader}>
+            <View style={appStyles.cardHeader }>
               <View style={[appStyles.categoryBadge, { backgroundColor: CATEGORY_COLORS[event.category] || CATEGORY_COLORS.default }]}>
                 <Text style={appStyles.categoryText}>{event.category}</Text>
               </View>
+              
+              {spotsLeft !== null && (
+                <Text style={ appStyles.spotsText }>
+                  {spotsLeft <= 0 ? 'Full' : `${spotsLeft} spots left`}
+                </Text>
+              )}
             </View>
 
+            <Text>{event.title}</Text>
+
             <Text>{event.location}</Text>
-
             <Text>{event.event_date}</Text>
-
             <Text>{event.rsvp_count} going</Text>
-
             <Text>by @{event.creator_username}</Text>
 
             <TouchableOpacity>
               <Text>RSVP</Text>
             </TouchableOpacity>
           </TouchableOpacity>
-        ))}
-      </ScrollView>
+        )
+      })}
+    </ScrollView>
 
       <TouchableOpacity
         style={appStyles.fab}
