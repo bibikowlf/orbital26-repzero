@@ -50,6 +50,13 @@ const CATEGORY_COLORS = {
   default: '#0048ff',
 }
 
+function formatEventDate(dateStr) {
+  const date = new Date(dateStr)
+  const day = date.toLocaleDateString('en-SG', { weekday: 'short', day: 'numeric', month: 'short' })
+  const time = date.toLocaleTimeString('en-SG', { hour: '2-digit', minute: '2-digit' })
+  return { day, time }
+}
+
 export default function Events() {
   const router = useRouter()
   const [events] = useState(MOCK_EVENTS)
@@ -60,6 +67,7 @@ export default function Events() {
       {events.map((event) => {
 
         const spotsLeft = event.max_attendees ? event.max_attendees - event.rsvp_count : null;
+        const { day, time } = formatEventDate(event.event_date);
         
         return (
           <TouchableOpacity
@@ -85,8 +93,13 @@ export default function Events() {
             <Text style={appStyles.title}>{event.title}</Text>
             <Text style={appStyles.description} numberOfLines={2}>{event.description}</Text>
 
-            <Text>{event.location}</Text>
-            <Text>{event.event_date}</Text>
+            <View style={appStyles.metaRow}>
+              <Text style={appStyles.metaText}>📅 {day} · {time}</Text>
+              </View>
+              <View style={appStyles.metaRow}>
+                <Text style={appStyles.metaText}>📍 {event.location}</Text>
+                </View>
+
             <Text>{event.rsvp_count} going</Text>
             <Text>by @{event.creator_username}</Text>
 
