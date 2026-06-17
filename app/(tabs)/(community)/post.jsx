@@ -39,6 +39,8 @@ export default function Post() {
   const [replyingTo, setReplyingTo] = useState(null)
   const [newComment, setNewComment] = useState('')
   const [votedPost, setVotedPost] = useState(null)
+  const [editingComment, setEditingComment] = useState(null)
+  const [editPost, setEditPost] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -182,6 +184,67 @@ export default function Post() {
     }
   }
 
+  const handleEditPost = async () => {
+    if (!editPost || !editPost.trim()) {
+      Alert.alert('Post cannot be empty')
+      return
+    } else if (editPost === post.content) {
+      setEditPost(null)
+      return
+    }
+    try {
+      setLoading(true)
+
+      const { error } = await supabase
+        .from('posts')
+        .upsert({
+          id: postId,
+          content: editPost,
+          user_id: userId,
+          created_at: post.created_at,
+          title: post.title
+        })
+      if (error) throw error
+      setPost({ ...post, content: editPost })
+    } catch (error) {
+      if (error instanceof Error) Alert.alert(error.message)
+    } finally {
+      setLoading(false)
+      setEditPost(null)
+    }
+  }
+
+  const handleEditComment = async ({ comment, editComment }) => {
+    if (!editComment || !editComment.trim()) {
+      Alert.alert('Comment cannot be empty')
+      return
+    } else if (editComment === comment.content) {
+      setEditingComment(null)
+      return
+    }
+    try {
+      setLoading(true)
+
+      const { data, error } = await supabase
+        .from('comments')
+        .upsert({
+          id: comment.id,
+          post_id: comment.post_id,
+          parent_id: comment.parent_id,
+          content: editComment,
+          user_id: userId,
+          created_at: comment.created_at,
+        })
+      if (error) throw error
+      setComments(comments.map(item => item.id === comment.id ? { ...item, content: editComment }: item))
+    } catch (error) {
+      if (error instanceof Error) Alert.alert(error.message)
+    } finally {
+      setLoading(false)
+      setEditingComment(null)
+    }
+  }
+
   if (loading) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
@@ -194,7 +257,28 @@ export default function Post() {
     <KeyboardAvoidingView behavior='padding'>
       <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10 }]}>
         <Stack.Screen options={{ title: 'Discussion Forum', headerBackVisible: false, headerTitleAlign: 'center' }}/>
-        <Text>{post.content}</Text>
+        {editPost === null ? (<Text>{post.content}</Text>): (
+          <View>
+            <TextInput 
+              value={editPost}
+              onChangeText={(text) => setEditPost(text)}
+              autoCapitalize='none'
+              multiline={true}
+              textAlignVertical='top'
+              numberOfLines={10}
+              style={styles.input}
+            />
+            <TouchableOpacity
+              style={[styles.actionButton, 
+                { backgroundColor: '#007AFF', flex: 0, marginTop: 10 }, 
+                loading && styles.buttonDisabled]}
+              onPress={() => handleEditPost()}
+              disabled={loading}
+            >
+              <Text style={styles.buttonText}>Edit</Text>
+            </TouchableOpacity>
+          </View>
+        )}
         <View style={styles.row}>
           <Text style={{ paddingLeft: 12, paddingRight: 4 }}>{post.score}</Text>
           <TouchableOpacity
@@ -202,20 +286,17 @@ export default function Post() {
             disabled={loading}>
             <Entypo name='arrow-bold-up' size={16} color={votedPost ? '#2e2c2c48' : '#000000'} />
           </TouchableOpacity>
-          {/*post.user_id === userId && (
+          {post.user_id === userId && (
             <TouchableOpacity
               style={{ marginLeft: 'auto', paddingRight: 12 }}
-              onPress={() => router.navigate({
-                pathname: 'edit-tutorial', 
-                params: {
-                  id: item.id,
-                  content: item.content,
-                  workoutId: id,
-                  workoutName: name}})}
-              disabled={loading}>
+              onPress={() => {
+                setEditingComment(null)
+                setEditPost(post.content)
+              }}
+              disabled={loading || editPost !== null}>
               <Entypo name='edit' size={16} />
             </TouchableOpacity>
-          )*/}
+          )}
         </View>
         {replyingTo && (
           <Text>Replying to {replyingTo.username}</Text>
@@ -226,10 +307,10 @@ export default function Post() {
           style={styles.input}
           placeholder='Enter comment'
         />
-        <Spacer height={10} />
         <TouchableOpacity
           style={[styles.button,
-          loading && styles.buttonDisabled]}
+            { backgroundColor: '#007AFF', flex: 0, marginTop: 10 }, 
+            loading && styles.buttonDisabled]}
           onPress={handleAdd}
           disabled={loading}
         >
@@ -238,12 +319,20 @@ export default function Post() {
 
         <FlatList
           data={commentTree}
+          extraData={[comments, votes, editingComment]}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <Comment 
               comment={item} depth={0} 
-              onReplyPress={() => setReplyingTo(item)} 
-              onVotePress={(comment) => handleVote({ comment: comment })}/>
+              editing={editingComment?.id} loading={loading}
+              onReplyPress={(comment) => setReplyingTo(comment)} 
+              onVotePress={(comment) => handleVote({ comment: comment })}
+              onEditPress={(comment) => {
+                setEditingComment(comment)
+                setEditPost(null)
+              }}
+              onUpdatePress={(editComment) => handleEditComment({ comment: editingComment, editComment: editComment })}
+            />
           )}
         />
       </View>
