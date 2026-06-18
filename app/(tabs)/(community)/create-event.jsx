@@ -24,39 +24,36 @@ export default function CreateEvent() {
 
   async function handleSubmit() {
   
-  if (!title.trim()) {
+  if (!title.trim()) 
     return Alert.alert('Missing Field', 'Please enter an event title.')
-  }
 
-  if (!description.trim()) {
+  if (!description.trim()) 
     return Alert.alert('Missing Field', 'Please enter an event description.')
-  }
 
-  if (!location.trim()) {
+  if (!location.trim()) 
     return Alert.alert('Missing Field', 'Please specify a location.')
-  }
 
-  if (!eventDate.trim()) {
+  if (!eventDate.trim()) 
     return Alert.alert('Missing Field', 'Please enter an event date (YYYY-MM-DD).')
-  }
-  if (!eventTime.trim()) {
+
+  if (!eventTime.trim())
     return Alert.alert('Missing Field', 'Please enter an event time (HH:MM).')
-  }
 
-  if (!category) {
+  if (!category)
     return Alert.alert('Missing Field', 'Please select a category chip.')
-  }
 
-  if (category === 'Other' && !customCategory.trim()) {
+  if (category === 'Other' && !customCategory.trim())
     return Alert.alert('Missing Field', 'Please specify your custom category.')
-  }
 
   const finalCategory = category === 'Other' ? customCategory.trim() : category
 
   const combinedDateTime = new Date(`${eventDate}T${eventTime}:00+08:00`)
-  if (isNaN(combinedDateTime)) {
+  if (isNaN(combinedDateTime))
     return Alert.alert('Invalid Format', 'Please use YYYY-MM-DD for date and HH:MM for time.')
-  }
+
+  const now = new Date()
+  if (combinedDateTime <= now) 
+    return Alert.alert('Error', 'Event date must be in the future.')
 
   if (!userId) {
     return Alert.alert('Error', 'You must be logged in to create an event')
