@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { View, Text, TextInput, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native'
 import { appStyles } from '../../../styles/styles'
+import { supabase } from '../../../lib/supabase'
 
 const CATEGORIES = ['Cardio', 'Strength', 'Flexibility', 'Social', 'Other']
 
@@ -13,6 +14,7 @@ export default function CreateEvent() {
   const [maxAttendees, setMaxAttendees] = useState('')
   const [category, setCategory] = useState(null)
   const [customCategory, setCustomCategory] = useState('')
+  const [saving, setSaving] = useState(false)
 
   async function handleSubmit() {
   
@@ -104,6 +106,7 @@ export default function CreateEvent() {
       <Text style={appStyles.label}>Date * (YYYY-MM-DD)</Text>
       <TextInput
         style={appStyles.input}
+        keyboardType='numbers-and-punctuation'
         placeholder="e.g. 2025-06-20"
         placeholderTextColor="#888"
         value={eventDate}
@@ -113,6 +116,7 @@ export default function CreateEvent() {
       <Text style={appStyles.label}>Time * (HH:MM)</Text>
       <TextInput
         style={appStyles.input}
+        keyboardType='numbers-and-punctuation'
         placeholder="e.g. 07:00"
         placeholderTextColor="#888"
         value={eventTime}
