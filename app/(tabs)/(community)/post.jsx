@@ -293,86 +293,95 @@ export default function Post() {
 
   return (
     <KeyboardAvoidingView behavior='padding' style={{ flex: 1 }}>
-      <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 0, flex: 1 }]}>
-        <Stack.Screen options={{ title: 'Discussion Forum', headerBackVisible: false, headerTitleAlign: 'center' }}/>
-        <Text style={{color: 'gray', fontSize: 12}}>{post.user_id === userId ? 'You': '@' + post.username}</Text>
-        <Spacer height={2} />
-        <Text style={styles.title}>{post.title}</Text>
-        <Spacer height={4} />
-        {editPost === null ? (
-          <Text style={{ fontSize: 16 }}>{post.content}</Text>): (
-          <View>
-            <TextInput 
-              value={editPost}
-              onChangeText={(text) => setEditPost(text)}
-              autoCapitalize='none'
-              multiline={true}
-              textAlignVertical='top'
-              numberOfLines={10}
-              style={styles.input}
-            />
-            <TouchableOpacity
-              style={[styles.actionButton, 
-                { backgroundColor: '#007AFF', flex: 0, marginTop: 10 }, 
-                loading && styles.buttonDisabled]}
-              onPress={() => handleEditPost()}
-              disabled={loading}
-            >
-              <Text style={styles.buttonText}>Edit</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-        <Spacer height={4} />
-        <View style={styles.row}>
-          <Text style={{ paddingLeft: 12, paddingRight: 4 }}>{post.score}</Text>
-          <TouchableOpacity
-            onPress={handleVotePost}
-            disabled={loading}>
-            <Entypo name='arrow-bold-up' size={16} color={votedPost ? '#2e2c2c48' : '#000000'} />
-          </TouchableOpacity>
-          {post.user_id === userId && (
-            <TouchableOpacity
-              style={{ marginLeft: 'auto', paddingRight: 12 }}
-              onPress={() => {
-                setEditingComment(null)
-                setEditPost(post.content)
-              }}
-              disabled={loading || editPost !== null}>
-              <Entypo name='edit' size={16} />
-            </TouchableOpacity>
-          )}
-          {post.user_id === userId && (
-            <TouchableOpacity
-              style={{ marginLeft: 'auto', paddingRight: 12 }}
-              onPress={handleDeletePost}
-              disabled={loading}>
-              <Entypo name='trash' size={16} />
-            </TouchableOpacity>
-          )}
-        </View>
-        {replyingTo && (
-          <Text>Replying to {replyingTo.username}</Text>
-        )}
-        <TextInput 
-          value={newComment}
-          onChangeText={(text) => setNewComment(text)}
-          style={styles.input}
-          placeholder='Enter comment'
-        />
-        <TouchableOpacity
-          style={[styles.button,
-            { backgroundColor: '#007AFF', flex: 0, marginTop: 10 }, 
-            loading && styles.buttonDisabled]}
-          onPress={handleAdd}
-          disabled={loading}
-        >
-          <Text style={styles.buttonText}>Add</Text>
-        </TouchableOpacity>
-        <Spacer height={10} />
+      <View style={[styles.container, 
+        { alignItems: 'stretch', width: '100%', marginTop: 0, flex: 1 }]}>
+        <Stack.Screen options={{ 
+          title: 'Discussion Forum', headerBackVisible: false, headerTitleAlign: 'center' }}/>
         <FlatList
           data={commentTree}
           extraData={[comments, votes, editingComment]}
           keyExtractor={(item) => item.id.toString()}
+          style={{ flex: 1 }}
+          ListHeaderComponent={
+            <View>
+              <Text style={{color: 'gray', fontSize: 12}}>
+                {post.user_id === userId ? 'You': '@' + post.username}
+              </Text>
+              <Spacer height={2} />
+              <Text style={styles.title}>{post.title}</Text>
+              <Spacer height={4} />
+              {editPost === null ? (
+                <Text style={{ fontSize: 16 }}>{post.content}</Text>): (
+                <View>
+                  <TextInput 
+                    value={editPost}
+                    onChangeText={(text) => setEditPost(text)}
+                    autoCapitalize='none'
+                    multiline={true}
+                    textAlignVertical='top'
+                    numberOfLines={10}
+                    style={styles.input}
+                  />
+                  <TouchableOpacity
+                    style={[styles.actionButton, 
+                      { backgroundColor: '#007AFF', flex: 0, marginTop: 10 }, 
+                      loading && styles.buttonDisabled]}
+                    onPress={() => handleEditPost()}
+                    disabled={loading}
+                  >
+                    <Text style={styles.buttonText}>Edit</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              <Spacer height={4} />
+              <View style={styles.row}>
+                <Text style={{ paddingLeft: 12, paddingRight: 4 }}>{post.score}</Text>
+                <TouchableOpacity
+                  onPress={handleVotePost}
+                  disabled={loading}>
+                  <Entypo name='arrow-bold-up' size={16} color={votedPost ? '#2e2c2c48' : '#000000'} />
+                </TouchableOpacity>
+                {post.user_id === userId && (
+                  <TouchableOpacity
+                    style={{ marginLeft: 'auto', paddingRight: 12 }}
+                    onPress={() => {
+                      setEditingComment(null)
+                      setEditPost(post.content)
+                    }}
+                    disabled={loading || editPost !== null}>
+                    <Entypo name='edit' size={16} />
+                  </TouchableOpacity>
+                )}
+                {post.user_id === userId && (
+                  <TouchableOpacity
+                    style={{ marginLeft: 'auto', paddingRight: 12 }}
+                    onPress={handleDeletePost}
+                    disabled={loading}>
+                    <Entypo name='trash' size={16} />
+                  </TouchableOpacity>
+                )}
+              </View>
+              {replyingTo && (
+                <Text>Replying to {replyingTo.username}</Text>
+              )}
+              <TextInput 
+                value={newComment}
+                onChangeText={(text) => setNewComment(text)}
+                style={styles.input}
+                placeholder='Enter comment'
+              />
+              <TouchableOpacity
+                style={[styles.button,
+                  { backgroundColor: '#007AFF', flex: 0, marginTop: 10 }, 
+                  loading && styles.buttonDisabled]}
+                onPress={handleAdd}
+                disabled={loading}
+              >
+                <Text style={styles.buttonText}>Add</Text>
+              </TouchableOpacity>
+              <Spacer height={10} />
+            </View>
+          }
           renderItem={({ item }) => (
             <Comment 
               comment={item} depth={0} 
