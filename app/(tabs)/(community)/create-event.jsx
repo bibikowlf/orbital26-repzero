@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { View, Text, TextInput, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native'
 import { appStyles } from '../../../styles/styles'
 
-const CATEGORIES = ['Cardio', 'Strength', 'Flexibility', 'Social']
+const CATEGORIES = ['Cardio', 'Strength', 'Flexibility', 'Social', 'Other']
 
 export default function CreateEvent() {
   const [title, setTitle] = useState('')
@@ -12,6 +12,7 @@ export default function CreateEvent() {
   const [eventTime, setEventTime] = useState('')
   const [maxAttendees, setMaxAttendees] = useState('')
   const [category, setCategory] = useState(null)
+  const [customCategory, setCustomCategory] = useState('')
 
   async function handleSubmit() {
   
@@ -38,6 +39,12 @@ export default function CreateEvent() {
     return Alert.alert('Missing Field', 'Please select a category chip.')
   }
 
+  if (category === 'Other' && !customCategory.trim()) {
+    return Alert.alert('Missing Field', 'Please specify your custom category.')
+  }
+
+  const finalCategory = category === 'Other' ? customCategory.trim() : category
+
   const combinedDateTime = new Date(`${eventDate}T${eventTime}:00+08:00`)
   if (isNaN(combinedDateTime)) {
     return Alert.alert('Invalid Format', 'Please use YYYY-MM-DD for date and HH:MM for time.')
@@ -51,7 +58,7 @@ export default function CreateEvent() {
       description: description.trim(),
       location: location.trim(),
       event_date: combinedDateTime.toISOString(),
-      category, 
+      finalCategory, 
       max_attendees: parseInt(maxAttendees),
     })
     
@@ -118,7 +125,11 @@ export default function CreateEvent() {
           <TouchableOpacity
             key={cat}
             style={[appStyles.categoryChip, category === cat && appStyles.categoryChipActive]}
-            onPress={() => setCategory(cat)}
+            onPress={() => {
+              setCategory(cat)
+              if (cat != 'Other') 
+                setCustomCategory('')
+            }}
           >
             <Text style={[appStyles.categoryChipText, category === cat && appStyles.categoryChipTextActive]}>
               {cat}
@@ -126,6 +137,19 @@ export default function CreateEvent() {
           </TouchableOpacity>
         ))}
       </View>
+
+      {category === 'Other' && (
+      <View style={{ marginTop: 10 }}>
+        <Text style={[appStyles.label, { marginTop: 0 }]}>Please specify *</Text>
+        <TextInput
+          style={appStyles.input}
+          placeholder="e.g. Pilates, Boxing, Dance"
+          placeholderTextColor="#888"
+          value={customCategory}
+          onChangeText={setCustomCategory}
+        />
+      </View>
+    )}
 
       <Text style={appStyles.label}>Max Attendees (optional)</Text>
       <TextInput
