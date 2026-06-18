@@ -292,10 +292,15 @@ export default function Post() {
   }
 
   return (
-    <KeyboardAvoidingView behavior='padding'>
-      <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10 }]}>
+    <KeyboardAvoidingView behavior='padding' style={{ flex: 1 }}>
+      <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 0, flex: 1 }]}>
         <Stack.Screen options={{ title: 'Discussion Forum', headerBackVisible: false, headerTitleAlign: 'center' }}/>
-        {editPost === null ? (<Text>{post.content}</Text>): (
+        <Text style={{color: 'gray', fontSize: 12}}>{post.user_id === userId ? 'You': '@' + post.username}</Text>
+        <Spacer height={2} />
+        <Text style={styles.title}>{post.title}</Text>
+        <Spacer height={4} />
+        {editPost === null ? (
+          <Text style={{ fontSize: 16 }}>{post.content}</Text>): (
           <View>
             <TextInput 
               value={editPost}
@@ -317,6 +322,7 @@ export default function Post() {
             </TouchableOpacity>
           </View>
         )}
+        <Spacer height={4} />
         <View style={styles.row}>
           <Text style={{ paddingLeft: 12, paddingRight: 4 }}>{post.score}</Text>
           <TouchableOpacity
@@ -362,7 +368,7 @@ export default function Post() {
         >
           <Text style={styles.buttonText}>Add</Text>
         </TouchableOpacity>
-
+        <Spacer height={10} />
         <FlatList
           data={commentTree}
           extraData={[comments, votes, editingComment]}

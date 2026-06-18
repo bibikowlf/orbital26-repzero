@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 export default function Comment({ comment, depth, editing, loading, onReplyPress, onVotePress, onEditPress, onUpdatePress, onDeletePress }) {
   const { claims } = useAuthContext()
   const userId = claims?.sub
-  const indentation = Math.min(depth, 4) * 16
+  const indentation = depth === 0 ? 0 : 16
   const [editComment, setEditComment] = useState(null)
   const styles = appStyles
 
@@ -21,6 +21,7 @@ export default function Comment({ comment, depth, editing, loading, onReplyPress
 
   return (
     <View style={{ marginLeft: indentation }}>
+      <Text style={{color: 'gray', fontSize: 12}}>{comment.user_id === userId ? 'You': '@' + comment.username}</Text>
       {editing !== comment.id ? (<Text>{comment.content}</Text>): (
         <View>
           <TextInput 

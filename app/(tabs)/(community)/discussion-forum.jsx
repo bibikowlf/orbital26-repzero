@@ -4,6 +4,7 @@ import { appStyles } from '../../../styles/styles'
 import { supabase } from '../../../lib/supabase'
 import { router, useFocusEffect } from 'expo-router'
 import Spacer from '../../../components/spacer'
+import Entypo from '@expo/vector-icons/Entypo'
 
 export default function DiscussionForum() {
   const [posts, setPosts] = useState([])
@@ -99,12 +100,16 @@ export default function DiscussionForum() {
                 borderWidth: 1, 
                 borderColor: '#ced4da', 
                 marginBottom: 8,
-                height: 80 }]}
+                height: 80,
+                padding: 12 }]}
             onPress={() => router.navigate({ pathname: '/post', params: {postId: item.id} })}
             disabled={loading}
           >
-            <Text style={[styles.title, {marginLeft: 10}]}>{item.title}</Text>
-            <Text style={{ marginLeft: 10 }}>{item.score} {item.score > 1 ? 'upvotes': 'upvote'}</Text>
+            <Text style={styles.title}>{item.title}</Text>
+            <View style={[styles.row, { marginTop: 6, marginBottom: 0 }]}>
+              <Entypo name='arrow-bold-up' size={16} />
+              <Text style={{ marginLeft: 4 }}>{item.score}</Text>
+            </View>
           </TouchableOpacity>
         )}
       />
