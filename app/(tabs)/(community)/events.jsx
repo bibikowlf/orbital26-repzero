@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native'
-import { useRouter } from 'expo-router'
+import { useRouter, useFocusEffect } from 'expo-router'
 import { appStyles } from '../../../styles/styles'
 import { supabase } from '../../../lib/supabase'
 import { useAuthContext } from '../../../hooks/auth-context'
@@ -67,9 +67,11 @@ export default function Events() {
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (userId) fetchEvents()
-  }, [userId])
+  useFocusEffect(
+    useCallback(() => {
+      if (userId) fetchEvents()
+    }, [userId])
+  )
 
   async function fetchEvents() {
     const { data, error } = await supabase
