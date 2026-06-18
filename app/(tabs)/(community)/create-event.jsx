@@ -35,10 +35,6 @@ export default function CreateEvent() {
     return Alert.alert('Missing Field', 'Please select a category chip.')
   }
 
-  if (!maxAttendees.trim()) {
-    return Alert.alert('Missing Field', 'Please specify the maximum number of attendees.')
-  }
-
   const combinedDateTime = new Date(`${eventDate}T${eventTime}:00+08:00`)
   if (isNaN(combinedDateTime)) {
     return Alert.alert('Invalid Format', 'Please use YYYY-MM-DD for date and HH:MM for time.')
