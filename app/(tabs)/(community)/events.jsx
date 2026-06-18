@@ -73,6 +73,28 @@ export default function Events() {
     }, [userId])
   )
 
+  async function handleRsvp(event) {
+    if (event.user_rsvp === 'going') {
+      const { error } = await supabase
+        .from('event_rsvps')
+        .delete()
+        .eq('event_id', event.id)
+        .eq('user_id', userId)
+      if (error) 
+        return Alert.alert('Error', error.message)
+    } else {
+      const { error } = await supabase
+        .from('event_rsvps')
+        .upsert({ 
+          event_id: event.id, 
+          user_id: userId, 
+          status: 'going' })
+      if (error) 
+        return Alert.alert('Error', error.message)
+    }
+    fetchEvents()
+  }
+
   async function fetchEvents() {
     const { data, error } = await supabase
       .from('events')
