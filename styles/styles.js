@@ -575,4 +575,33 @@ submitText: {
   fontWeight: '700', 
   fontSize: 15 
 },
+
+//category in create event
+categoryRow: { 
+  flexDirection: 'row', 
+  flexWrap: 'wrap', 
+  gap: 8 
+},
+
+categoryChip: { 
+  borderWidth: 1, 
+  borderColor: '#ccc', 
+  borderRadius: 20, 
+  paddingHorizontal: 14, 
+  paddingVertical: 6 
+},
+
+categoryChipActive: { 
+  backgroundColor: '#007AFF', 
+  borderColor: '#007AFF' 
+},
+
+categoryChipText: { 
+  fontSize: 13, 
+  color: '#333' 
+},
+
+categoryChipTextActive: { 
+  color: '#fff' 
+},
 })

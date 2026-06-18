@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { View, Text, TextInput, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native'
 import { appStyles } from '../../../styles/styles'
 
+const CATEGORIES = ['Cardio', 'Strength', 'Flexibility', 'Social']
+
 export default function CreateEvent() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -9,6 +11,7 @@ export default function CreateEvent() {
   const [eventDate, setEventDate] = useState('')
   const [eventTime, setEventTime] = useState('')
   const [maxAttendees, setMaxAttendees] = useState('')
+  const [category, setCategory] = useState(null)
 
   async function handleSubmit() {
   
@@ -72,7 +75,7 @@ export default function CreateEvent() {
         onChangeText={setTitle}
       />
 
-      <Text style={appStyles.label}>Description</Text>
+      <Text style={appStyles.label}>Description *</Text>
       <TextInput
         style={[appStyles.input, { height: 80 }]}
         placeholder="What's the plan?"
@@ -82,7 +85,7 @@ export default function CreateEvent() {
         multiline
       />
 
-      <Text style={appStyles.label}>Location</Text>
+      <Text style={appStyles.label}>Location *</Text>
       <TextInput
         style={appStyles.input}
         placeholder="e.g. East Coast Park"
@@ -108,6 +111,21 @@ export default function CreateEvent() {
         value={eventTime}
         onChangeText={setEventTime}
       />
+
+      <Text style={appStyles.label}>Category *</Text>
+      <View style={appStyles.categoryRow}>
+        {CATEGORIES.map((cat) => (
+          <TouchableOpacity
+            key={cat}
+            style={[appStyles.categoryChip, category === cat && appStyles.categoryChipActive]}
+            onPress={() => setCategory(cat)}
+          >
+            <Text style={[appStyles.categoryChipText, category === cat && appStyles.categoryChipTextActive]}>
+              {cat}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
 
       <Text style={appStyles.label}>Max Attendees (optional)</Text>
       <TextInput
