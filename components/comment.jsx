@@ -4,7 +4,7 @@ import { useAuthContext } from '../hooks/auth-context'
 import Entypo from '@expo/vector-icons/Entypo'
 import { useEffect, useState } from 'react'
 
-export default function Comment({ comment, depth, editing, loading, onReplyPress, onVotePress, onEditPress, onUpdatePress }) {
+export default function Comment({ comment, depth, editing, loading, onReplyPress, onVotePress, onEditPress, onUpdatePress, onDeletePress }) {
   const { claims } = useAuthContext()
   const userId = claims?.sub
   const indentation = Math.min(depth, 4) * 16
@@ -42,7 +42,7 @@ export default function Comment({ comment, depth, editing, loading, onReplyPress
           </TouchableOpacity>
         </View>
       )}
-      <View style={[styles.row, { justifyContent: 'space-between' }]}>
+      <View style={[styles.row, { justifyContent: 'space-between', paddingHorizontal: 12 }]}>
         <Text>{comment.score}</Text>
         <TouchableOpacity onPress={() => onVotePress(comment)} disabled={loading}>
           <Entypo name='arrow-bold-up' size={16} color={comment.voted === null ? '#000000': '#2e2c2c48' } />
@@ -53,6 +53,14 @@ export default function Comment({ comment, depth, editing, loading, onReplyPress
             onPress={() => onEditPress(comment)}
             disabled={loading || editing === comment.id}>
             <Entypo name='edit' size={16} />
+          </TouchableOpacity>
+        )}
+        {comment.user_id === userId && (
+          <TouchableOpacity
+            style={{ marginLeft: 'auto', paddingRight: 12 }}
+            onPress={() => onDeletePress(comment.id)}
+            disabled={loading}>
+            <Entypo name='trash' size={16} />
           </TouchableOpacity>
         )}
         <TouchableOpacity onPress={() => onReplyPress(comment)} disabled={loading}>
@@ -67,6 +75,7 @@ export default function Comment({ comment, depth, editing, loading, onReplyPress
           onVotePress={onVotePress}
           onEditPress={onEditPress}
           onUpdatePress={onUpdatePress}
+          onDeletePress={onDeletePress}
         />
       ))}
     </View>

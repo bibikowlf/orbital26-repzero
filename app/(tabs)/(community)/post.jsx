@@ -3,7 +3,7 @@ import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity,
   Alert, KeyboardAvoidingView } from 'react-native'
 import { appStyles } from '../../../styles/styles'
 import { supabase } from '../../../lib/supabase'
-import { useLocalSearchParams, Stack } from 'expo-router'
+import { useLocalSearchParams, Stack, router } from 'expo-router'
 import { useAuthContext } from '../../../hooks/auth-context'
 import Entypo from '@expo/vector-icons/Entypo'
 import Comment from '../../../components/comment'
@@ -48,6 +48,10 @@ export default function Post() {
   }, [postId])
 
   const fetchData = async () => {
+    setNewComment('')
+    setReplyingTo(null)
+    setEditPost(null)
+    setEditingComment(null)
     try {
       setLoading(true)
 
@@ -245,7 +249,41 @@ export default function Post() {
     }
   }
 
-  if (loading) {
+  const handleDeletePost = async () => {
+    try {
+      setLoading(true)
+
+      const { error } = await supabase
+        .from('posts')
+        .delete()
+        .eq('id', postId)
+      if (error) throw error
+    } catch (error) {
+      if (error instanceof Error) Alert.alert(error.message)
+    } finally {
+      setLoading(false)
+      router.navigate('/discussion-forum')
+    }
+  }
+
+  const handleDeleteComment = async (commentId) => {
+    try {
+      setLoading(true)
+
+      const { error } = await supabase
+        .from('comments')
+        .delete()
+        .eq('id', commentId)
+      if (error) throw error
+      setComments(comments.filter(item => item.id !== commentId))
+    } catch (error) {
+      if (error instanceof Error) Alert.alert(error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading || !post) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
         <ActivityIndicator size="large" color="#000" />
@@ -297,6 +335,14 @@ export default function Post() {
               <Entypo name='edit' size={16} />
             </TouchableOpacity>
           )}
+          {post.user_id === userId && (
+            <TouchableOpacity
+              style={{ marginLeft: 'auto', paddingRight: 12 }}
+              onPress={handleDeletePost}
+              disabled={loading}>
+              <Entypo name='trash' size={16} />
+            </TouchableOpacity>
+          )}
         </View>
         {replyingTo && (
           <Text>Replying to {replyingTo.username}</Text>
@@ -332,6 +378,7 @@ export default function Post() {
                 setEditPost(null)
               }}
               onUpdatePress={(editComment) => handleEditComment({ comment: editingComment, editComment: editComment })}
+              onDeletePress={(commentId) => handleDeleteComment(commentId)}
             />
           )}
         />
