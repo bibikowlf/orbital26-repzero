@@ -1,12 +1,17 @@
-import { useState, useEffect } from 'react'
-import { View, Text, TextInput, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native'
+import { useState } from 'react'
+import { View, Text, TextInput, ScrollView, TouchableOpacity, Alert } from 'react-native'
 import { appStyles } from '../../../styles/styles'
 import { supabase } from '../../../lib/supabase'
 import { useRouter } from 'expo-router'
+import { useAuthContext } from '../../../hooks/auth-context'
 
 const CATEGORIES = ['Cardio', 'Strength', 'Flexibility', 'Social', 'Other']
 
 export default function CreateEvent() {
+  const router = useRouter()
+  const { claims } = useAuthContext()
+  const userId = claims?.sub
+
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [location, setLocation] = useState('')
@@ -53,8 +58,13 @@ export default function CreateEvent() {
     return Alert.alert('Invalid Format', 'Please use YYYY-MM-DD for date and HH:MM for time.')
   }
 
+  if (!userId) {
+    return Alert.alert('Error', 'You must be logged in to create an event')
+  }
+
   try {
     setSaving(true)
+    
     const { data: { user }, error: userError } = await supabase.auth.getUser()
     if (userError || !user) {
       return Alert.alert('Error', 'You must be logged in to create an event')
@@ -171,7 +181,11 @@ export default function CreateEvent() {
         keyboardType="numeric"
       />
 
-      <TouchableOpacity style={appStyles.submitButton} onPress={handleSubmit}>
+      <TouchableOpacity style={[
+          appStyles.submitButton,
+          saving && { opacity: 0.5 }
+        ]} onPress={handleSubmit} disabled={saving}
+      >
         <Text style={appStyles.submitText}>Post Event</Text>
       </TouchableOpacity>
     </ScrollView>
