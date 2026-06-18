@@ -49,11 +49,35 @@ export default function CreateEvent() {
 
   const combinedDateTime = new Date(`${eventDate}T${eventTime}:00+08:00`)
   if (isNaN(combinedDateTime))
-    return Alert.alert('Invalid Format', 'Please use YYYY-MM-DD for date and HH:MM for time.')
+    return Alert.alert('Invalid Format', 'Invalid date configuration.')
 
   const now = new Date()
   if (combinedDateTime <= now) 
     return Alert.alert('Error', 'Event date must be in the future.')
+
+  const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/
+  if (!timeRegex.test(eventTime)) 
+    return Alert.alert('Error', 'Invalid time. Please use HH:MM format (e.g. 07:00).')
+
+  const [hours, minutes] = eventTime.split(':').map(Number)
+  if (hours < 0 || hours > 23) 
+    return Alert.alert('Invalid Time', 'Hours must be between 00 and 23.')
+  if (minutes < 0 || minutes > 59)
+    return Alert.alert('Invalid Time', 'Minutes must be between 00 and 59.')
+
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/
+  if (!dateRegex.test(eventDate)) 
+    return Alert.alert('Invalid Date', 'Date must be in YYYY-MM-DD format.')
+
+  const [year, month, day] = eventDate.split('-').map(Number)
+  if (month < 1 || month > 12) 
+    return Alert.alert('Invalid Date', 'Month must be between 01 and 12.')
+
+  const days = new Date(year, month, 0).getDate()
+  if (day < 1 || day > days) {
+    return Alert.alert('Invalid Date', `Day must be between 01 and ${daysInMonth} for this month.`)
+  }
+
 
   if (!userId) {
     return Alert.alert('Error', 'You must be logged in to create an event')
