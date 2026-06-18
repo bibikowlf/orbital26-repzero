@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { View, Text, TextInput, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native'
 import { appStyles } from '../../../styles/styles'
 import { supabase } from '../../../lib/supabase'
+import { useRouter } from 'expo-router'
 
 const CATEGORIES = ['Cardio', 'Strength', 'Flexibility', 'Social', 'Other']
 
@@ -54,14 +55,19 @@ export default function CreateEvent() {
 
   try {
     setSaving(true)
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    if (userError || !user) {
+      return Alert.alert('Error', 'You must be logged in to create an event')
+    }
+
     const { error } = await supabase.from('events').insert({
       creator_id: userId,
       title: title.trim(),
       description: description.trim(),
       location: location.trim(),
       event_date: combinedDateTime.toISOString(),
-      finalCategory, 
-      max_attendees: parseInt(maxAttendees),
+      category: finalCategory, 
+      max_attendees: maxAttendees ? parseInt(maxAttendees) : null,
     })
     
     if (error) throw error
