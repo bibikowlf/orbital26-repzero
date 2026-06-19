@@ -6,7 +6,6 @@ import { supabase } from '../../../lib/supabase'
 import { Stack, router } from 'expo-router'
 import { useAuthContext } from '../../../hooks/auth-context'
 import * as ImagePicker from 'expo-image-picker'
-import * as FileSystem from 'expo-file-system'
 import { decode } from 'base64-arraybuffer'
 import Entypo from '@expo/vector-icons/Entypo'
 
