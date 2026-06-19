@@ -32,7 +32,7 @@ export default function TextInfo({ marginBottom, isAuthor, canReply, score, load
           style={{ marginLeft: 12 }}
           onPress={() => {
             Alert.alert(
-              'COnfirm Deletion', 'Are you sure you want to delete this item? This action cannot be undone.', 
+              'Confirm Deletion', 'Are you sure you want to delete this item? This action cannot be undone.', 
               [
                 {text: 'Cancel'}, 
                 {text: 'Delete', onPress: onDeletePress}
