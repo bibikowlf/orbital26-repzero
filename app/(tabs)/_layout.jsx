@@ -70,13 +70,7 @@ export default function TabLayout() {
 
       {/* Workout Tutorials (No Tab) */}
       <Tabs.Screen
-        name="(workouts)/[id]"
-        options={{ href: null }}
-      />
-
-      {/* Edit Workout Tutorial (No Tab) */}
-      <Tabs.Screen
-        name="(workouts)/edit-tutorial"
+        name="tutorial"
         options={{ href: null }}
       />
 
@@ -84,6 +78,24 @@ export default function TabLayout() {
       <Tabs.Screen
         name="(community)/leaderboard"
         options={{ title: 'Leaderboard' }}
+      />
+
+      {/* Discussion Forum (Temporary Tab) */}
+      <Tabs.Screen
+        name="(community)/discussion-forum"
+        options={{ title: 'Discussion Forum' }}
+      />
+
+      {/* Add Post (No Tab) */}
+      <Tabs.Screen
+        name="(community)/add-post"
+        options={{ href: null }}
+      />
+
+      {/* Post (No Tab) */}
+      <Tabs.Screen
+        name="(community)/post"
+        options={{ href: null }}
       />
     </Tabs>
   );
