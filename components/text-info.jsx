@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, Text, TouchableOpacity, Alert } from 'react-native'
 import { appStyles } from '../styles/styles'
 import Entypo from '@expo/vector-icons/Entypo'
 
@@ -30,7 +30,14 @@ export default function TextInfo({ marginBottom, isAuthor, canReply, score, load
       {isAuthor && (
         <TouchableOpacity
           style={{ marginLeft: 12 }}
-          onPress={onDeletePress}
+          onPress={() => {
+            Alert.alert(
+              'COnfirm Deletion', 'Are you sure you want to delete this item? This action cannot be undone.', 
+              [
+                {text: 'Cancel', style: 'cancel'}, 
+                {text: 'Delete', style: 'destructive', onPress: onDeletePress}
+              ]
+          )}}
           disabled={loading}>
           <Entypo name='trash' size={16} />
         </TouchableOpacity>
