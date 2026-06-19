@@ -34,8 +34,8 @@ export default function TextInfo({ marginBottom, isAuthor, canReply, score, load
             Alert.alert(
               'COnfirm Deletion', 'Are you sure you want to delete this item? This action cannot be undone.', 
               [
-                {text: 'Cancel', style: 'cancel'}, 
-                {text: 'Delete', style: 'destructive', onPress: onDeletePress}
+                {text: 'Cancel'}, 
+                {text: 'Delete', onPress: onDeletePress}
               ]
           )}}
           disabled={loading}>
