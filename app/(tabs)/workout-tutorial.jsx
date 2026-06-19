@@ -143,7 +143,7 @@ export default function WorkoutTutorial() {
                 borderColor: '#ced4da', 
                 marginBottom: 8,
                 height: 80 }]}
-            onPress={() => router.navigate({ pathname: `/${item.id}`, params: {name: item.name}})}
+            onPress={() => router.navigate({ pathname: '/tutorial', params: {id: item.id, name: item.name}})}
             disabled={loading}
           >
             <Text style={styles.title}>{item.name}</Text>

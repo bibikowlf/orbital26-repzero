@@ -3,6 +3,7 @@ import { appStyles } from '../styles/styles'
 import { useAuthContext } from '../hooks/auth-context'
 import Entypo from '@expo/vector-icons/Entypo'
 import { useEffect, useState } from 'react'
+import TextInfo from './text-info'
 
 export default function Comment({ comment, depth, editing, loading, onReplyPress, onVotePress, onEditPress, onUpdatePress, onDeletePress }) {
   const { claims } = useAuthContext()
@@ -21,8 +22,11 @@ export default function Comment({ comment, depth, editing, loading, onReplyPress
 
   return (
     <View style={{ marginLeft: indentation }}>
-      <Text style={{color: 'gray', fontSize: 12}}>{comment.user_id === userId ? 'You': '@' + comment.username}</Text>
-      {editing !== comment.id ? (<Text>{comment.content}</Text>): (
+      <Text style={{color: 'gray', fontSize: 12}}>
+        {comment.user_id === userId ? 'You': '@' + comment.username}
+      </Text>
+      {editing !== comment.id ? (
+        <Text style={{ fontSize: 16 }}>{comment.content}</Text>): (
         <View>
           <TextInput 
             value={editComment}
@@ -43,31 +47,19 @@ export default function Comment({ comment, depth, editing, loading, onReplyPress
           </TouchableOpacity>
         </View>
       )}
-      <View style={[styles.row, { justifyContent: 'space-between', paddingHorizontal: 12 }]}>
-        <Text>{comment.score}</Text>
-        <TouchableOpacity onPress={() => onVotePress(comment)} disabled={loading}>
-          <Entypo name='arrow-bold-up' size={16} color={comment.voted === null ? '#000000': '#2e2c2c48' } />
-        </TouchableOpacity>
-        {comment.user_id === userId && (
-          <TouchableOpacity
-            style={{ marginLeft: 'auto', paddingRight: 12 }}
-            onPress={() => onEditPress(comment)}
-            disabled={loading || editing === comment.id}>
-            <Entypo name='edit' size={16} />
-          </TouchableOpacity>
-        )}
-        {comment.user_id === userId && (
-          <TouchableOpacity
-            style={{ marginLeft: 'auto', paddingRight: 12 }}
-            onPress={() => onDeletePress(comment.id)}
-            disabled={loading}>
-            <Entypo name='trash' size={16} />
-          </TouchableOpacity>
-        )}
-        <TouchableOpacity onPress={() => onReplyPress(comment)} disabled={loading}>
-          <Entypo name='reply' size={16} />
-        </TouchableOpacity>
-      </View>
+      <TextInfo 
+        marginBottom={10}
+        isAuthor={comment.user_id === userId} 
+        canReply={true} 
+        score={comment.score} 
+        loading={loading}
+        editing={editing === comment.id}
+        hasVoted={comment.voted !== null} 
+        onVotePress={() => onVotePress(comment)} 
+        onEditPress={() => onEditPress(comment)} 
+        onDeletePress={() => onDeletePress(comment.id)} 
+        onReplyPress={() => onReplyPress(comment)}
+      />
       {comment.replies && comment.replies.map(reply => (
         <Comment 
           key={reply.id} comment={reply} depth={depth + 1} 

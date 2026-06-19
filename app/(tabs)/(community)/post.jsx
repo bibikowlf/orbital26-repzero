@@ -8,6 +8,7 @@ import { useAuthContext } from '../../../hooks/auth-context'
 import Entypo from '@expo/vector-icons/Entypo'
 import Comment from '../../../components/comment'
 import Spacer from '../../../components/spacer'
+import TextInfo from '../../../components/text-info'
 
 const buildCommentTree = (comments, votes) => {
   const map = {}
@@ -126,7 +127,7 @@ export default function Post() {
     try {
       setLoading(true)
       
-      if (votedPost) {
+      if (votedPost !== null) {
         const { error } = await supabase
           .from('post_votes')
           .delete()
@@ -218,11 +219,11 @@ export default function Post() {
     }
   }
 
-  const handleEditComment = async ({ comment, editComment }) => {
-    if (!editComment || !editComment.trim()) {
+  const handleEditComment = async (editComment) => {
+    if (!editingComment || !editComment.trim()) {
       Alert.alert('Comment cannot be empty')
       return
-    } else if (editComment === comment.content) {
+    } else if (editComment === editingComment.content) {
       setEditingComment(null)
       return
     }
@@ -232,15 +233,15 @@ export default function Post() {
       const { data, error } = await supabase
         .from('comments')
         .upsert({
-          id: comment.id,
-          post_id: comment.post_id,
-          parent_id: comment.parent_id,
+          id: editingComment.id,
+          post_id: editingComment.post_id,
+          parent_id: editingComment.parent_id,
           content: editComment,
           user_id: userId,
-          created_at: comment.created_at,
+          created_at: editingComment.created_at,
         })
       if (error) throw error
-      setComments(comments.map(item => item.id === comment.id ? { ...item, content: editComment }: item))
+      setComments(comments.map(item => item.id === editingComment.id ? { ...item, content: editComment }: item))
     } catch (error) {
       if (error instanceof Error) Alert.alert(error.message)
     } finally {
@@ -305,7 +306,7 @@ export default function Post() {
           ListHeaderComponent={
             <View>
               <Text style={{color: 'gray', fontSize: 12}}>
-                {post.user_id === userId ? 'You': '@' + post.username}
+                {post.user_id === userId ? 'You' : '@'+post.username}
               </Text>
               <Spacer height={2} />
               <Text style={styles.title}>{post.title}</Text>
@@ -333,37 +334,26 @@ export default function Post() {
                   </TouchableOpacity>
                 </View>
               )}
+              <TextInfo
+                marginBottom={10}
+                isAuthor={post.user_id === userId} 
+                canReply={true} 
+                score={post.score} 
+                loading={loading}
+                editing={editPost !== null}
+                hasVoted={votedPost !== null} 
+                onVotePress={handleVotePost} 
+                onEditPress={() => {
+                  setEditingComment(null)
+                  setEditPost(post.content)
+                }} 
+                onDeletePress={handleDeletePost} 
+                onReplyPress={() => setReplyingTo(null)}
+              />
+              <Text style={{color: 'gray', fontSize: 12}}>
+                Replying to {replyingTo === null ? 'post' : replyingTo.user_id === userId ? 'yourself' : '@'+replyingTo.username}
+              </Text>
               <Spacer height={4} />
-              <View style={styles.row}>
-                <Text style={{ paddingLeft: 12, paddingRight: 4 }}>{post.score}</Text>
-                <TouchableOpacity
-                  onPress={handleVotePost}
-                  disabled={loading}>
-                  <Entypo name='arrow-bold-up' size={16} color={votedPost ? '#2e2c2c48' : '#000000'} />
-                </TouchableOpacity>
-                {post.user_id === userId && (
-                  <TouchableOpacity
-                    style={{ marginLeft: 'auto', paddingRight: 12 }}
-                    onPress={() => {
-                      setEditingComment(null)
-                      setEditPost(post.content)
-                    }}
-                    disabled={loading || editPost !== null}>
-                    <Entypo name='edit' size={16} />
-                  </TouchableOpacity>
-                )}
-                {post.user_id === userId && (
-                  <TouchableOpacity
-                    style={{ marginLeft: 'auto', paddingRight: 12 }}
-                    onPress={handleDeletePost}
-                    disabled={loading}>
-                    <Entypo name='trash' size={16} />
-                  </TouchableOpacity>
-                )}
-              </View>
-              {replyingTo && (
-                <Text>Replying to {replyingTo.username}</Text>
-              )}
               <TextInput 
                 value={newComment}
                 onChangeText={(text) => setNewComment(text)}
@@ -392,7 +382,7 @@ export default function Post() {
                 setEditingComment(comment)
                 setEditPost(null)
               }}
-              onUpdatePress={(editComment) => handleEditComment({ comment: editingComment, editComment: editComment })}
+              onUpdatePress={(editComment) => handleEditComment(editComment)}
               onDeletePress={(commentId) => handleDeleteComment(commentId)}
             />
           )}

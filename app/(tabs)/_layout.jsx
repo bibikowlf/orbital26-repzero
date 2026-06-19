@@ -70,13 +70,7 @@ export default function TabLayout() {
 
       {/* Workout Tutorials (No Tab) */}
       <Tabs.Screen
-        name="(workouts)/[id]"
-        options={{ href: null }}
-      />
-
-      {/* Edit Workout Tutorial (No Tab) */}
-      <Tabs.Screen
-        name="(workouts)/edit-tutorial"
+        name="tutorial"
         options={{ href: null }}
       />
 
