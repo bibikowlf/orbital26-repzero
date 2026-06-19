@@ -59,7 +59,7 @@ export default function WorkoutTutorial() {
   return (
     <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10 }]}>
       <Text style={[styles.title, { fontSize: 20, textAlign: 'center' }]}>
-        You're in {rank} place with {minutes} minutes!
+        You're in {rank}{rank === 1 ? 'st' : rank === 2 ? 'nd' : rank === 3 ? 'rd' : 'th'} place with {minutes} minutes!
       </Text>
       <Spacer height={10} />
       <View style={[styles.row, 
@@ -71,7 +71,7 @@ export default function WorkoutTutorial() {
           return (
             <View key={user.id} style={{ alignItems: 'center', width: 100 }}>
               <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 6 }}>
-                {user.username ?? 'Anonymous'}
+                {user.id === userId ? 'You' : (user.username ?? 'Anonymous')}
               </Text>
               <View style={{ backgroundColor: config.color, width: 100, height: config.height, alignItems: 'center', borderTopLeftRadius: 8, borderTopRightRadius: 8, justifyContent: 'space-between' }}>
                 <Text style={{ fontSize: 50, fontWeight: 'bold', marginTop: 20 }}>
@@ -95,7 +95,7 @@ export default function WorkoutTutorial() {
               marginBottom: 0, justifyContent: 'space-between',
               height: 50 }]}>
             <Text style={{ fontSize: 16 }}>
-              {index + 4}       {item.username ?? 'Anonymous'}
+              {index + 4}       {item.id === userId ? 'You' : (item.username ?? 'Anonymous')}
             </Text>
             <Text style={{ fontSize: 16 }}>
               {item.minutes} minutes
