@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity, 
-  Alert, KeyboardAvoidingView } from 'react-native'
+  Alert, KeyboardAvoidingView, Image, useWindowDimensions} from 'react-native'
 import { appStyles } from '../../../styles/styles'
 import { supabase } from '../../../lib/supabase'
 import { useLocalSearchParams, Stack, router } from 'expo-router'
@@ -34,6 +34,7 @@ export default function Post() {
   const userId = claims?.sub
   const { postId } = useLocalSearchParams()
   const styles = appStyles
+  const { width: windowWidth } = useWindowDimensions()
   const [post, setPost] = useState(null)
   const [comments, setComments] = useState(null)
   const [votes, setVotes] = useState(null)
@@ -42,6 +43,8 @@ export default function Post() {
   const [votedPost, setVotedPost] = useState(null)
   const [editingComment, setEditingComment] = useState(null)
   const [editPost, setEditPost] = useState(null)
+  const [imgIndex, setImgIndex] = useState(0)
+  const imageListRef = useRef(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -53,6 +56,7 @@ export default function Post() {
     setReplyingTo(null)
     setEditPost(null)
     setEditingComment(null)
+    setImgIndex(0)
     try {
       setLoading(true)
 
@@ -121,6 +125,12 @@ export default function Post() {
       setReplyingTo(null)
       setLoading(false)
     }
+  }
+
+  const handleScrollImage = (index) => {
+    if (!post?.image_urls || index < 0 || index >= post.image_urls.length) return
+    imageListRef.current?.scrollToIndex({ index: index, animated: true })
+    setImgIndex(index)
   }
 
   const handleVotePost = async () => {
@@ -207,7 +217,8 @@ export default function Post() {
           content: editPost,
           user_id: userId,
           created_at: post.created_at,
-          title: post.title
+          title: post.title, 
+          image_urls: post.image_urls
         })
       if (error) throw error
       setPost({ ...post, content: editPost })
@@ -310,7 +321,80 @@ export default function Post() {
               </Text>
               <Spacer height={2} />
               <Text style={styles.title}>{post.title}</Text>
-              <Spacer height={4} />
+              {post.image_urls && post.image_urls.length > 0 && (
+                <View style={{ 
+                  marginVertical: 10, 
+                  width: '100%', 
+                  height: 250, 
+                  position: 'relative', 
+                  backgroundColor: '#F1F5F9', 
+                  borderRadius: 12, 
+                  overflow: 'hidden' }}
+                >
+                  <FlatList
+                    ref={imageListRef}
+                    data={post.image_urls}
+                    horizontal
+                    pagingEnabled
+                    showsHorizontalScrollIndicator={false}
+                    keyExtractor={(item, idx) => idx.toString()}
+                    scrollEnabled={false}
+                    renderItem={({ item }) => (
+                      <Image 
+                        source={{ uri: item }} 
+                        style={{ width: windowWidth - 32, height: '100%', resizeMode: 'contain' }} 
+                      />
+                    )}
+                  />
+                  {imgIndex > 0 && (
+                    <TouchableOpacity 
+                      style={{ 
+                        position: 'absolute', 
+                        left: 10, 
+                        top: '40%', 
+                        backgroundColor: 'black', 
+                        borderRadius: 20, 
+                        width: 36, 
+                        height: 36, 
+                        justifyContent: 'center', 
+                        alignItems: 'center' }}
+                      onPress={() => handleScrollImage(imgIndex - 1)}
+                    >
+                      <Entypo name='chevron-left' size={24} color='white' />
+                    </TouchableOpacity>
+                  )}
+                  {imgIndex < post.image_urls.length - 1 && (
+                    <TouchableOpacity 
+                      style={{ 
+                        position: 'absolute', 
+                        right: 10, 
+                        top: '40%', 
+                        backgroundColor: 'black', 
+                        borderRadius: 20, 
+                        width: 36, 
+                        height: 36, 
+                        justifyContent: 'center', 
+                        alignItems: 'center' }}
+                      onPress={() => handleScrollImage(imgIndex + 1)}
+                    >
+                      <Entypo name='chevron-right' size={24} color='white' />
+                    </TouchableOpacity>
+                  )}
+                  <View style={{ 
+                    position: 'absolute', 
+                    bottom: 10, 
+                    right: 10, 
+                    backgroundColor: 'black', 
+                    paddingHorizontal: 8, 
+                    paddingVertical: 4, 
+                    borderRadius: 12 }}
+                  >
+                    <Text style={{ color: 'white', fontSize: 11, fontWeight: 'bold' }}>
+                      {imgIndex + 1} / {post.image_urls.length}
+                    </Text>
+                  </View>
+                </View>
+              )}
               {editPost === null ? (
                 <Text style={{ fontSize: 16 }}>{post.content}</Text>): (
                 <View>
