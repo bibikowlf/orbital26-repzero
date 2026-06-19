@@ -604,4 +604,112 @@ categoryChipText: {
 categoryChipTextActive: { 
   color: '#fff' 
 },
+
+// event details page
+
+categoryBadge: {
+  alignSelf: 'flex-start',
+  paddingHorizontal: 10,
+  paddingVertical: 4,
+  borderRadius: 12,
+  marginBottom: 12,
+},
+
+categoryText: {
+  color: '#fff',
+  fontSize: 12,
+  fontWeight: '700',
+},
+
+title: {
+  fontSize: 22,
+  fontWeight: '800',
+  color: '#1a1a1a',
+  marginBottom: 4,
+},
+
+host: {
+  fontSize: 13,
+  color: '#888',
+  marginBottom: 16,
+},
+
+infoBox: {
+  backgroundColor: '#f8f9fa',
+  borderRadius: 12,
+  padding: 14,
+  marginBottom: 20,
+  gap: 10,
+},
+
+infoRow: {
+  flexDirection: 'row',
+  alignItems: 'flex-start',
+  gap: 10,
+},
+
+infoIcon: {
+  fontSize: 15,
+},
+
+infoText: {
+  fontSize: 14,
+  color: '#333',
+  flex: 1,
+},
+
+sectionLabel: {
+  fontSize: 13,
+  fontWeight: '700',
+  color: '#888',
+  marginBottom: 6,
+  textTransform: 'uppercase',
+  letterSpacing: 0.5,
+},
+
+description: {
+  fontSize: 15,
+  color: '#333',
+  lineHeight: 22,
+  marginBottom: 28,
+},
+
+rsvpButton: {
+  backgroundColor: '#f1f3f5',
+  borderRadius: 12,
+  padding: 16,
+  alignItems: 'center',
+  marginBottom: 12,
+},
+
+rsvpButtonActive: {
+  backgroundColor: '#34C759',
+},
+
+rsvpButtonDisabled: {
+  backgroundColor: '#e9ecef',
+  opacity: 0.6,
+},
+
+rsvpButtonText: {
+  fontSize: 16,
+  fontWeight: '700',
+  color: '#333',
+},
+
+rsvpButtonTextActive: {
+  color: '#fff',
+},
+
+creatorBadge: {
+  backgroundColor: '#f0f0ff',
+  borderRadius: 12,
+  padding: 14,
+  alignItems: 'center',
+},
+
+creatorBadgeText: {
+  color: '#5856D6',
+  fontWeight: '600',
+},
 })
