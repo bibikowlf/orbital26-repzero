@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert } from 'react-native'
 import { useRouter, useFocusEffect } from 'expo-router'
 import { appStyles } from '../../../styles/styles'
 import { supabase } from '../../../lib/supabase'
@@ -74,7 +74,7 @@ export default function Events() {
   )
 
   async function handleRsvp(event) {
-    if (event.user_rsvp === 'going') {
+    if (event.user_rsvp?.[0]?.status === 'going') {
       const { error } = await supabase
         .from('event_rsvps')
         .delete()
@@ -88,7 +88,8 @@ export default function Events() {
         .upsert({ 
           event_id: event.id, 
           user_id: userId, 
-          status: 'going' })
+          status: 'going' },
+        { onConflict: 'event_id,user_id' })
       if (error) 
         return Alert.alert('Error', error.message)
     }
@@ -98,11 +99,22 @@ export default function Events() {
   async function fetchEvents() {
     const { data, error } = await supabase
       .from('events')
-      .select('*, profiles(username)')
+      .select(`
+        *,
+        profiles(username),
+        user_rsvp:event_rsvps(status)
+      `)
+      .eq('event_rsvps.user_id', userId)
       .order('event_date', { ascending: true })
 
     if (error) console.error(error)
-    else setEvents(data || [])
+    else {
+      const normalized = (data || []).map(event => ({
+        ...event,
+        rsvp_count: event.event_rsvps?.[0]?.count ?? 0,
+      }))
+      setEvents(normalized)
+    }
     setLoading(false)
   }
 
@@ -156,12 +168,14 @@ export default function Events() {
 
                 <View style={appStyles.cardFooter}>
                   <Text style={appStyles.hostText}>
-                    by @{event.creator_username} · {event.rsvp_count} going
+                    by @{event.profiles?.username} · {event.event_rsvps?.[0]?.count ?? 0} going
                   </Text>
 
-                  <TouchableOpacity style={[appStyles.rsvpBadge, event.user_rsvp === 'going' && appStyles.rsvpBadgeActive]}>
-                    <Text style={[appStyles.rsvpBadgeText, event.user_rsvp === 'going' && appStyles.rsvpBadgeTextActive]}>
-                      {event.user_rsvp === 'going' ? '✓ Going' : 'RSVP'}
+                  <TouchableOpacity style={[appStyles.rsvpBadge, event.user_rsvp?.[0]?.status === 'going' && appStyles.rsvpBadgeActive]}
+                    onPress={() => handleRsvp(event)}
+                  >
+                    <Text style={[appStyles.rsvpBadgeText, event.user_rsvp?.[0]?.status === 'going' && appStyles.rsvpBadgeTextActive]}>
+                      {event.user_rsvp?.[0]?.status === 'going' ? '✓ Going' : 'RSVP'}
                     </Text>
                   </TouchableOpacity>
                 </View> 
