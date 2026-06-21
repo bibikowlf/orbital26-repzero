@@ -1,10 +1,10 @@
-import { useState, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity, Alert } from 'react-native'
-import { appStyles } from '../../../styles/styles'
-import { supabase } from '../../../lib/supabase'
-import { useLocalSearchParams, Stack, router, useFocusEffect } from 'expo-router'
-import { useAuthContext } from '../../../hooks/auth-context'
-import Entypo from '@expo/vector-icons/Entypo'
+import { appStyles } from '../../styles/styles'
+import { supabase } from '../../lib/supabase'
+import { useLocalSearchParams, Stack, router } from 'expo-router'
+import { useAuthContext } from '../../hooks/auth-context'
+import TextInfo from '../../components/text-info'
 
 export default function WorkoutTutorials() {
   const { claims } = useAuthContext()
@@ -16,16 +16,18 @@ export default function WorkoutTutorials() {
   const [newTutorial, setNewTutorial] = useState('')
   const [loading, setLoading] = useState(false)
   const [voted, setVoted] = useState(new Set())
+  const [editing, setEditing] = useState(null)
+  const [editTutorial, setEditTutorial] = useState('')
 
-  useFocusEffect(
-    useCallback(() => {
+  useEffect(() => {
       fetchData()
-    }, [id, userId])
-  )
+  }, [id, userId])
 
   const fetchData = async () => {
     try {
       setLoading(true)
+      setEditing(null)
+      setNewTutorial('')
 
       const [tutorialsResponse, votesResponse] = await Promise.all([
         supabase
@@ -137,6 +139,52 @@ export default function WorkoutTutorials() {
     }
   }
 
+  const handleEdit = async () => {
+    if (!editing || !editTutorial.trim()) {
+      Alert.alert('Tutorial cannot be empty')
+      return
+    } else if (editTutorial === editing.content) {
+      setEditing(null)
+      return
+    }
+    try {
+      setLoading(true)
+
+      const { error } = await supabase
+        .from('workout_tutorials')
+        .upsert({
+          id: editing.id,
+          content: editTutorial,
+          user_id: userId,
+          workout_id: editing.workout_id
+        })
+      if (error) throw error
+      setTutorials(tutorials.map(item => item.id === editing.id ? { ...item, content: editTutorial } : item))
+    } catch (error) {
+      if (error instanceof Error) Alert.alert(error.message)
+    } finally {
+      setLoading(false)
+      setEditing(null)
+    }
+  }
+
+  const handleDelete = async (tutorialId) => {
+    try {
+      setLoading(true)
+
+      const { error } = await supabase
+        .from('workout_tutorials')
+        .delete()
+        .eq('id', tutorialId)
+      if (error) throw error
+      setTutorials(tutorials.filter(item => item.id !== tutorialId))
+    } catch (error) {
+      if (error instanceof Error) Alert.alert(error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   if (loading) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
@@ -146,7 +194,7 @@ export default function WorkoutTutorials() {
   }
 
   return (
-    <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10 }]}>
+    <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10, flex: 1 }]}>
       <Stack.Screen options={{ title: name, headerBackVisible: false, headerTitleAlign: 'center' }}/>
       <View style={styles.row}>
         <TextInput
@@ -154,6 +202,9 @@ export default function WorkoutTutorials() {
           placeholder='Enter tutorial'
           value={newTutorial}
           onChangeText={setNewTutorial}
+          multiline={true}
+          textAlignVertical='top'
+          numberOfLines={5}
         />
         <TouchableOpacity
           style={[styles.button,
@@ -171,40 +222,57 @@ export default function WorkoutTutorials() {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View
-            style={{ backgroundColor: '#fff', 
-              flex: 0, 
-              alignSelf: 'stretch', 
-              borderWidth: 1, 
-              borderColor: '#ced4da', 
-              marginBottom: 8}}
+            style={[styles.actionButton, 
+              loading && styles.buttonDisabled,
+              { backgroundColor: '#fff', 
+                flex: 0, 
+                alignSelf: 'stretch', 
+                alignItems: 'baseline',
+                borderWidth: 1, 
+                borderColor: '#ced4da', 
+                marginBottom: 8,
+                padding: 12 }]}
           >
-            <Text style={[{ padding: 12, fontSize: 16 }]}>{item.content}</Text>
-            <View style={styles.row}>
-              <Text style={{ paddingLeft: 12, paddingRight: 4 }}>{item.score}</Text>
-              <TouchableOpacity
-                style={{  }}
-                onPress={() => handleVote({ commentId: item.id })}
-                disabled={loading}>
-                <Entypo name='arrow-bold-up' size={16} color={voted.has(item.id) ? '#2e2c2c48' : '#000000'} />
-              </TouchableOpacity>
-              {item.user_id === userId && (
+            {(editing === null || editing.id !== item.id) ? (
+              <Text style={{ fontSize: 16, marginBottom: 6 }}>{item.content}</Text>): (
+              <View style={{ marginBottom: 6 }}>
+                <TextInput 
+                  value={editTutorial}
+                  onChangeText={(text) => setEditTutorial(text)}
+                  autoCapitalize='none'
+                  multiline={true}
+                  textAlignVertical='top'
+                  numberOfLines={10}
+                  style={styles.input}
+                />
                 <TouchableOpacity
-                  style={{ marginLeft: 'auto', paddingRight: 12 }}
-                  onPress={() => router.navigate({
-                    pathname: 'edit-tutorial', 
-                    params: {
-                      id: item.id,
-                      content: item.content,
-                      workoutId: id,
-                      workoutName: name}})}
-                  disabled={loading}>
-                  <Entypo name='edit' size={16} />
+                  style={[styles.actionButton, 
+                    { backgroundColor: '#007AFF', flex: 0, marginTop: 10 }, 
+                    loading && styles.buttonDisabled]}
+                  onPress={handleEdit}
+                  disabled={loading}
+                >
+                  <Text style={styles.buttonText}>Edit</Text>
                 </TouchableOpacity>
-              )}
-            </View>
+              </View>
+            )}
+            <TextInfo 
+              marginBottom={0}
+              isAuthor={item.user_id === userId} 
+              canReply={false} 
+              score={item.score} 
+              loading={loading} 
+              editing={editing !== null && editing.id === item.id}
+              hasVoted={voted.has(item.id)} 
+              onVotePress={() => handleVote({ commentId: item.id })} 
+              onEditPress={() => {
+                setEditTutorial(item.content)
+                setEditing(item)
+              }}
+              onDeletePress={() => handleDelete(item.id)} 
+            />
           </View>
         )}
-        ListEmptyComponent={<Text style={{ fontSize: 16, padding: 12, alignSelf: 'center' }}>Add your tutorial!</Text>}
       />
     </View>
   )

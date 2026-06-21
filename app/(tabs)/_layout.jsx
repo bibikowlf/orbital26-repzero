@@ -68,7 +68,7 @@ export default function TabLayout() {
         }}
       />
 
-      {/* Community Tab */}
+      {/* Community Tab 
       <Tabs.Screen
         name="(community)/events"
         options={{
@@ -77,6 +77,40 @@ export default function TabLayout() {
             <Entypo name="users" size={24} color={color} />
           ),
           headerRight: () => <MyEventsButton />,            
+        }}
+      />*/}
+
+      {/* Discussion Tab */}
+      <Tabs.Screen
+        name="(community)/discussion-forum"
+        options={{
+          title: 'Discussion',
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="chatbubbles-outline" size={24} color={color} />
+          ),
+        }}
+      />
+
+      {/* Events Tab */}
+      <Tabs.Screen
+        name="(community)/events"
+        options={{
+          title: 'Events',
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="calendar-outline" size={24} color={color} />
+          ),
+          headerRight: () => <MyEventsButton />,
+        }}
+      />
+
+      {/* Leaderboard Tab */}
+      <Tabs.Screen
+        name="(community)/leaderboard"
+        options={{
+          title: 'Leaderboard',
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="trophy-outline" size={24} color={color} />
+          ),
         }}
       />
 
@@ -106,8 +140,20 @@ export default function TabLayout() {
 
       {/* Profile (No Tab) */}
       <Tabs.Screen
-        name="profile"
+        name="(settings)/profile"
         options={{ title: 'Profile', href: null }}
+      />
+
+      {/* My Posts (No Tab) */}
+      <Tabs.Screen
+        name="(settings)/my-posts"
+        options={{ title: 'My Posts', href: null }}
+      />
+
+      {/* My Tutorials (No Tab) */}
+      <Tabs.Screen
+        name="(settings)/my-tutorials"
+        options={{ title: 'My Tutorials', href: null }}
       />
 
       {/* Change Password (No Tab) */}
@@ -118,13 +164,7 @@ export default function TabLayout() {
 
       {/* Workout Tutorials (No Tab) */}
       <Tabs.Screen
-        name="(workouts)/[id]"
-        options={{ href: null }}
-      />
-
-      {/* Edit Workout Tutorial (No Tab) */}
-      <Tabs.Screen
-        name="(workouts)/edit-tutorial"
+        name="tutorial"
         options={{ href: null }}
       />
 
@@ -132,6 +172,24 @@ export default function TabLayout() {
       <Tabs.Screen
         name="(community)/leaderboard"
         options={{ title: 'Leaderboard' }}
+      />
+
+      {/* Discussion Forum (Temporary Tab) */}
+      <Tabs.Screen
+        name="(community)/discussion-forum"
+        options={{ title: 'Discussion Forum' }}
+      />
+
+      {/* Add Post (No Tab) */}
+      <Tabs.Screen
+        name="(community)/add-post"
+        options={{ href: null }}
+      />
+
+      {/* Post (No Tab) */}
+      <Tabs.Screen
+        name="(community)/post"
+        options={{ href: null }}
       />
     </Tabs>
   );

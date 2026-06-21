@@ -57,7 +57,10 @@ export default function WorkoutTutorial() {
   }
 
   const handleAdd = async () => {
-    if (!newWorkout.trim()) return
+    if (!newWorkout.trim()) {
+      Alert.alert('Cannot add empty workout')
+      return
+    }
     const cleaned = cleanString(newWorkout)
     if (workouts.some(item => cleanString(item.name) === cleaned)) {
       Alert.alert('Workout already exists')
@@ -98,7 +101,7 @@ export default function WorkoutTutorial() {
   }
 
   return (
-    <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10 }]}>
+    <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10, flex: 1 }]}>
       <TextInput
         style={[styles.input, { alignSelf: 'stretch' }]}
         placeholder='Search workouts'
@@ -140,13 +143,12 @@ export default function WorkoutTutorial() {
                 borderColor: '#ced4da', 
                 marginBottom: 8,
                 height: 80 }]}
-            onPress={() => router.navigate({ pathname: `/${item.id}`, params: {name: item.name}})}
+            onPress={() => router.navigate({ pathname: '/tutorial', params: {id: item.id, name: item.name}})}
             disabled={loading}
           >
             <Text style={styles.title}>{item.name}</Text>
           </TouchableOpacity>
         )}
-        ListEmptyComponent={<Text>No workouts found</Text>}
       />
     </View>
   )

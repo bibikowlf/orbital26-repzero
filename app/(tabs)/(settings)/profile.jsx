@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../../lib/supabase'
+import { supabase } from '../../../lib/supabase'
 import { View, Alert, TextInput, Text, TouchableOpacity, Button, ScrollView, 
   KeyboardAvoidingView } from 'react-native'
-import { useAuthContext } from '../../hooks/auth-context'
-import { appStyles } from '../../styles/styles'
+import { useAuthContext } from '../../../hooks/auth-context'
+import { appStyles } from '../../../styles/styles'
 import { router } from 'expo-router'
-import SignOutButton from '../../components/signout-button'
-import Spacer from '../../components/spacer'
+import SignOutButton from '../../../components/signout-button'
+import Spacer from '../../../components/spacer'
 import { Dropdown } from 'react-native-element-dropdown'
-import { handleNumericInput } from '../../functions/numeric-input'
+import { handleNumericInput } from '../../../functions/numeric-input'
 
 const genderData = [
   { label: 'Male', value: 'Male' },

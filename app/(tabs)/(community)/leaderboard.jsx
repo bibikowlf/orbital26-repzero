@@ -9,7 +9,8 @@ export default function WorkoutTutorial() {
   const { claims } = useAuthContext()
   const userId = claims?.sub
   const [loading, setLoading] = useState(true)
-  const [users, setUsers] = useState([])
+  const [topTen, setTopTen] = useState([])
+  const [topThree, setTopThree] = useState([])
   const [rank, setRank] = useState(0)
   const [minutes, setMinutes] = useState(0)
   const styles = appStyles
@@ -35,7 +36,8 @@ export default function WorkoutTutorial() {
         setMinutes(userData.minutes)
         setRank(userIndex + 1)
         data.length = Math.min(10, data.length)
-        setUsers(data)
+        setTopThree([{...data[1], idx: 2}, {...data[0], idx: 1}, {...data[2], idx: 3}])
+        setTopTen(data.slice(3))
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -57,11 +59,34 @@ export default function WorkoutTutorial() {
   return (
     <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10 }]}>
       <Text style={[styles.title, { fontSize: 20, textAlign: 'center' }]}>
-        You're in {rank} place with {minutes} minutes!
+        You're in {rank}{rank === 1 ? 'st' : rank === 2 ? 'nd' : rank === 3 ? 'rd' : 'th'} place with {minutes} minutes!
       </Text>
-      <Spacer />
+      <Spacer height={10} />
+      <View style={[styles.row, 
+        { justifyContent: 'center', gap: 10, padding: 12, alignItems: 'flex-end' }]}>
+        {topThree.map((user) => {
+          const config = { 
+            color: user.idx === 1 ? 'gold' : user.idx === 2 ? 'silver' : '#CD7F32',
+            height: user.idx === 1 ? 200 : user.idx === 2 ? 160 : 140}
+          return (
+            <View key={user.id} style={{ alignItems: 'center', width: 100 }}>
+              <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 6 }}>
+                {user.id === userId ? 'You' : (user.username ?? 'Anonymous')}
+              </Text>
+              <View style={{ backgroundColor: config.color, width: 100, height: config.height, alignItems: 'center', borderTopLeftRadius: 8, borderTopRightRadius: 8, justifyContent: 'space-between' }}>
+                <Text style={{ fontSize: 50, fontWeight: 'bold', marginTop: 20 }}>
+                  {user.idx}
+                </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>
+                  {user.minutes}
+                </Text>
+              </View>
+            </View>
+          )
+        })}
+      </View>
       <FlatList
-        data={users}
+        data={topTen}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item, index }) => (
           <View style={[styles.row, 
@@ -69,16 +94,10 @@ export default function WorkoutTutorial() {
               borderBottomWidth: 1, borderColor: '#ced4da',
               marginBottom: 0, justifyContent: 'space-between',
               height: 50 }]}>
-            <Text style={[{ fontSize: 16 }, 
-              index === 0 && { color: 'gold', fontWeight: 'bold', fontSize: 18 },
-              index === 1 && { color: 'silver', fontWeight: 'bold', fontSize: 18 },
-              index === 2 && { color: '#CD7F32', fontWeight: 'bold', fontSize: 18 }]}>
-              {index + 1}       {item.username ?? 'Anonymous User'}
+            <Text style={{ fontSize: 16 }}>
+              {index + 4}       {item.id === userId ? 'You' : (item.username ?? 'Anonymous')}
             </Text>
-            <Text style={[{ fontSize: 16 }, 
-              index === 0 && { color: 'gold', fontWeight: 'bold', fontSize: 18 },
-              index === 1 && { color: 'silver', fontWeight: 'bold', fontSize: 18 },
-              index === 2 && { color: '#CD7F32', fontWeight: 'bold', fontSize: 18 }]}>
+            <Text style={{ fontSize: 16 }}>
               {item.minutes} minutes
             </Text>
           </View>
