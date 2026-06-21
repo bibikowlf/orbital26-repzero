@@ -3,6 +3,7 @@ import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native'
 import { useLocalSearchParams } from 'expo-router'
 import { supabase } from '../../../lib/supabase'
 import { useAuthContext } from '../../../hooks/auth-context'
+import { appStyles } from '../../../styles/styles'
 
 const CATEGORY_COLORS = {
   Cardio: '#FF9500',
