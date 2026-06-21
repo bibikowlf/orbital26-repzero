@@ -61,20 +61,35 @@ export default function MyEventDetail() {
     }
 
     const { data: rsvpData, error: rsvpError } = await supabase
-      .from('event_rsvps')
-      .select(`status, created_at, profiles(username)`)
-      .eq('event_id', id)
-      .eq('status', 'going')
-      .order('created_at', { ascending: true })
+    .from('event_rsvps')
+    .select('user_id, status, created_at')
+    .eq('event_id', id)
+    .eq('status', 'going')
+    .order('created_at', { ascending: true })
 
     if (rsvpError) console.error(rsvpError)
+
+    const userIds = (rsvpData || []).map(r => r.user_id)
+    let profileMap = {}
+    if (userIds.length > 0) {
+    const { data: profileData } = await supabase
+        .from('profiles')
+        .select('id, username')
+        .in('id', userIds)
+    profileMap = Object.fromEntries((profileData || []).map(p => [p.id, p]))
+    }
+
+    const attendeesWithProfiles = (rsvpData || []).map(r => ({
+    ...r,
+    profiles: profileMap[r.user_id] ?? null
+    }))
 
     const loaded = {
       ...eventData,
       rsvp_count: eventData.event_rsvps?.[0]?.count ?? 0,
     }
     setEvent(loaded)
-    setAttendees(rsvpData || [])
+    setAttendees(attendeesWithProfiles)
     setLoading(false)
 
     const dt = new Date(eventData.event_date)
