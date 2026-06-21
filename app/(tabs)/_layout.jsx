@@ -58,8 +58,20 @@ export default function TabLayout() {
 
       {/* Profile (No Tab) */}
       <Tabs.Screen
-        name="profile"
+        name="(settings)/profile"
         options={{ title: 'Profile', href: null }}
+      />
+
+      {/* My Posts (No Tab) */}
+      <Tabs.Screen
+        name="(settings)/my-posts"
+        options={{ title: 'My Posts', href: null }}
+      />
+
+      {/* My Tutorials (No Tab) */}
+      <Tabs.Screen
+        name="(settings)/my-tutorials"
+        options={{ title: 'My Tutorials', href: null }}
       />
 
       {/* Change Password (No Tab) */}
