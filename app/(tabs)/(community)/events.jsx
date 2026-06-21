@@ -103,6 +103,7 @@ export default function Events() {
         *,
         profiles(username),
         user_rsvp:event_rsvps(status)
+        .neq('creator_id', userId)
       `)
       .eq('event_rsvps.user_id', userId)
       .order('event_date', { ascending: true })
