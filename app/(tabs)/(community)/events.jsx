@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native'
 import { useRouter, useFocusEffect } from 'expo-router'
 import { appStyles } from '../../../styles/styles'
@@ -35,6 +35,7 @@ export default function Events() {
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [sortBy, setSortBy] = useState('date_asc')
+  const [activeTab, setActiveTab] = useState('All Events')
 
   useFocusEffect(
     useCallback(() => {
@@ -87,6 +88,7 @@ export default function Events() {
   }
 
   const filteredEvents = events
+    .filter(e => activeTab === 'Going' ? e.user_rsvp?.[0]?.status === 'going' : true)
     .filter(e => selectedCategory === 'All' || e.category === selectedCategory)
     .sort((a, b) => {
       const da = new Date(a.event_date)
@@ -96,11 +98,34 @@ export default function Events() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
+
       <View style={{ borderBottomWidth: 1, borderBottomColor: '#f0f0f0' }}>
+
+        <View style={{ flexDirection: 'row', margin: 12, backgroundColor: '#f2f2f2', borderRadius: 10, padding: 3 }}>
+          {['All Events', 'Going'].map(tab => (
+            <TouchableOpacity
+              key={tab}
+              onPress={() => setActiveTab(tab)}
+              style={{
+                flex: 1,
+                paddingVertical: 8,
+                borderRadius: 8,
+                alignItems: 'center',
+                backgroundColor: activeTab === tab ? '#fff' : 'transparent',
+                elevation: activeTab === tab ? 2 : 0,
+              }}
+            >
+              <Text style={{ fontWeight: '600', fontSize: 14, color: activeTab === tab ? '#000' : '#888' }}>
+                {tab}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 10, paddingBottom: 6, gap: 8 }}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 6, gap: 8 }}
         >
           {CATEGORIES.map(cat => (
             <TouchableOpacity
@@ -115,19 +140,17 @@ export default function Events() {
                   : '#f2f2f2',
               }}
             >
-              <Text style={{
-                fontSize: 13,
-                fontWeight: '600',
-                color: selectedCategory === cat ? '#fff' : '#444',
-              }}>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: selectedCategory === cat ? '#fff' : '#444' }}>
                 {cat}
               </Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 10, gap: 8 }}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 10, gap: 8 }}
         >
           {SORT_OPTIONS.map(opt => (
             <TouchableOpacity
@@ -140,11 +163,7 @@ export default function Events() {
                 backgroundColor: sortBy === opt.value ? '#333' : '#f2f2f2',
               }}
             >
-              <Text style={{
-                fontSize: 13,
-                fontWeight: '600',
-                color: sortBy === opt.value ? '#fff' : '#444',
-              }}>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: sortBy === opt.value ? '#fff' : '#444' }}>
                 {opt.label}
               </Text>
             </TouchableOpacity>
@@ -157,9 +176,11 @@ export default function Events() {
           <Text style={{ textAlign: 'center', marginTop: 40, color: '#888' }}>Loading...</Text>
         ) : filteredEvents.length === 0 ? (
           <Text style={{ textAlign: 'center', marginTop: 40, color: '#888' }}>
-            {selectedCategory === 'All' ? 
-            'No events yet. Be the first to post!' : 
-            `No ${selectedCategory} events found.`}
+            {activeTab === 'Going'
+              ? "You haven't RSVP'd to any events yet."
+              : selectedCategory === 'All'
+              ? 'No events yet. Be the first to post!'
+              : `No ${selectedCategory} events found.`}
           </Text>
         ) : (
           filteredEvents.map((event) => {
