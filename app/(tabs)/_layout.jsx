@@ -4,6 +4,18 @@ import Entypo from '@expo/vector-icons/Entypo'
 import ProfileButton from '../../components/profile-button'
 import { TouchableOpacity, Text } from 'react-native'
 
+function MyEventsButton() {
+  const router = useRouter()
+  return (
+    <TouchableOpacity
+      onPress={() => router.push('/(tabs)/(community)/my-events')}
+      style={{ marginRight: 16 }}
+    >
+      <Text style={{ color: '#007AFF', fontWeight: '600', fontSize: 15 }}>My Events</Text>
+    </TouchableOpacity>
+  )
+}
+
 export default function TabLayout() {
   return (
     <Tabs
@@ -64,14 +76,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <Entypo name="users" size={24} color={color} />
           ),
-          headerRight: () => (
-            <TouchableOpacity
-              onPress={() => router.push('/(tabs)/(community)/my-events')}
-              style={{ marginRight: 16 }}
-            >
-              <Text style={{ color: '#007AFF', fontWeight: '600', fontSize: 15 }}>My Events</Text>
-            </TouchableOpacity>
-          ),
+          headerRight: () => <MyEventsButton />,            
         }}
       />
 
@@ -95,7 +100,7 @@ export default function TabLayout() {
 
       {/* My Event Detail (No Tab) */}
       <Tabs.Screen
-        name="(community)/my-event-detail"
+        name="(community)/my-events-detail"
         options={{ title: 'Event Details', href: null }}
       />
 
