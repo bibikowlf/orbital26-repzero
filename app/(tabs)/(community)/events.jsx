@@ -97,16 +97,17 @@ export default function Events() {
   }
 
   async function fetchEvents() {
-    const { data, error } = await supabase
-      .from('events')
-      .select(`
-        *,
-        profiles(username),
-        user_rsvp:event_rsvps(status)
-        .neq('creator_id', userId)
-      `)
-      .eq('event_rsvps.user_id', userId)
-      .order('event_date', { ascending: true })
+  const { data, error } = await supabase
+    .from('events')
+    .select(`
+      *,
+      profiles(username),
+      event_rsvps(count),
+      user_rsvp:event_rsvps(status)
+    `)
+    .eq('user_rsvp.user_id', userId)
+    .neq('creator_id', userId)
+    .order('event_date', { ascending: true })
 
     if (error) console.error(error)
     else {
