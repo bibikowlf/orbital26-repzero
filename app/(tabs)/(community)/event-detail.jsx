@@ -56,6 +56,28 @@ export default function EventDetail() {
     setLoading(false)
   }
 
+  async function handleDelete() {
+    Alert.alert(
+      'Delete Event',
+      'Are you sure you want to delete this event? This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            const { error } = await supabase
+              .from('events')
+              .delete()
+              .eq('id', id)
+            if (error) return Alert.alert('Error', error.message)
+            router.back()
+          },
+        },
+      ]
+    )
+  }
+
   async function handleRsvp() {
     if (!event) return
     setRsvping(true)
@@ -108,8 +130,8 @@ export default function EventDetail() {
   return (
     <ScrollView style={{ flex: 1, backgroundColor: '#fff' }} contentContainerStyle={{ padding: 20 }}>
 
-      <View style={[localStyles.categoryBadge, { backgroundColor: CATEGORY_COLORS[event.category] || CATEGORY_COLORS.default }]}>
-        <Text style={localStyles.categoryText}>{event.category}</Text>
+      <View style={[appStyles.categoryBadge, { backgroundColor: CATEGORY_COLORS[event.category] || CATEGORY_COLORS.default }]}>
+        <Text style={appStyles.categoryText}>{event.category}</Text>
       </View>
       <Text style={appStyles.title}>{event.title}</Text>
 
