@@ -712,4 +712,102 @@ creatorBadgeText: {
   color: '#5856D6',
   fontWeight: '600',
 },
+
+//my event details
+categoryBadge: {
+  alignSelf: 'flex-start',
+  paddingHorizontal: 10,
+  paddingVertical: 4,
+  borderRadius: 12,
+  marginBottom: 12,
+},
+
+categoryText: {
+  color: '#fff',
+  fontSize: 12,
+  fontWeight: '700',
+},
+
+title: {
+  fontSize: 22,
+  fontWeight: '800',
+  color: '#1a1a1a',
+  marginBottom: 16,
+},
+
+infoBox: {
+  backgroundColor: '#f8f9fa',
+  borderRadius: 12,
+  padding: 14,
+  marginBottom: 20,
+  gap: 10,
+},
+
+infoRow: {
+  flexDirection: 'row',
+  alignItems: 'flex-start',
+  gap: 10,
+},
+
+infoIcon: {
+  fontSize: 15,
+},
+
+infoText: {
+  fontSize: 14,
+  color: '#333',
+  flex: 1,
+},
+
+sectionLabel: {
+  fontSize: 13,
+  fontWeight: '700',
+  color: '#888',
+  marginBottom: 10,
+  textTransform: 'uppercase',
+  letterSpacing: 0.5,
+},
+
+description: {
+  fontSize: 15,
+  color: '#333',
+  lineHeight: 22,
+  marginBottom: 28,
+},
+
+emptyText: {
+  color: '#888',
+  fontSize: 14,
+  marginBottom: 20,
+},
+
+attendeeRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 12,
+  paddingVertical: 10,
+  borderBottomWidth: 1,
+  borderBottomColor: '#f1f3f5',
+},
+
+avatarCircle: {
+  width: 36,
+  height: 36,
+  borderRadius: 18,
+  backgroundColor: '#5856D6',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+
+avatarText: {
+  color: '#fff',
+  fontWeight: '700',
+  fontSize: 14,
+},
+
+attendeeUsername: {
+  fontSize: 15,
+  color: '#333',
+  fontWeight: '500',
+},
 })
