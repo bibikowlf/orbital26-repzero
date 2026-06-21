@@ -1,39 +1,38 @@
-import { useState, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity, Alert } from 'react-native'
-import { appStyles } from '../../styles/styles'
-import { supabase } from '../../lib/supabase'
-import { useLocalSearchParams, Stack, router } from 'expo-router'
-import { useAuthContext } from '../../hooks/auth-context'
-import TextInfo from '../../components/text-info'
+import { appStyles } from '../../../styles/styles'
+import { supabase } from '../../../lib/supabase'
+import { useFocusEffect, Stack } from 'expo-router'
+import { useAuthContext } from '../../../hooks/auth-context'
+import TextInfo from '../../../components/text-info'
 
 export default function WorkoutTutorials() {
   const { claims } = useAuthContext()
   const userId = claims?.sub
-  const { id, name } = useLocalSearchParams()
   const styles = appStyles
   const [tutorials, setTutorials] = useState([])
   const [votes, setVotes] = useState([])
-  const [newTutorial, setNewTutorial] = useState('')
   const [loading, setLoading] = useState(false)
   const [voted, setVoted] = useState(new Set())
   const [editing, setEditing] = useState(null)
   const [editTutorial, setEditTutorial] = useState('')
 
-  useEffect(() => {
+  useFocusEffect(
+    useCallback(() => {
       fetchData()
-  }, [id, userId])
+    }, [])
+  )
 
   const fetchData = async () => {
     try {
       setLoading(true)
       setEditing(null)
-      setNewTutorial('')
 
       const [tutorialsResponse, votesResponse] = await Promise.all([
         supabase
           .from('workout_tutorials_with_votes')
           .select('*')
-          .eq('workout_id', id),
+          .eq('user_id', userId),
         supabase
           .from('workout_tutorial_votes')
           .select('*')
@@ -49,39 +48,8 @@ export default function WorkoutTutorials() {
         setVoted(new Set(votesResponse.data.map(item => item.comment_id)))
       }
     } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert(error.message)
-      }
+      if (error instanceof Error) Alert.alert(error.message)
     } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleAdd = async () => {
-    if (!newTutorial.trim()) return
-
-    try {
-      setLoading(true)
-
-      const { data, error } = await supabase
-        .from('workout_tutorials')
-        .insert({
-          content: newTutorial,
-          user_id: userId,
-          workout_id: id
-        })
-        .select()
-      if (error) throw error
-      if (data) {
-        const updated = [...tutorials, {...data[0], score: 0}]
-        setTutorials(updated)
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert(error.message)
-      }
-    } finally {
-      setNewTutorial('')
       setLoading(false)
     }
   }
@@ -131,9 +99,7 @@ export default function WorkoutTutorials() {
         }
       }
     } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert(error.message)
-      }
+      if (error instanceof Error) Alert.alert(error.message)
     } finally {
       setLoading(false)
     }
@@ -195,28 +161,7 @@ export default function WorkoutTutorials() {
 
   return (
     <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10, flex: 1 }]}>
-      <Stack.Screen options={{ title: name, headerBackVisible: false, headerTitleAlign: 'center' }}/>
-      <View style={styles.row}>
-        <TextInput
-          style={[styles.input, { flex: 1, marginRight: 10 }]}
-          placeholder='Enter tutorial'
-          value={newTutorial}
-          onChangeText={setNewTutorial}
-          multiline={true}
-          textAlignVertical='top'
-          numberOfLines={5}
-        />
-        <TouchableOpacity
-          style={[styles.button,
-            loading && styles.buttonDisabled, 
-            { width: 60 }]}
-          onPress={handleAdd}
-          disabled={loading}
-        >
-          <Text style={styles.buttonText}>Add</Text>
-        </TouchableOpacity>
-      </View>
-
+      <Stack.Screen options={{ title: 'My Tutorials', headerBackVisible: false, headerTitleAlign: 'center' }}/>
       <FlatList
         data={tutorials}
         keyExtractor={(item) => item.id.toString()}
@@ -233,6 +178,7 @@ export default function WorkoutTutorials() {
                 marginBottom: 8,
                 padding: 12 }]}
           >
+            <Text style={{color: 'gray', fontSize: 12, marginBottom: 4}}>{item.workout_name}</Text>
             {(editing === null || editing.id !== item.id) ? (
               <Text style={{ fontSize: 16, marginBottom: 6 }}>{item.content}</Text>): (
               <View style={{ marginBottom: 6 }}>
