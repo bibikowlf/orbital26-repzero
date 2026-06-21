@@ -63,6 +63,14 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <Entypo name="users" size={24} color={color} />
           ),
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => router.push('/(tabs)/(community)/my-events')}
+              style={{ marginRight: 16 }}
+            >
+              <Text style={{ color: '#007AFF', fontWeight: '600', fontSize: 15 }}>My Events</Text>
+            </TouchableOpacity>
+          ),
         }}
       />
 
