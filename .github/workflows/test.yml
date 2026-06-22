@@ -2,11 +2,9 @@ name: Automated Testing
 
 on:
   push:
-    branches:
-      - '*'
+    branches: [testing]
   pull_request:
-    branches:
-      - '*'
+    branches: [testing]
 
 jobs:
   test:
