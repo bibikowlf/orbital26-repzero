@@ -389,10 +389,10 @@ export const appStyles = StyleSheet.create({
 
   //calender arrow
   arrowButton: {
-  padding: 8,
-  justifyContent: 'center',
-  alignItems: 'center',
-},
+    padding: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 arrowText: {
   fontSize: 28,
   color: '#007AFF',
@@ -419,9 +419,395 @@ monthText: {
 monthTextSelected: {
   color: '#fff',
 },
-  row: {
-    flexDirection: "row", 
-    alignItems: "center", 
-    marginBottom: 10,
-  },
+row: {
+  flexDirection: "row", 
+  alignItems: "center", 
+  marginBottom: 10,
+},
+
+//community - events log
+
+card: {
+  backgroundColor: '#fff',
+  borderRadius: 12,
+  padding: 16,
+  marginBottom: 14,
+  borderWidth: 1,
+  borderColor: '#e9ecef',
+  shadowColor: '#000',
+  shadowOpacity: 0.05,
+  shadowRadius: 4,
+  elevation: 2,
+},
+
+cardHeader: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginBottom: 8,
+},
+
+categoryBadge: {
+  borderRadius: 6,
+  paddingHorizontal: 8,
+  paddingVertical: 3,
+},
+
+categoryText: {
+  color: '#fff',
+  fontSize: 11,
+  fontWeight: '700',
+},
+
+spotsText: {
+  fontSize: 12,
+  color: '#888',
+},
+
+title: {
+  fontSize: 16,
+  fontWeight: '700',
+  color: '#212529',
+  marginBottom: 4,
+},
+
+description: {
+  fontSize: 13,
+  color: '#666',
+  marginBottom: 10,
+},
+
+metaRow: {
+  marginBottom: 3,
+},
+
+metaText: {
+  fontSize: 12,
+  color: '#495057',
+},
+
+cardFooter: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginTop: 12,
+},
+
+hostText: {
+  fontSize: 12,
+  color: '#888',
+},
+
+rsvpBadge: {
+  borderWidth: 1.5,
+  borderColor: '#007AFF',
+  borderRadius: 8,
+  paddingHorizontal: 14,
+  paddingVertical: 6,
+},
+
+rsvpBadgeActive: {
+  backgroundColor: '#007AFF',
+},
+
+rsvpBadgeText: {
+  fontSize: 13,
+  fontWeight: '600',
+  color: '#007AFF',
+},
+
+rsvpBadgeTextActive: {
+  color: '#fff',
+},
+
+fab: {
+  position: 'absolute',
+  bottom: 24,
+  right: 24,
+  backgroundColor: '#007AFF',
+  width: 56,
+  height: 56,
+  borderRadius: 28,
+  justifyContent: 'center',
+  alignItems: 'center',
+  shadowColor: '#000',
+  shadowOpacity: 0.2,
+  shadowRadius: 6,
+  elevation: 5,
+},
+
+fabText: {
+  color: '#fff',
+  fontSize: 28,
+  fontWeight: '300',
+  lineHeight: 32,
+},  
+
+// create-event
+
+label: { 
+  fontSize: 13, 
+  fontWeight: '600', 
+  color: '#333', 
+  marginBottom: 6, 
+  marginTop: 14 
+},
+
+input: { 
+  borderWidth: 1, 
+  borderColor: '#ccc', 
+  borderRadius: 8, 
+  padding: 10, 
+  fontSize: 14, 
+  color: '#212529' 
+},
+
+submitButton: { 
+  marginTop: 24, 
+  backgroundColor: '#007AFF', 
+  borderRadius: 8, 
+  padding: 14, 
+  alignItems: 'center' 
+},
+
+submitText: { 
+  color: '#fff', 
+  fontWeight: '700', 
+  fontSize: 15 
+},
+
+//category in create event
+categoryRow: { 
+  flexDirection: 'row', 
+  flexWrap: 'wrap', 
+  gap: 8 
+},
+
+categoryChip: { 
+  borderWidth: 1, 
+  borderColor: '#ccc', 
+  borderRadius: 20, 
+  paddingHorizontal: 14, 
+  paddingVertical: 6 
+},
+
+categoryChipActive: { 
+  backgroundColor: '#007AFF', 
+  borderColor: '#007AFF' 
+},
+
+categoryChipText: { 
+  fontSize: 13, 
+  color: '#333' 
+},
+
+categoryChipTextActive: { 
+  color: '#fff' 
+},
+
+// event details page
+
+categoryBadge: {
+  alignSelf: 'flex-start',
+  paddingHorizontal: 10,
+  paddingVertical: 4,
+  borderRadius: 12,
+  marginBottom: 12,
+},
+
+categoryText: {
+  color: '#fff',
+  fontSize: 12,
+  fontWeight: '700',
+},
+
+title: {
+  fontSize: 22,
+  fontWeight: '800',
+  color: '#1a1a1a',
+  marginBottom: 4,
+},
+
+host: {
+  fontSize: 13,
+  color: '#888',
+  marginBottom: 16,
+},
+
+infoBox: {
+  backgroundColor: '#f8f9fa',
+  borderRadius: 12,
+  padding: 14,
+  marginBottom: 20,
+  gap: 10,
+},
+
+infoRow: {
+  flexDirection: 'row',
+  alignItems: 'flex-start',
+  gap: 10,
+},
+
+infoIcon: {
+  fontSize: 15,
+},
+
+infoText: {
+  fontSize: 14,
+  color: '#333',
+  flex: 1,
+},
+
+sectionLabel: {
+  fontSize: 13,
+  fontWeight: '700',
+  color: '#888',
+  marginBottom: 6,
+  textTransform: 'uppercase',
+  letterSpacing: 0.5,
+},
+
+description: {
+  fontSize: 15,
+  color: '#333',
+  lineHeight: 22,
+  marginBottom: 28,
+},
+
+rsvpButton: {
+  backgroundColor: '#f1f3f5',
+  borderRadius: 12,
+  padding: 16,
+  alignItems: 'center',
+  marginBottom: 12,
+},
+
+rsvpButtonActive: {
+  backgroundColor: '#34C759',
+},
+
+rsvpButtonDisabled: {
+  backgroundColor: '#e9ecef',
+  opacity: 0.6,
+},
+
+rsvpButtonText: {
+  fontSize: 16,
+  fontWeight: '700',
+  color: '#333',
+},
+
+rsvpButtonTextActive: {
+  color: '#fff',
+},
+
+creatorBadge: {
+  backgroundColor: '#f0f0ff',
+  borderRadius: 12,
+  padding: 14,
+  alignItems: 'center',
+},
+
+creatorBadgeText: {
+  color: '#5856D6',
+  fontWeight: '600',
+},
+
+//my event details
+categoryBadge: {
+  alignSelf: 'flex-start',
+  paddingHorizontal: 10,
+  paddingVertical: 4,
+  borderRadius: 12,
+  marginBottom: 12,
+},
+
+categoryText: {
+  color: '#fff',
+  fontSize: 12,
+  fontWeight: '700',
+},
+
+title: {
+  fontSize: 22,
+  fontWeight: '800',
+  color: '#1a1a1a',
+  marginBottom: 16,
+},
+
+infoBox: {
+  backgroundColor: '#f8f9fa',
+  borderRadius: 12,
+  padding: 14,
+  marginBottom: 20,
+  gap: 10,
+},
+
+infoRow: {
+  flexDirection: 'row',
+  alignItems: 'flex-start',
+  gap: 10,
+},
+
+infoIcon: {
+  fontSize: 15,
+},
+
+infoText: {
+  fontSize: 14,
+  color: '#333',
+  flex: 1,
+},
+
+sectionLabel: {
+  fontSize: 13,
+  fontWeight: '700',
+  color: '#888',
+  marginBottom: 10,
+  textTransform: 'uppercase',
+  letterSpacing: 0.5,
+},
+
+description: {
+  fontSize: 15,
+  color: '#333',
+  lineHeight: 22,
+  marginBottom: 28,
+},
+
+emptyText: {
+  color: '#888',
+  fontSize: 14,
+  marginBottom: 20,
+},
+
+attendeeRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 12,
+  paddingVertical: 10,
+  borderBottomWidth: 1,
+  borderBottomColor: '#f1f3f5',
+},
+
+avatarCircle: {
+  width: 36,
+  height: 36,
+  borderRadius: 18,
+  backgroundColor: '#5856D6',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+
+avatarText: {
+  color: '#fff',
+  fontWeight: '700',
+  fontSize: 14,
+},
+
+attendeeUsername: {
+  fontSize: 15,
+  color: '#333',
+  fontWeight: '500',
+},
 })
