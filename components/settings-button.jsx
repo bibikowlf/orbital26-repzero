@@ -7,6 +7,7 @@ const MENU_ITEMS = [
   { label: '👤  Profile', route: '/(settings)/profile' },
   { label: '📝  My Posts', route: '/(settings)/my-posts' },
   { label: '🎥  My Tutorials', route: '/(settings)/my-tutorials' },
+  { label: '📅  My Events', route: '/(tabs)/(community)/my-events' },
 ]
 
 export default function SettingsButton() {

@@ -4,7 +4,7 @@ import Entypo from '@expo/vector-icons/Entypo'
 import SettingsButton from '../../components/settings-button'
 import { TouchableOpacity, Text } from 'react-native'
 
-function MyEventsButton() {
+/*function MyEventsButton() {
   const router = useRouter()
   return (
     <TouchableOpacity
@@ -14,7 +14,7 @@ function MyEventsButton() {
       <Text style={{ color: '#007AFF', fontWeight: '600', fontSize: 15 }}>My Events</Text>
     </TouchableOpacity>
   )
-}
+}*/
 
 export default function TabLayout() {
   return (
@@ -99,7 +99,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <Ionicons name="calendar-outline" size={24} color={color} />
           ),
-          headerRight: () => <MyEventsButton />,
         }}
       />
 
