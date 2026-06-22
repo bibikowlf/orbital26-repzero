@@ -1,7 +1,7 @@
 import { Tabs, useRouter } from 'expo-router'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import Entypo from '@expo/vector-icons/Entypo'
-import ProfileButton from '../../components/profile-button'
+import SettingsButton from '../../components/settings-button'
 import { TouchableOpacity, Text } from 'react-native'
 
 function MyEventsButton() {
@@ -22,7 +22,7 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: '#007AFF',
         tabBarInactiveTintColor: '#8E8E93',
-        headerLeft: () => <ProfileButton />, 
+        headerLeft: () => <SettingsButton />, 
         headerTitleAlign: 'center',
         headerLeftContainerStyle: {
           paddingLeft: 16,
@@ -168,17 +168,17 @@ export default function TabLayout() {
         options={{ href: null }}
       />
 
-      {/* Leaderboard (Temporary Tab) */}
+      {/* Leaderboard (Temporary Tab) 
       <Tabs.Screen
         name="(community)/leaderboard"
         options={{ title: 'Leaderboard' }}
-      />
+      />*/}
 
-      {/* Discussion Forum (Temporary Tab) */}
+      {/* Discussion Forum (Temporary Tab) 
       <Tabs.Screen
         name="(community)/discussion-forum"
         options={{ title: 'Discussion Forum' }}
-      />
+      />*/}
 
       {/* Add Post (No Tab) */}
       <Tabs.Screen
