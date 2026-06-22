@@ -13,7 +13,6 @@
     "@react-native-async-storage/async-storage": "2.2.0",
     "@rneui/themed": "^5.0.0",
     "@supabase/supabase-js": "^2.106.2",
-    "@testing-library/react-native": "^14.0.0",
     "base64-arraybuffer": "^1.0.2",
     "expo": "~54.0.35",
     "expo-constants": "~18.0.13",
@@ -33,11 +32,16 @@
   },
   "private": true,
   "devDependencies": {
+    "@testing-library/react-native": "^14.0.0",
     "@types/react": "~19.1.10",
     "supabase": "^2.105.0",
+    "test-renderer": "1.1",
     "typescript": "~5.9.2"
   },
   "jest": {
-    "preset": "jest-expo"
+    "preset": "jest-expo",
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.js"
+    ]
   }
 }

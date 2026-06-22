@@ -10,7 +10,7 @@ import Comment from '../../../components/comment'
 import Spacer from '../../../components/spacer'
 import TextInfo from '../../../components/text-info'
 
-const buildCommentTree = (comments, votes) => {
+export const buildCommentTree = (comments, votes) => {
   const map = {}
   const roots = []
 
@@ -154,10 +154,10 @@ export default function Post() {
           })
           .select()
         if (error) throw error
-        if (data) {
+        if (data && data[0]) {
           setVotedPost(data[0].id)
-          setPost({ ...post, score: post.score+1 })
         }
+        setPost({ ...post, score: post.score+1 })
       }
     } catch (error) {
       if (error instanceof Error) Alert.alert(error.message)
