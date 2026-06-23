@@ -5,6 +5,10 @@ import { supabase } from '../../lib/supabase'
 import { router } from 'expo-router'
 import Spacer from '../../components/spacer'
 
+export const cleanString = (s) => {
+  return s.toLowerCase().replace(/[^a-z]/g, '')
+}
+
 export default function WorkoutTutorial() {
   const [workouts, setWorkouts] = useState([])
   const [filteredWorkouts, setFilteredWorkouts] = useState([])
@@ -38,10 +42,6 @@ export default function WorkoutTutorial() {
     } finally {
       setLoading(false)
     }
-  }
-
-  const cleanString = (s) => {
-    return s.toLowerCase().replace(/[^a-z]/g, '')
   }
 
   const handleSearch = (query) => {

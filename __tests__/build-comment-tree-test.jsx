@@ -9,7 +9,7 @@ jest.mock('../lib/supabase', () => ({
   }
 }))
 
-describe('buildCommentTree utility unit tests', () => {
+describe('BuildCommentTree Unit Tests', () => {
   it('should correctly nest a reply under its parent comment', () => {
     const mockComments = [
       { id: 1, content: 'Parent comment', parent_id: null },
