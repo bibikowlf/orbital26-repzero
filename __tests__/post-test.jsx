@@ -103,7 +103,7 @@ jest.mock('../components/text-info', () => {
   }
 })
 
-describe('Post Screen Comprehensive Integration Tests', () => {
+describe('Post Integration Tests', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockActiveChains = {}

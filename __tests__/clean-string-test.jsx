@@ -9,7 +9,7 @@ jest.mock('../lib/supabase', () => ({
   }
 }))
 
-describe('cleanString utility test', () => {
+describe('CleanString Unit Tests', () => {
   it('should remove non alphabetic characters from a string and change to lowercase', () => {
     const mockString = 'Aa^bB01  -'
     const result = cleanString(mockString)
