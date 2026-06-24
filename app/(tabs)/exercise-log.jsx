@@ -10,7 +10,7 @@ import { useFocusEffect } from 'expo-router'
 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December']
 
-function getWeekRangeLabel(weekDays) {
+export function getWeekRangeLabel(weekDays) {
   if (!weekDays || weekDays.length === 0) 
     return ''
   const first = weekDays[0]
@@ -31,7 +31,7 @@ function getWeekRangeLabel(weekDays) {
 }
 
 // helper function to get all days for the current week, week starts on monday
-function getCurrentWeekDays(offset = 0) {
+export function getCurrentWeekDays(offset = 0) {
   const current = new Date()
   const dayOfWeek = current.getDay() 
   

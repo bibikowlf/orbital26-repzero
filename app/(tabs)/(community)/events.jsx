@@ -19,11 +19,22 @@ const SORT_OPTIONS = [
   { label: 'Date ↓', value: 'date_desc' },
 ]
 
-function formatEventDate(dateStr) {
+export function formatEventDate(dateStr) {
   const date = new Date(dateStr)
   const day = date.toLocaleDateString('en-SG', { weekday: 'short', day: 'numeric', month: 'short' })
   const time = date.toLocaleTimeString('en-SG', { hour: '2-digit', minute: '2-digit' })
   return { day, time }
+}
+
+export function filterEvents(events, activeTab, selectedCategory, sortBy) {
+  return events
+    .filter(e => activeTab === 'Going' ? e.user_rsvp?.[0]?.status === 'going' : true)
+    .filter(e => selectedCategory === 'All' || e.category === selectedCategory)
+    .sort((a, b) => {
+      const da = new Date(a.event_date)
+      const db = new Date(b.event_date)
+      return sortBy === 'date_asc' ? da - db : db - da
+    })
 }
 
 export default function Events() {
@@ -87,14 +98,7 @@ export default function Events() {
     setLoading(false)
   }
 
-  const filteredEvents = events
-    .filter(e => activeTab === 'Going' ? e.user_rsvp?.[0]?.status === 'going' : true)
-    .filter(e => selectedCategory === 'All' || e.category === selectedCategory)
-    .sort((a, b) => {
-      const da = new Date(a.event_date)
-      const db = new Date(b.event_date)
-      return sortBy === 'date_asc' ? da - db : db - da
-    })
+  const filteredEvents = filterEvents(events, activeTab, selectedCategory, sortBy)
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>

@@ -7,6 +7,35 @@ import { useAuthContext } from '../../../hooks/auth-context'
 
 const CATEGORIES = ['Cardio', 'Strength', 'Flexibility', 'Social', 'Other']
 
+export function isValidDateFormat(dateStr) {
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/
+  if (!dateRegex.test(dateStr)) return false
+  const [year, month, day] = dateStr.split('-').map(Number)
+  if (month < 1 || month > 12) return false
+  const daysInMonth = new Date(year, month, 0).getDate()
+  if (day < 1 || day > daysInMonth) return false
+  return true
+}
+
+export function isValidTimeFormat(timeStr) {
+  const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/
+  if (!timeRegex.test(timeStr)) return false
+  const [hours, minutes] = timeStr.split(':').map(Number)
+  if (hours < 0 || hours > 23) return false
+  if (minutes < 0 || minutes > 59) return false
+  return true
+}
+
+export function combineDatetime(dateStr, timeStr) {
+  const dt = new Date(`${dateStr}T${timeStr}:00+08:00`)
+  return isNaN(dt) ? null : dt
+}
+
+export function isFutureDate(dateStr, timeStr) {
+  const dt = new Date(`${dateStr}T${timeStr}:00+08:00`)
+  return dt > new Date()
+}
+
 export default function CreateEvent() {
   const router = useRouter()
   const { claims } = useAuthContext()
@@ -23,17 +52,16 @@ export default function CreateEvent() {
   const [saving, setSaving] = useState(false)
 
   async function handleSubmit() {
-  
-  if (!title.trim()) 
+  if (!title.trim())
     return Alert.alert('Missing Field', 'Please enter an event title.')
 
-  if (!description.trim()) 
+  if (!description.trim())
     return Alert.alert('Missing Field', 'Please enter an event description.')
 
-  if (!location.trim()) 
+  if (!location.trim())
     return Alert.alert('Missing Field', 'Please specify a location.')
 
-  if (!eventDate.trim()) 
+  if (!eventDate.trim())
     return Alert.alert('Missing Field', 'Please enter an event date (YYYY-MM-DD).')
 
   if (!eventTime.trim())
@@ -45,51 +73,30 @@ export default function CreateEvent() {
   if (category === 'Other' && !customCategory.trim())
     return Alert.alert('Missing Field', 'Please specify your custom category.')
 
-  const finalCategory = category === 'Other' ? customCategory.trim() : category
-
-  const combinedDateTime = new Date(`${eventDate}T${eventTime}:00+08:00`)
-  if (isNaN(combinedDateTime))
-    return Alert.alert('Invalid Format', 'Invalid date configuration.')
-
-  const now = new Date()
-  if (combinedDateTime <= now) 
-    return Alert.alert('Error', 'Event date must be in the future.')
-
-  const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/
-  if (!timeRegex.test(eventTime)) 
-    return Alert.alert('Error', 'Invalid time. Please use HH:MM format (e.g. 07:00).')
-
-  const [hours, minutes] = eventTime.split(':').map(Number)
-  if (hours < 0 || hours > 23) 
-    return Alert.alert('Invalid Time', 'Hours must be between 00 and 23.')
-  if (minutes < 0 || minutes > 59)
-    return Alert.alert('Invalid Time', 'Minutes must be between 00 and 59.')
-
-  const dateRegex = /^\d{4}-\d{2}-\d{2}$/
-  if (!dateRegex.test(eventDate)) 
+  if (!isValidDateFormat(eventDate))
     return Alert.alert('Invalid Date', 'Date must be in YYYY-MM-DD format.')
 
-  const [year, month, day] = eventDate.split('-').map(Number)
-  if (month < 1 || month > 12) 
-    return Alert.alert('Invalid Date', 'Month must be between 01 and 12.')
+  if (!isValidTimeFormat(eventTime))
+    return Alert.alert('Invalid Time', 'Please use HH:MM format (e.g. 07:00).')
 
-  const days = new Date(year, month, 0).getDate()
-  if (day < 1 || day > days) {
-    return Alert.alert('Invalid Date', `Day must be between 01 and ${daysInMonth} for this month.`)
-  }
+  const combinedDateTime = combineDatetime(eventDate, eventTime)
+  if (!combinedDateTime)
+    return Alert.alert('Invalid Format', 'Invalid date configuration.')
 
+  if (!isFutureDate(eventDate, eventTime))
+    return Alert.alert('Error', 'Event date must be in the future.')
 
-  if (!userId) {
+  const finalCategory = category === 'Other' ? customCategory.trim() : category
+
+  if (!userId)
     return Alert.alert('Error', 'You must be logged in to create an event')
-  }
 
   try {
     setSaving(true)
-    
+
     const { data: { user }, error: userError } = await supabase.auth.getUser()
-    if (userError || !user) {
+    if (userError || !user)
       return Alert.alert('Error', 'You must be logged in to create an event')
-    }
 
     const { error } = await supabase.from('events').insert({
       creator_id: userId,
@@ -97,10 +104,10 @@ export default function CreateEvent() {
       description: description.trim(),
       location: location.trim(),
       event_date: combinedDateTime.toISOString(),
-      category: finalCategory, 
+      category: finalCategory,
       max_attendees: maxAttendees ? parseInt(maxAttendees) : null,
     })
-    
+
     if (error) throw error
     Alert.alert('Done', 'Event created!', [{ text: 'OK', onPress: () => router.back() }])
   } catch (error) {
