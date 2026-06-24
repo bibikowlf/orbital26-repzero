@@ -5,6 +5,38 @@ import { useAuthContext } from '../../hooks/auth-context'
 import { appStyles } from '../../styles/styles'
 import Spacer from '../../components/spacer'
 
+export function addExerciseToDay(plan, dayIndex) {
+  const updated = plan.map((day, i) =>
+    i === dayIndex
+      ? { ...day, exercises: [...day.exercises, { name: '', sets: '', reps: '', notes: '' }] }
+      : day
+  )
+  return updated
+}
+
+export function deleteExerciseFromDay(plan, dayIndex, exerciseIndex) {
+  const updated = plan.map((day, i) =>
+    i === dayIndex
+      ? { ...day, exercises: day.exercises.filter((_, j) => j !== exerciseIndex) }
+      : day
+  )
+  return updated
+}
+
+export function updateExerciseField(plan, dayIndex, exerciseIndex, field, value) {
+  const updated = plan.map((day, i) =>
+    i === dayIndex
+      ? {
+          ...day,
+          exercises: day.exercises.map((ex, j) =>
+            j === exerciseIndex ? { ...ex, [field]: value } : ex
+          ),
+        }
+      : day
+  )
+  return updated
+}
+
 export default function GeneratePlan() {
   const {claims} = useAuthContext()
   const userId = claims?.sub
@@ -14,32 +46,17 @@ export default function GeneratePlan() {
   const [isEditing, setIsEditing] = useState(false)
   const [workoutPlan, setWorkoutPlan] = useState([])
 
-  const styles = appStyles
-
   function handleAddExercise(dayIndex) {
-    const updatedPlan = [...workoutPlan]
-    
-    updatedPlan[dayIndex].exercises.push({
-      name: "",
-      sets: "",
-      reps: "",
-      notes: ""
-    })
-    
-    setWorkoutPlan(updatedPlan)
-    setIsEditing(true) 
+    setWorkoutPlan(addExerciseToDay(workoutPlan, dayIndex))
+    setIsEditing(true)
   }
 
   function handleDeleteExercise(dayIndex, exerciseIndex) {
-    const updatedPlan = [...workoutPlan]
-    updatedPlan[dayIndex].exercises.splice(exerciseIndex, 1)
-    setWorkoutPlan(updatedPlan)
+    setWorkoutPlan(deleteExerciseFromDay(workoutPlan, dayIndex, exerciseIndex))
   }
 
   function handleUpdateExercise(dayIndex, exerciseIndex, field, value) {
-    const updatedPlan = [...workoutPlan]
-    updatedPlan[dayIndex].exercises[exerciseIndex][field] = value
-    setWorkoutPlan(updatedPlan)
+    setWorkoutPlan(updateExerciseField(workoutPlan, dayIndex, exerciseIndex, field, value))
   }
 
   useEffect(() => {
@@ -120,12 +137,6 @@ export default function GeneratePlan() {
       throw error
   }
 
-  const handleFieldChange = (dayIndex, exerciseIndex, field, value) => {
-    const updatedPlan = [...workoutPlan]
-    updatedPlan[dayIndex].exercises[exerciseIndex][field] = value
-    setWorkoutPlan(updatedPlan)
-  }
-
   const handleSaveEdits = async () => {
     try {
       setLoading(true)
@@ -143,7 +154,7 @@ export default function GeneratePlan() {
 
   if (fetching) {
     return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+      <View style={[appStyles.container, { justifyContent: 'center', alignItems: 'center' }]}>
         <ActivityIndicator size="large" color="#000" />
       </View>
     )
@@ -151,25 +162,25 @@ export default function GeneratePlan() {
 
   return (
     <ScrollView style={{ paddingHorizontal: 15, paddingTop: 20 }}>
-      <Text style={[styles.label, { fontSize: 22, fontWeight: 'bold' }]}>AI Workout Suite</Text>
+      <Text style={[appStyles.label, { fontSize: 22, fontWeight: 'bold' }]}>AI Workout Suite</Text>
       <Text style={{ color: '#666', marginTop: 4 }}>Review, refine, or rewrite your customized routine split.</Text>
       <Spacer />
 
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <TouchableOpacity 
-          style={[styles.actionButton, { backgroundColor: '#007AFF' }, loading && styles.buttonDisabled]}
+          style={[appStyles.actionButton, { backgroundColor: '#007AFF' }, loading && appStyles.buttonDisabled]}
           onPress={handleGenerateWorkout}
           disabled={loading}
         >
-          <Text style={styles.buttonText}>{workoutPlan.length > 0 ? 'AI Regenerate' : 'AI Generate'}</Text>
+          <Text style={appStyles.buttonText}>{workoutPlan.length > 0 ? 'AI Regenerate' : 'AI Generate'}</Text>
         </TouchableOpacity>
 
         {workoutPlan.length > 0 && (
           <TouchableOpacity 
-            style={[styles.actionButton, { backgroundColor: isEditing ? '#34C759' : '#5856D6' }]}
+            style={[appStyles.actionButton, { backgroundColor: isEditing ? '#34C759' : '#5856D6' }]}
             onPress={isEditing ? handleSaveEdits : () => setIsEditing(true)}
           >
-            <Text style={styles.buttonText}>{isEditing ? 'Save Customizations' : 'Modify Items'}</Text>
+            <Text style={appStyles.buttonText}>{isEditing ? 'Save Customizations' : 'Modify Items'}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -178,51 +189,51 @@ export default function GeneratePlan() {
 
       {workoutPlan.length > 0 ? (
         workoutPlan.map((dayItem, dayIdx) => (
-          <View key={dayIdx} style={styles.dayContainer}>
-            <Text style={styles.dayHeader}>{dayItem.day}</Text>
+          <View key={dayIdx} style={appStyles.dayContainer}>
+            <Text style={appStyles.dayHeader}>{dayItem.day}</Text>
             
             {dayItem.exercises?.map((exercise, exIdx) => (
-              <View key={exIdx} style={styles.exerciseRow}>
+              <View key={exIdx} style={appStyles.exerciseRow}>
                 {isEditing ? (
                   <View style={{ width: '100%' }}>
-                    <Text style={styles.miniLabel}>Exercise Name</Text>
+                    <Text style={appStyles.miniLabel}>Exercise Name</Text>
                     <TextInput 
-                      style={styles.inlineInput}
+                      style={appStyles.inlineInput}
                       value={exercise.name}
-                      onChangeText={(val) => handleFieldChange(dayIdx, exIdx, 'name', val)}
+                      onChangeText={(val) => handleUpdateExercise(dayIdx, exIdx, 'name', val)}
                     />
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 }}>
                       <View style={{ width: '48%' }}>
-                        <Text style={styles.miniLabel}>Sets</Text>
+                        <Text style={appStyles.miniLabel}>Sets</Text>
                         <TextInput 
-                          style={styles.inlineInput}
+                          style={appStyles.inlineInput}
                           value={String(exercise.sets)}
                           keyboardType="numeric"
-                          onChangeText={(val) => handleFieldChange(dayIdx, exIdx, 'sets', parseInt(val) || 0)}
+                          onChangeText={(val) => handleUpdateExercise(dayIdx, exIdx, 'sets', parseInt(val) || 0)}
                         />
                       </View>
                       <View style={{ width: '48%' }}>
-                        <Text style={styles.miniLabel}>Reps</Text>
+                        <Text style={appStyles.miniLabel}>Reps</Text>
                         <TextInput 
-                          style={styles.inlineInput}
+                          style={appStyles.inlineInput}
                           value={exercise.reps}
-                          onChangeText={(val) => handleFieldChange(dayIdx, exIdx, 'reps', val)}
+                          onChangeText={(val) => handleUpdateExercise(dayIdx, exIdx, 'reps', val)}
                         />
                       </View>
                     </View>
 
                     {/* Delete exercise button */}
                     <TouchableOpacity onPress={() => handleDeleteExercise(dayIdx, exIdx)}>
-                      <Text style={styles.removeText}>Remove</Text>
+                      <Text style={appStyles.removeText}>Remove</Text>
                       </TouchableOpacity>
                   </View>                     
                 ) : (
                   <View style={{ flex: 1 }}>
-                    <Text style={styles.exerciseName}>{exercise.name}</Text>
-                    <Text style={styles.exerciseMeta}>
+                    <Text style={appStyles.exerciseName}>{exercise.name}</Text>
+                    <Text style={appStyles.exerciseMeta}>
                       {exercise.sets} Sets x {exercise.reps} Reps
                     </Text>
-                    {exercise.notes && <Text style={styles.exerciseNotes}>{exercise.notes}</Text>}
+                    {exercise.notes && <Text style={appStyles.exerciseNotes}>{exercise.notes}</Text>}
                   </View>
                 )}
               </View>             
@@ -231,16 +242,16 @@ export default function GeneratePlan() {
             {/* Add exercise button */}
             {isEditing && (
               <TouchableOpacity
-                style={[styles.addExerciseButton, { marginTop: 8 }]}
+                style={[appStyles.addExerciseButton, { marginTop: 8 }]}
                 onPress={() => handleAddExercise(dayIdx)}
               >
-                <Text style={styles.addExerciseText}>+ Add Exercise</Text>
+                <Text style={appStyles.addExerciseText}>+ Add Exercise</Text>
               </TouchableOpacity>
             )}
           </View>
         ))
       ) : (
-        <Text style={styles.fallbackText}>No routine active. Prompt Gemini to map out your week.</Text>
+        <Text style={appStyles.fallbackText}>No routine active. Prompt Gemini to map out your week.</Text>
       )}
       <Spacer />
     </ScrollView>
