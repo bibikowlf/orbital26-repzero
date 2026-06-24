@@ -65,15 +65,15 @@ export default function DiscussionForum() {
                 borderWidth: 1, 
                 borderColor: '#ced4da', 
                 marginBottom: 8,
-                height: 80,
+                height: 100,
                 padding: 12 }]}
             onPress={() => router.navigate({ pathname: '/post', params: {postId: item.id} })}
             disabled={loading}
           >
             <Text style={styles.title}>{item.title}</Text>
-            <View style={[styles.row, { marginTop: 6, marginBottom: 0 }]}>
-              <Entypo name='arrow-bold-up' size={16} />
-              <Text style={{ marginLeft: 4 }}>{item.score}</Text>
+            <View style={[styles.row, { marginTop: 0, marginBottom: 0 }]}>
+              <Entypo name='arrow-bold-up' size={16} color='black' />
+              <Text style={{ marginLeft: 4, color: 'black' }}>{item.score}</Text>
             </View>
           </TouchableOpacity>
         )}

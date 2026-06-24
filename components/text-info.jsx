@@ -8,15 +8,15 @@ export default function TextInfo({ marginBottom, isAuthor, canReply, score, load
   return (
     <View style={[styles.row, { marginBottom: marginBottom }]}>
       <TouchableOpacity onPress={onVotePress} disabled={loading}>
-        <Entypo name='arrow-bold-up' size={16} color={hasVoted ? '#2e2c2c48' : '#000000'} />
+        <Entypo name='arrow-bold-up' size={16} color={hasVoted ? '#2e2c2c48' : 'black'} />
       </TouchableOpacity>
-      <Text style={{ marginLeft: 4 }}>{score}</Text>
+      <Text style={{ marginLeft: 4, color: 'black' }}>{score}</Text>
       {canReply && (
         <TouchableOpacity
           style={{ marginLeft: 12 }}
           onPress={onReplyPress} 
           disabled={loading}>
-          <Entypo name='reply' size={16} />
+          <Entypo name='reply' size={16} color='black' />
         </TouchableOpacity>
       )}
       {isAuthor && (
@@ -24,7 +24,7 @@ export default function TextInfo({ marginBottom, isAuthor, canReply, score, load
           style={{ marginLeft: 12 }}
           onPress={onEditPress}
           disabled={loading || editing}>
-          <Entypo name='edit' size={16} />
+          <Entypo name='edit' size={16} color='black' />
         </TouchableOpacity>
       )}
       {isAuthor && (
@@ -39,7 +39,7 @@ export default function TextInfo({ marginBottom, isAuthor, canReply, score, load
               ]
           )}}
           disabled={loading}>
-          <Entypo name='trash' size={16} />
+          <Entypo name='trash' size={16} color='black' />
         </TouchableOpacity>
       )}
     </View>
