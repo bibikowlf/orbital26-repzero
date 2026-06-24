@@ -25,7 +25,8 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.bibikowolf.repzero_app1"
+      "package": "com.bibikowolf.repzero_app1",
+      "newArchEnabled": false
     },
     "web": {
       "favicon": "./assets/favicon.png"
