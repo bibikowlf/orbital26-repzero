@@ -394,7 +394,7 @@ export default function Post() {
                 </View>
               )}
               {editPost === null ? (
-                <Text style={{ fontSize: 16 }}>{post.content}</Text>): (
+                <Text style={{ fontSize: 16, color: 'black' }}>{post.content}</Text>): (
                 <View>
                   <TextInput 
                     value={editPost}
