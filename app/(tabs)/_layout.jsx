@@ -29,11 +29,11 @@ export default function TabLayout() {
         },
       }}
     >
-      {/* Workout Plan Tab */}
+      {/* Exercise Plan Tab */}
       <Tabs.Screen
         name="generate-plan"
         options={{
-          title: 'Workout Plan',
+          title: 'Exercise Plan',
           tabBarIcon: ({ color }) => (
             <Ionicons name='barbell' size={24} color={color} />
           ),
