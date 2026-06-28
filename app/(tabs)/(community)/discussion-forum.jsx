@@ -70,7 +70,8 @@ export default function DiscussionForum() {
     <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10, flex: 1 }]}>
       <TextInput
         style={[styles.input, { alignSelf: 'stretch' }]}
-        value={searchQuery || 'Search posts'}
+        value={searchQuery}
+        placeholder='Search posts'
         onChangeText={handleSearch}
       />
 
