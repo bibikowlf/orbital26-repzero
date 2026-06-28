@@ -300,7 +300,7 @@ export default function ExerciseLog() {
             style={appStyles.importButton}
             onPress={handleImportPress}
           >
-            <Text style={appStyles.importButtonText}>↓ Import from Workout Plan</Text>
+            <Text style={appStyles.importButtonText}>↓ Import from Exercise Plan</Text>
           </TouchableOpacity>
         )}
 
