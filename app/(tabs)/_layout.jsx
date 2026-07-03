@@ -4,18 +4,6 @@ import Entypo from '@expo/vector-icons/Entypo'
 import SettingsButton from '../../components/settings-button'
 import { TouchableOpacity, Text } from 'react-native'
 
-/*function MyEventsButton() {
-  const router = useRouter()
-  return (
-    <TouchableOpacity
-      onPress={() => router.push('/(tabs)/(community)/my-events')}
-      style={{ marginRight: 16 }}
-    >
-      <Text style={{ color: '#007AFF', fontWeight: '600', fontSize: 15 }}>My Events</Text>
-    </TouchableOpacity>
-  )
-}*/
-
 export default function TabLayout() {
   return (
     <Tabs
@@ -68,18 +56,6 @@ export default function TabLayout() {
         }}
       />
 
-      {/* Community Tab 
-      <Tabs.Screen
-        name="(community)/events"
-        options={{
-          title: 'Community',
-          tabBarIcon: ({ color }) => (
-            <Entypo name="users" size={24} color={color} />
-          ),
-          headerRight: () => <MyEventsButton />,            
-        }}
-      />*/}
-
       {/* Discussion Tab */}
       <Tabs.Screen
         name="(community)/discussion-forum"
@@ -98,17 +74,6 @@ export default function TabLayout() {
           title: 'Events',
           tabBarIcon: ({ color }) => (
             <Ionicons name="calendar-outline" size={24} color={color} />
-          ),
-        }}
-      />
-
-      {/* Leaderboard Tab */}
-      <Tabs.Screen
-        name="(community)/leaderboard"
-        options={{
-          title: 'Leaderboard',
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="trophy-outline" size={24} color={color} />
           ),
         }}
       />
@@ -166,18 +131,6 @@ export default function TabLayout() {
         name="tutorial"
         options={{ href: null }}
       />
-
-      {/* Leaderboard (Temporary Tab) 
-      <Tabs.Screen
-        name="(community)/leaderboard"
-        options={{ title: 'Leaderboard' }}
-      />*/}
-
-      {/* Discussion Forum (Temporary Tab) 
-      <Tabs.Screen
-        name="(community)/discussion-forum"
-        options={{ title: 'Discussion Forum' }}
-      />*/}
 
       {/* Add Post (No Tab) */}
       <Tabs.Screen

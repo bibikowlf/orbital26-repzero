@@ -810,4 +810,11 @@ attendeeUsername: {
   color: '#333',
   fontWeight: '500',
 },
+
+//exercise log tab
+tabRow: { flexDirection: 'row', borderBottomWidth: 1, borderColor: '#e9ecef' },
+  tabButton: { flex: 1, paddingVertical: 12, alignItems: 'center' },
+  tabButtonActive: { borderBottomWidth: 2, borderBottomColor: '#007AFF' },
+  tabText: { fontSize: 15, fontWeight: '600', color: '#8E8E93' },
+  tabTextActive: { color: '#007AFF' },
 })
