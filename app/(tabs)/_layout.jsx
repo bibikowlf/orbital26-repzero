@@ -10,6 +10,18 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: '#007AFF',
         tabBarInactiveTintColor: '#8E8E93',
+        tabBarShowLabel: false,
+        tabBarStyle: {
+          height: 70,          
+          paddingBottom: 0,  
+        },
+        tabBarIconStyle: {
+          justifyContent: 'center',
+          alignItems: 'center',
+          alignSelf: 'center',
+          flex: 1,
+          transform: [{ scale: 1.35 }],
+        },
         headerLeft: () => <SettingsButton />, 
         headerTitleAlign: 'center',
         headerLeftContainerStyle: {
