@@ -78,6 +78,12 @@ export default function TabLayout() {
         }}
       />
 
+      {/* Leaderboard (No Tab) */}
+      <Tabs.Screen
+        name="(community)/leaderboard"
+        options={{ href: null }}
+      />
+
       {/* Create Event (No Tab) */}
       <Tabs.Screen
         name="(community)/create-event"
