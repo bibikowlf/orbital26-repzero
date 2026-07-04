@@ -10,18 +10,6 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: '#007AFF',
         tabBarInactiveTintColor: '#8E8E93',
-        tabBarShowLabel: false,
-        tabBarStyle: {
-          height: 70,          
-          paddingBottom: 0,  
-        },
-        tabBarIconStyle: {
-          justifyContent: 'center',
-          alignItems: 'center',
-          alignSelf: 'center',
-          flex: 1,
-          transform: [{ scale: 1.35 }],
-        },
         headerLeft: () => <SettingsButton />, 
         headerTitleAlign: 'center',
         headerLeftContainerStyle: {
@@ -33,7 +21,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="generate-plan"
         options={{
-          title: 'Workout Plan',
+          title: 'Plan',
           tabBarIcon: ({ color }) => (
             <Ionicons name='barbell' size={24} color={color} />
           ),
@@ -50,7 +38,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="exercise-log"
         options={{
-          title: 'Exercise Log',
+          title: 'Log',
           tabBarIcon: ({ color }) => (
             <Entypo name="calendar" size={24} color={color} />
           ),
@@ -61,7 +49,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="workout-tutorial"
         options={{
-          title: 'Workout Tutorial',
+          title: 'Tutorial',
           tabBarIcon: ({ color }) => (
             <Entypo name='book' size={24} color={color} />
           ),
