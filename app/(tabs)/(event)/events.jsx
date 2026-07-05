@@ -1,9 +1,9 @@
 import { useState, useCallback } from 'react'
 import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native'
 import { useRouter, useFocusEffect } from 'expo-router'
-import { appStyles } from '../../styles/styles'
-import { supabase } from '../../lib/supabase'
-import { useAuthContext } from '../../hooks/auth-context'
+import { appStyles } from '../../../styles/styles'
+import { supabase } from '../../../lib/supabase'
+import { useAuthContext } from '../../../hooks/auth-context'
 
 const CATEGORY_COLORS = {
   Cardio: '#FF9500',

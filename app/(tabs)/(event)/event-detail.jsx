@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { View, Text, ScrollView, TouchableOpacity, Alert, StyleSheet } from 'react-native'
-import { useLocalSearchParams, Stack } from 'expo-router'
-import { supabase } from '../../lib/supabase'
-import { useAuthContext } from '../../hooks/auth-context'
-import { appStyles } from '../../styles/styles'
+import { useLocalSearchParams } from 'expo-router'
+import { supabase } from '../../../lib/supabase'
+import { useAuthContext } from '../../../hooks/auth-context'
+import { appStyles } from '../../../styles/styles'
 
 const CATEGORY_COLORS = {
   Cardio: '#FF9500',
@@ -106,7 +106,6 @@ export default function EventDetail() {
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: '#fff' }} contentContainerStyle={{ padding: 20 }}>
-      <Stack.Screen options={{ title: 'Event Details', headerBackVisible: false, headerTitleAlign: 'center' }}/>
 
       <View style={[appStyles.categoryBadge, { backgroundColor: CATEGORY_COLORS[event.category] || CATEGORY_COLORS.default }]}>
         <Text style={appStyles.categoryText}>{event.category}</Text>

@@ -2,7 +2,7 @@ import { Stack } from 'expo-router'
 import SettingsButton from '../../../components/settings-button'
 import BackButton from '../../../components/back-button'
 
-export default function DiscussionLayout() {
+export default function EventLayout() {
   return (
     <Stack screenOptions={{ headerShown: true, 
         headerTitleAlign: 'center',
@@ -10,14 +10,14 @@ export default function DiscussionLayout() {
         headerLeftContainerStyle: { paddingLeft: 16 } }}
     >
       <Stack.Screen name='index' />
-      <Stack.Screen name='discussion-forum' 
-        options={{ title: 'Discussion', headerLeft: () => <SettingsButton /> }}
+      <Stack.Screen name='events' 
+        options={{ title: 'Events', headerLeft: () => <SettingsButton /> }}
       />
-      <Stack.Screen name='add-post' 
-        options={{ title: 'Add Post', headerLeft: () => <BackButton /> }}
+      <Stack.Screen name='create-event' 
+        options={{ title: 'Create Event', headerLeft: () => <BackButton /> }}
       />
-      <Stack.Screen name='post' 
-        options={{ title: 'Discussion', headerLeft: () => <BackButton /> }}
+      <Stack.Screen name='event-detail' 
+        options={{ title: 'Event Details', headerLeft: () => <BackButton /> }}
       />
     </Stack>
   )
