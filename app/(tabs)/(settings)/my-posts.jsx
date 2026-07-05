@@ -66,7 +66,7 @@ export default function DiscussionForum() {
                 marginBottom: 8,
                 height: 100,
                 padding: 12 }]}
-            onPress={() => router.navigate({ pathname: '/post', params: {postId: item.id} })}
+            onPress={() => router.navigate({ pathname: '/my-posts-detail', params: {postId: item.id} })}
             disabled={loading}
           >
             <Text style={styles.title}>{item.title}</Text>

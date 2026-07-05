@@ -21,6 +21,9 @@ export default function SettingsLayout() {
       <Stack.Screen name='my-posts' 
         options={{ title: 'My Posts', headerLeft: () => <SettingsButton /> }}
       />
+      <Stack.Screen name='my-posts-detail' 
+        options={{ title: 'Discussion', headerLeft: () => <BackButton /> }}
+      />
       <Stack.Screen name='my-tutorials' 
         options={{ title: 'My Tutorials', headerLeft: () => <SettingsButton /> }}
       />
