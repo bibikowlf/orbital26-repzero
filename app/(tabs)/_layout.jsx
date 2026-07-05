@@ -4,18 +4,6 @@ import Entypo from '@expo/vector-icons/Entypo'
 import SettingsButton from '../../components/settings-button'
 import { TouchableOpacity, Text } from 'react-native'
 
-/*function MyEventsButton() {
-  const router = useRouter()
-  return (
-    <TouchableOpacity
-      onPress={() => router.push('/(tabs)/(community)/my-events')}
-      style={{ marginRight: 16 }}
-    >
-      <Text style={{ color: '#007AFF', fontWeight: '600', fontSize: 15 }}>My Events</Text>
-    </TouchableOpacity>
-  )
-}*/
-
 export default function TabLayout() {
   return (
     <Tabs
@@ -33,7 +21,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="generate-plan"
         options={{
-          title: 'Exercise Plan',
+          title: 'Plan',
           tabBarIcon: ({ color }) => (
             <Ionicons name='barbell' size={24} color={color} />
           ),
@@ -50,7 +38,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="exercise-log"
         options={{
-          title: 'Exercise Log',
+          title: 'Log',
           tabBarIcon: ({ color }) => (
             <Entypo name="calendar" size={24} color={color} />
           ),
@@ -61,24 +49,12 @@ export default function TabLayout() {
       <Tabs.Screen
         name="workout-tutorial"
         options={{
-          title: 'Workout Tutorial',
+          title: 'Tutorial',
           tabBarIcon: ({ color }) => (
             <Entypo name='book' size={24} color={color} />
           ),
         }}
       />
-
-      {/* Community Tab 
-      <Tabs.Screen
-        name="(community)/events"
-        options={{
-          title: 'Community',
-          tabBarIcon: ({ color }) => (
-            <Entypo name="users" size={24} color={color} />
-          ),
-          headerRight: () => <MyEventsButton />,            
-        }}
-      />*/}
 
       {/* Discussion Tab */}
       <Tabs.Screen
@@ -102,15 +78,10 @@ export default function TabLayout() {
         }}
       />
 
-      {/* Leaderboard Tab */}
+      {/* Leaderboard (No Tab) */}
       <Tabs.Screen
         name="(community)/leaderboard"
-        options={{
-          title: 'Leaderboard',
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="trophy-outline" size={24} color={color} />
-          ),
-        }}
+        options={{ href: null }}
       />
 
       {/* Create Event (No Tab) */}
@@ -166,18 +137,6 @@ export default function TabLayout() {
         name="tutorial"
         options={{ href: null }}
       />
-
-      {/* Leaderboard (Temporary Tab) 
-      <Tabs.Screen
-        name="(community)/leaderboard"
-        options={{ title: 'Leaderboard' }}
-      />*/}
-
-      {/* Discussion Forum (Temporary Tab) 
-      <Tabs.Screen
-        name="(community)/discussion-forum"
-        options={{ title: 'Discussion Forum' }}
-      />*/}
 
       {/* Add Post (No Tab) */}
       <Tabs.Screen
