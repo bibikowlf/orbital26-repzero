@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react'
 import { Alert, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { supabase } from '../lib/supabase'
 import { appStyles } from '../styles/styles'
-import { router, useFocusEffect } from 'expo-router'
+import { router, useFocusEffect, Stack } from 'expo-router'
 
 const Login = () => {
   const [email, setEmail] = useState('')
@@ -45,6 +45,7 @@ const Login = () => {
 
   return (
     <View style={styles.container}>
+      <Stack.Screen options={{ title: 'Login', headerBackVisible: false, headerTitleAlign: 'center' }}/>
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Text style={styles.label}>Email</Text>
         <TextInput

@@ -9,11 +9,10 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: '#007AFF',
         tabBarInactiveTintColor: '#8E8E93',
-        headerLeft: () => <SettingsButton />, 
         headerTitleAlign: 'center',
         headerLeftContainerStyle: {
           paddingLeft: 16,
-        },
+        }
       }}
     >
       {/* Exercise Plan Tab */}
@@ -57,9 +56,10 @@ export default function TabLayout() {
 
       {/* Discussion Tab */}
       <Tabs.Screen
-        name="discussion-forum"
+        name="(discussion)"
         options={{
           title: 'Discussion',
+          headerShown: false,
           tabBarIcon: ({ color }) => (
             <Ionicons name="chatbubbles-outline" size={24} color={color} />
           ),

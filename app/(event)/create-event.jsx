@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { View, Text, TextInput, ScrollView, TouchableOpacity, Alert } from 'react-native'
 import { appStyles } from '../../styles/styles'
 import { supabase } from '../../lib/supabase'
-import { useRouter } from 'expo-router'
+import { useRouter, Stack } from 'expo-router'
 import { useAuthContext } from '../../hooks/auth-context'
 
 const CATEGORIES = ['Cardio', 'Strength', 'Flexibility', 'Social', 'Other']
@@ -119,6 +119,7 @@ export default function CreateEvent() {
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: '#fff' }} contentContainerStyle={{ padding: 16 }}>
+      <Stack.Screen options={{ title: 'Create Event', headerBackVisible: false, headerTitleAlign: 'center' }}/>
       <Text style={appStyles.label}>Title *</Text>
       <TextInput
         style={appStyles.input}

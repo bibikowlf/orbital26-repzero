@@ -1,9 +1,9 @@
 import { useState, useCallback } from 'react'
 import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity, Alert } from 'react-native'
-import { appStyles } from '../../styles/styles'
-import { supabase } from '../../lib/supabase'
+import { appStyles } from '../../../styles/styles'
+import { supabase } from '../../../lib/supabase'
 import { router, useFocusEffect } from 'expo-router'
-import Spacer from '../../components/spacer'
+import Spacer from '../../../components/spacer'
 import Entypo from '@expo/vector-icons/Entypo'
 
 export default function DiscussionForum() {

@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
-import { useRouter, useFocusEffect } from 'expo-router'
+import { useRouter, useFocusEffect, Stack } from 'expo-router'
 import { supabase } from '../../lib/supabase'
 import { useAuthContext } from '../../hooks/auth-context'
 import { appStyles } from '../../styles/styles'
@@ -58,6 +58,7 @@ export default function MyEvents() {
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
       <ScrollView contentContainerStyle={{ padding: 16 }}>
+        <Stack.Screen options={{ title: 'My Events', headerBackVisible: false, headerTitleAlign: 'center' }}/>
         {loading ? (
           <Text style={{ textAlign: 'center', marginTop: 40, color: '#888' }}>Loading...</Text>
         ) : events.length === 0 ? (

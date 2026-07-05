@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native'
-import { useLocalSearchParams, useRouter } from 'expo-router'
+import { useLocalSearchParams, useRouter, Stack } from 'expo-router'
 import { supabase } from '../../lib/supabase'
 import { useAuthContext } from '../../hooks/auth-context'
 import { appStyles } from '../../styles/styles'
@@ -190,6 +190,7 @@ export default function MyEventDetail() {
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: '#fff' }} contentContainerStyle={{ padding: 20 }}>
+      <Stack.Screen options={{ title: 'Event Details', headerBackVisible: false, headerTitleAlign: 'center' }}/>
 
       {isEditing ? (
         <>
