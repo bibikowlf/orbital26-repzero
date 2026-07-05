@@ -33,7 +33,7 @@ export default function Comment({ comment, depth, editing, loading, onReplyPress
           {comment.user_id === userId ? 'You': '@' + comment.username}
         </Text>
         {editing !== comment.id ? (
-          <Text style={{ fontSize: 16 }}>{comment.content}</Text>): (
+          <Text style={{ fontSize: 16, color: 'black' }}>{comment.content}</Text>): (
           <View>
             <TextInput 
               value={editComment}

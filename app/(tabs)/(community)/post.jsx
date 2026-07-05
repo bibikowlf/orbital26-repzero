@@ -306,7 +306,7 @@ export default function Post() {
       <View style={[styles.container, 
         { alignItems: 'stretch', width: '100%', marginTop: 0, flex: 1 }]}>
         <Stack.Screen options={{ 
-          title: 'Discussion Forum', headerBackVisible: false, headerTitleAlign: 'center' }}/>
+          title: 'Discussion', headerBackVisible: false, headerTitleAlign: 'center' }}/>
         <FlatList
           data={commentTree}
           extraData={[comments, votes, editingComment]}
@@ -394,7 +394,7 @@ export default function Post() {
                 </View>
               )}
               {editPost === null ? (
-                <Text style={{ fontSize: 16 }}>{post.content}</Text>): (
+                <Text style={{ fontSize: 16, color: 'black' }}>{post.content}</Text>): (
                 <View>
                   <TextInput 
                     value={editPost}

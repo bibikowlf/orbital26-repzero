@@ -17,7 +17,7 @@ export default function TabLayout() {
         },
       }}
     >
-      {/* Workout Plan Tab */}
+      {/* Exercise Plan Tab */}
       <Tabs.Screen
         name="generate-plan"
         options={{

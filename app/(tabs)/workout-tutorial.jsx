@@ -104,8 +104,8 @@ export default function WorkoutTutorial() {
     <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10, flex: 1 }]}>
       <TextInput
         style={[styles.input, { alignSelf: 'stretch' }]}
-        placeholder='Search workouts'
         value={searchQuery}
+        placeholder='Search workouts'
         onChangeText={handleSearch}
       />
 

@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase'
 import { useAuthContext } from '../../hooks/auth-context'
 import { appStyles } from '../../styles/styles'
 import Spacer from '../../components/spacer'
+import { FunctionsHttpError } from '@supabase/supabase-js'
 
 export function addExerciseToDay(plan, dayIndex) {
   const updated = plan.map((day, i) =>
@@ -119,8 +120,8 @@ export default function GeneratePlan() {
         body: { profile: profile, notes: notes || null },
       });
 
-      if (edgeError) 
-        throw edgeError;
+    if (edgeError) 
+      throw edgeError
 
       console.log("EDGE DATA RECEIVED:", JSON.stringify(edgeData, null, 2))
 
@@ -157,8 +158,12 @@ export default function GeneratePlan() {
       Alert.alert("Success", "Your routine has been generated!")
 
     } catch (error) {
-      Alert.alert("Generation Failed", error.message)
+      Alert.alert("Generation Failed", "Please try again later")
       console.error(error)
+      if (error && error instanceof FunctionsHttpError) {
+        const errorMessage = await error.context.json()
+        console.log('Function returned an error', errorMessage)
+      }
     } finally {
       setLoading(false)
     }

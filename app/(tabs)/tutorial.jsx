@@ -234,7 +234,7 @@ export default function WorkoutTutorials() {
                 padding: 12 }]}
           >
             {(editing === null || editing.id !== item.id) ? (
-              <Text style={{ fontSize: 16, marginBottom: 6 }}>{item.content}</Text>): (
+              <Text style={{ fontSize: 16, marginBottom: 6, color: 'black' }}>{item.content}</Text>): (
               <View style={{ marginBottom: 6 }}>
                 <TextInput 
                   value={editTutorial}
