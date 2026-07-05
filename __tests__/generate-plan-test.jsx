@@ -1,4 +1,4 @@
-import { addExerciseToDay, deleteExerciseFromDay, updateExerciseField } from '../app/(tabs)/generate-plan'
+import { addExerciseToDay, deleteExerciseFromDay, updateExerciseField } from '../app/(tabs)/(plan)/generate-plan'
 
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock')

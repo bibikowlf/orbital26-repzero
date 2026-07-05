@@ -1,4 +1,4 @@
-import { formatEventDate, filterEvents } from '../app/(tabs)/(community)/events'
+import { formatEventDate, filterEvents } from '../app/(tabs)/(event)/events'
 
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock')

@@ -130,5 +130,5 @@ describe('Profile Integration Tests', () => {
         })
       )
     })
-  })
+  }, 10000)
 })

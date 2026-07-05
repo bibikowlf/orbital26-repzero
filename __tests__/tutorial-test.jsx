@@ -1,6 +1,6 @@
 import React from 'react'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react-native'
-import WorkoutTutorials from '../app/(tabs)/tutorial'
+import WorkoutTutorials from '../app/(tabs)/(tutorial)/tutorial'
 import { supabase } from '../lib/supabase'
 
 const mockUserSubId = 'mock-user-123'

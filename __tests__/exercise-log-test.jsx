@@ -1,4 +1,4 @@
-import { getCurrentWeekDays, getWeekRangeLabel } from '../app/(tabs)/exercise-log'
+import { getCurrentWeekDays, getWeekRangeLabel } from '../app/(tabs)/(log)/exercise-log'
 
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock')

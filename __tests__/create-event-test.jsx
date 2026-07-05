@@ -1,4 +1,4 @@
-import { isValidDateFormat, isValidTimeFormat, combineDatetime, isFutureDate } from '../app/(tabs)/(community)/create-event'
+import { isValidDateFormat, isValidTimeFormat, combineDatetime, isFutureDate } from '../app/(tabs)/(event)/create-event'
 
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock')
