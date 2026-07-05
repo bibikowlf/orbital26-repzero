@@ -20,7 +20,7 @@ export default function TabLayout() {
 
       {/* Exercise Plan Tab */}
       <Tabs.Screen
-        name="generate-plan"
+        name="(plan)"
         options={{
           title: 'Plan',
           tabBarIcon: ({ color }) => (
@@ -31,7 +31,7 @@ export default function TabLayout() {
 
       {/* Exercise Log Tab */}
       <Tabs.Screen
-        name="exercise-log"
+        name="(log)"
         options={{
           title: 'Log',
           tabBarIcon: ({ color }) => (
