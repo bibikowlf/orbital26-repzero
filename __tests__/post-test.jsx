@@ -1,6 +1,6 @@
 import React from 'react'
 import { render, screen, waitFor, fireEvent, act } from '@testing-library/react-native'
-import Post from '../app/(tabs)/(community)/post'
+import Post from '../app/(tabs)/(discussion)/post'
 import { supabase } from '../lib/supabase'
 import * as ReactNative from 'react-native'
 import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity, Alert, Image } from 'react-native'
@@ -117,9 +117,7 @@ describe('Post Integration Tests', () => {
   })
 
   it('updates index indicator text when carousel chevrons are pressed', async () => {
-    await act(async () => {
-      render(<Post />)
-    })
+    await act(async () => render(<Post />))
     await waitFor(() => expect(screen.getByText('Test Post Title')).toBeTruthy())
     
     const primaryIndicator = screen.queryByText('1 / 2')

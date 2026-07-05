@@ -1,6 +1,6 @@
 import React from 'react'
-import { render, screen, waitFor, act } from '@testing-library/react-native'
-import LeaderBoard from '../app/(tabs)/(community)/leaderboard'
+import { render, screen, waitFor, fireEvent, act } from '@testing-library/react-native'
+import ExerciseLog from '../app/(tabs)/(log)/exercise-log'
 import { supabase } from '../lib/supabase'
 
 const mockLeaderboardData = Array.from({ length: 11 }, (_, i) => ({
@@ -17,10 +17,22 @@ jest.mock('../lib/supabase', () => {
       from: jest.fn((table) => {
         if (!mockActiveChains[table]) {
           const builder = {
+            // 🚀 Return the builder instance to support method chaining
             select: jest.fn().mockImplementation(() => builder),
+            eq: jest.fn().mockImplementation(() => builder),
+            single: jest.fn().mockImplementation(() => builder),
+            
+            // Handles final async await resolution
             then: jest.fn().mockImplementation((resolve) => {
               if (table === 'total_minutes_this_week') {
                 return Promise.resolve(resolve({ data: mockLeaderboardData, error: null }))
+              }
+              // 🚀 Add a fallback mock response for the 'profiles' query
+              if (table === 'profiles') {
+                return Promise.resolve(resolve({ 
+                  data: { workout_plan: [] }, 
+                  error: null 
+                }))
               }
               return Promise.resolve(resolve({ data: [], error: null }))
             })
@@ -39,6 +51,19 @@ jest.mock('../hooks/auth-context', () => ({
   }),
 }))
 
+jest.mock('expo-router', () => {
+  const actual = jest.requireActual('expo-router')
+  return {
+    ...actual,
+    useFocusEffect: (callback) => {
+      const React = require('react')
+      React.useEffect(() => {
+        callback()
+      }, [callback])
+    },
+  }
+})
+
 describe('Leaderboard Integration Tests', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -46,8 +71,12 @@ describe('Leaderboard Integration Tests', () => {
   })
 
   it('correctly filters, renders ranks 1 through 10, and omits rank 11', async () => {
-    await act(async () => render(<LeaderBoard />))
-    await waitFor(() => expect(screen.getByText(/You're in 5th place with 460 minutes!/)).toBeTruthy())
+    await act(async () => render(<ExerciseLog />))
+    await waitFor(() => expect(screen.getByText('Leaderboard')).toBeTruthy())
+
+    const switchBtn = screen.getByText('Leaderboard')
+    await act(async () => fireEvent.press(switchBtn))
+    await waitFor(() => expect(screen.getByText('You\'re in 5th place with 460 minutes!')).toBeTruthy())
 
     expect(screen.getByText('User_Rank_1')).toBeTruthy()
     expect(screen.getByText('User_Rank_2')).toBeTruthy()

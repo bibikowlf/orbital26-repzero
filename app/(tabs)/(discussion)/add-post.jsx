@@ -3,7 +3,7 @@ import { View, Text, TextInput, Image, ActivityIndicator, TouchableOpacity, Aler
   KeyboardAvoidingView, ScrollView } from 'react-native'
 import { appStyles } from '../../../styles/styles'
 import { supabase } from '../../../lib/supabase'
-import { Stack, router } from 'expo-router'
+import { router } from 'expo-router'
 import { useAuthContext } from '../../../hooks/auth-context'
 import * as ImagePicker from 'expo-image-picker'
 import { decode } from 'base64-arraybuffer'
@@ -148,7 +148,6 @@ export default function AddPost() {
       <ScrollView style={{ width: '100%', padding: 12, paddingTop: 20 }}
         contentContainerStyle={{ alignItems: 'stretch' }}
       >
-        <Stack.Screen options={{ title: 'Add Post', headerBackVisible: false, headerTitleAlign: 'center' }}/>
         <Text style={styles.label}>Title</Text>
         <TextInput
           value={title}

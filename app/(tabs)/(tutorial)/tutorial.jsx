@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
 import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity, Alert } from 'react-native'
-import { appStyles } from '../../styles/styles'
-import { supabase } from '../../lib/supabase'
-import { useLocalSearchParams, Stack, router } from 'expo-router'
-import { useAuthContext } from '../../hooks/auth-context'
-import TextInfo from '../../components/text-info'
+import { appStyles } from '../../../styles/styles'
+import { supabase } from '../../../lib/supabase'
+import { useLocalSearchParams, Stack } from 'expo-router'
+import { useAuthContext } from '../../../hooks/auth-context'
+import TextInfo from '../../../components/text-info'
 
 export default function WorkoutTutorials() {
   const { claims } = useAuthContext()
@@ -195,7 +195,7 @@ export default function WorkoutTutorials() {
 
   return (
     <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10, flex: 1 }]}>
-      <Stack.Screen options={{ title: name, headerBackVisible: false, headerTitleAlign: 'center' }}/>
+      <Stack.Screen options={{ title: name }}/>
       <View style={styles.row}>
         <TextInput
           style={[styles.input, { flex: 1, marginRight: 10 }]}

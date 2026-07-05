@@ -3,7 +3,7 @@ import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity,
   Alert, KeyboardAvoidingView, Image, useWindowDimensions} from 'react-native'
 import { appStyles } from '../../../styles/styles'
 import { supabase } from '../../../lib/supabase'
-import { useLocalSearchParams, Stack, router } from 'expo-router'
+import { useLocalSearchParams, router } from 'expo-router'
 import { useAuthContext } from '../../../hooks/auth-context'
 import Entypo from '@expo/vector-icons/Entypo'
 import Comment from '../../../components/comment'
@@ -305,8 +305,6 @@ export default function Post() {
     <KeyboardAvoidingView behavior='padding' style={{ flex: 1 }}>
       <View style={[styles.container, 
         { alignItems: 'stretch', width: '100%', marginTop: 0, flex: 1 }]}>
-        <Stack.Screen options={{ 
-          title: 'Discussion', headerBackVisible: false, headerTitleAlign: 'center' }}/>
         <FlatList
           data={commentTree}
           extraData={[comments, votes, editingComment]}

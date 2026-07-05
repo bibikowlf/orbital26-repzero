@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react'
 import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity, Alert } from 'react-native'
 import { appStyles } from '../../../styles/styles'
 import { supabase } from '../../../lib/supabase'
-import { useFocusEffect, Stack } from 'expo-router'
+import { useFocusEffect } from 'expo-router'
 import { useAuthContext } from '../../../hooks/auth-context'
 import TextInfo from '../../../components/text-info'
 
@@ -161,7 +161,6 @@ export default function WorkoutTutorials() {
 
   return (
     <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10, flex: 1 }]}>
-      <Stack.Screen options={{ title: 'My Tutorials', headerBackVisible: false, headerTitleAlign: 'center' }}/>
       <FlatList
         data={tutorials}
         keyExtractor={(item) => item.id.toString()}

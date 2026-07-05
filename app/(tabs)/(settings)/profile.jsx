@@ -284,7 +284,7 @@ export default function Profile() {
         <View style={styles.verticallySpaced}>
           <Button 
             title="Change Password" 
-            onPress={() => router.navigate("/change-password")} 
+            onPress={() => router.navigate('/change-password')} 
           />
         </View>
 

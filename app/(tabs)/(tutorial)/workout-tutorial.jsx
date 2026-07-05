@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity, Alert } from 'react-native'
-import { appStyles } from '../../styles/styles'
-import { supabase } from '../../lib/supabase'
+import { appStyles } from '../../../styles/styles'
+import { supabase } from '../../../lib/supabase'
 import { router } from 'expo-router'
-import Spacer from '../../components/spacer'
+import Spacer from '../../../components/spacer'
 
 export const cleanString = (s) => {
   return s.toLowerCase().replace(/[^a-z]/g, '')

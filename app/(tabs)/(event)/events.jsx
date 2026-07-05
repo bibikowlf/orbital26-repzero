@@ -196,7 +196,7 @@ export default function Events() {
                 key={event.id}
                 style={appStyles.card}
                 onPress={() => router.push({
-                  pathname: '/(tabs)/(community)/event-detail',
+                  pathname: '/event-detail',
                   params: { id: event.id }
                 })}
               >
@@ -242,7 +242,7 @@ export default function Events() {
 
       <TouchableOpacity
         style={appStyles.fab}
-        onPress={() => router.push('/(tabs)/(community)/create-event')}
+        onPress={() => router.push('/create-event')}
       >
         <Text>+</Text>
       </TouchableOpacity>

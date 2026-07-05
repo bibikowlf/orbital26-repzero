@@ -73,7 +73,7 @@ export default function MyEvents() {
                 key={event.id}
                 style={appStyles.card}
                 onPress={() => router.push({
-                  pathname: '/(tabs)/(community)/my-events-detail',
+                  pathname: '/my-events-detail',
                   params: { id: event.id }
                 })}
               >

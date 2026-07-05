@@ -1,4 +1,4 @@
-import { cleanString } from '../app/(tabs)/workout-tutorial'
+import { cleanString } from '../app/(tabs)/(tutorial)/workout-tutorial'
 
 jest.mock('@react-native-async-storage/async-storage', () => 
   require('@react-native-async-storage/async-storage/jest/async-storage-mock')

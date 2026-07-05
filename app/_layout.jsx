@@ -23,7 +23,7 @@ function RootNavigator() {
     } else if (!inLogin && !isLoggedIn) {
       router.replace('/login')
     }
-  }, [segments, isLoading, isLoggedIn])
+  }, [isLoading, isLoggedIn])
 
   if (isLoading) {
     return (
@@ -33,9 +33,9 @@ function RootNavigator() {
     )
   }
   return (
-    <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }}/>
-      <Stack.Screen name="login" options={{ title: "Login", headerBackVisible: false, headerTitleAlign: 'center' }}/>
+    <Stack screenOptions={{ headerShown: true }}>
+      <Stack.Screen name="(tabs)" options={{headerShown: false}} />
+      <Stack.Screen name="login" />
     </Stack>
   )
 }
