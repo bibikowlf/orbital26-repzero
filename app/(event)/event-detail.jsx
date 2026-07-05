@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { View, Text, ScrollView, TouchableOpacity, Alert, StyleSheet } from 'react-native'
-import { useLocalSearchParams, useRouter } from 'expo-router'
-import { supabase } from '../../../lib/supabase'
-import { useAuthContext } from '../../../hooks/auth-context'
-import { appStyles } from '../../../styles/styles'
+import { useLocalSearchParams } from 'expo-router'
+import { supabase } from '../../lib/supabase'
+import { useAuthContext } from '../../hooks/auth-context'
+import { appStyles } from '../../styles/styles'
 
 const CATEGORY_COLORS = {
   Cardio: '#FF9500',
@@ -22,7 +22,6 @@ function formatEventDate(dateStr) {
 
 export default function EventDetail() {
   const { id } = useLocalSearchParams()
-  const router = useRouter()
   const { claims } = useAuthContext()
   const userId = claims?.sub
 

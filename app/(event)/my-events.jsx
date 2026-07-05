@@ -1,9 +1,9 @@
 import { useState, useCallback } from 'react'
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
 import { useRouter, useFocusEffect } from 'expo-router'
-import { supabase } from '../../../lib/supabase'
-import { useAuthContext } from '../../../hooks/auth-context'
-import { appStyles } from '../../../styles/styles'
+import { supabase } from '../../lib/supabase'
+import { useAuthContext } from '../../hooks/auth-context'
+import { appStyles } from '../../styles/styles'
 
 const CATEGORY_COLORS = {
   Cardio: '#FF9500',
@@ -73,7 +73,7 @@ export default function MyEvents() {
                 key={event.id}
                 style={appStyles.card}
                 onPress={() => router.push({
-                  pathname: '/(tabs)/(community)/my-events-detail',
+                  pathname: '/my-events-detail',
                   params: { id: event.id }
                 })}
               >

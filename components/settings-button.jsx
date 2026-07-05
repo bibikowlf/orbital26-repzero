@@ -4,10 +4,10 @@ import { router } from 'expo-router'
 import Ionicons from '@expo/vector-icons/Ionicons'
 
 const MENU_ITEMS = [
-  { label: '👤  Profile', route: '/(settings)/profile' },
-  { label: '📝  My Posts', route: '/(settings)/my-posts' },
-  { label: '🎥  My Tutorials', route: '/(settings)/my-tutorials' },
-  { label: '📅  My Events', route: '/(tabs)/(community)/my-events' },
+  { label: '👤  Profile', route: '/profile' },
+  { label: '📝  My Posts', route: '/my-posts' },
+  { label: '🎥  My Tutorials', route: '/my-tutorials' },
+  { label: '📅  My Events', route: '/my-events' },
 ]
 
 export default function SettingsButton() {

@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { View, Text, TextInput, Image, ActivityIndicator, TouchableOpacity, Alert, 
   KeyboardAvoidingView, ScrollView } from 'react-native'
-import { appStyles } from '../../../styles/styles'
-import { supabase } from '../../../lib/supabase'
+import { appStyles } from '../../styles/styles'
+import { supabase } from '../../lib/supabase'
 import { Stack, router } from 'expo-router'
-import { useAuthContext } from '../../../hooks/auth-context'
+import { useAuthContext } from '../../hooks/auth-context'
 import * as ImagePicker from 'expo-image-picker'
 import { decode } from 'base64-arraybuffer'
 import Entypo from '@expo/vector-icons/Entypo'

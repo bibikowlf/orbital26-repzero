@@ -1,14 +1,14 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity, 
   Alert, KeyboardAvoidingView, Image, useWindowDimensions} from 'react-native'
-import { appStyles } from '../../../styles/styles'
-import { supabase } from '../../../lib/supabase'
+import { appStyles } from '../../styles/styles'
+import { supabase } from '../../lib/supabase'
 import { useLocalSearchParams, Stack, router } from 'expo-router'
-import { useAuthContext } from '../../../hooks/auth-context'
+import { useAuthContext } from '../../hooks/auth-context'
 import Entypo from '@expo/vector-icons/Entypo'
-import Comment from '../../../components/comment'
-import Spacer from '../../../components/spacer'
-import TextInfo from '../../../components/text-info'
+import Comment from '../../components/comment'
+import Spacer from '../../components/spacer'
+import TextInfo from '../../components/text-info'
 
 export const buildCommentTree = (comments, votes) => {
   const map = {}

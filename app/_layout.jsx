@@ -23,7 +23,7 @@ function RootNavigator() {
     } else if (!inLogin && !isLoggedIn) {
       router.replace('/login')
     }
-  }, [segments, isLoading, isLoggedIn])
+  }, [isLoading, isLoggedIn])
 
   if (isLoading) {
     return (

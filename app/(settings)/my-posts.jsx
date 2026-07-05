@@ -1,15 +1,15 @@
 import { useState, useCallback } from 'react'
-import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity, Alert } from 'react-native'
-import { appStyles } from '../../../styles/styles'
-import { supabase } from '../../../lib/supabase'
-import { router, useFocusEffect } from 'expo-router'
-import Spacer from '../../../components/spacer'
+import { View, Text, FlatList, ActivityIndicator, TouchableOpacity, Alert } from 'react-native'
+import { appStyles } from '../../styles/styles'
+import { supabase } from '../../lib/supabase'
+import { Stack, router, useFocusEffect } from 'expo-router'
+import { useAuthContext } from '../../hooks/auth-context'
 import Entypo from '@expo/vector-icons/Entypo'
 
 export default function DiscussionForum() {
+  const { claims } = useAuthContext()
+  const userId = claims?.sub
   const [posts, setPosts] = useState([])
-  const [filteredPosts, setFilteredPosts] = useState([])
-  const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const styles = appStyles
 
@@ -22,39 +22,20 @@ export default function DiscussionForum() {
   const fetchData = async () => {
     try {
       setLoading(true)
-      setSearchQuery('')
 
       const { data, error } = await supabase
         .from('posts_with_votes')
         .select('*')
+        .eq('user_id', userId)
       if (error) throw error
       if (data) {
         const sortedData = data.sort((a, b) => b.score - a.score)
         setPosts(sortedData)
-        setFilteredPosts(sortedData)
       }
     } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert(error.message)
-      }
+      if (error instanceof Error) Alert.alert(error.message)
     } finally {
       setLoading(false)
-    }
-  }
-
-  const cleanString = (s) => {
-    return s.toLowerCase().replace(/[^a-z]/g, '')
-  }
-
-  const handleSearch = (query) => {
-    setSearchQuery(query)
-    if (query.trim() === '') {
-      setFilteredPosts(posts)
-    } else {
-      const filtered = posts.filter((post) =>
-        cleanString(post.title).includes(cleanString(query))
-      )
-      setFilteredPosts(filtered)
     }
   }
 
@@ -68,28 +49,11 @@ export default function DiscussionForum() {
 
   return (
     <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10, flex: 1 }]}>
-      <TextInput
-        style={[styles.input, { alignSelf: 'stretch' }]}
-        value={searchQuery}
-        placeholder='Search posts'
-        onChangeText={handleSearch}
-      />
-
-      <TouchableOpacity
-        style={[styles.actionButton, 
-          { backgroundColor: '#007AFF', flex: 0, marginTop: 10 }, 
-          loading && styles.buttonDisabled]}
-        onPress={() => router.navigate('/add-post')}
-        disabled={loading}
-      >
-        <Text style={styles.buttonText}>Add post</Text>
-      </TouchableOpacity>
-
-      <Spacer height={10} />
-
+      <Stack.Screen options={{ title: 'My Posts', headerBackVisible: false, headerTitleAlign: 'center' }}/>
       <FlatList
-        data={filteredPosts}
+        data={posts}
         keyExtractor={(item) => item.id.toString()}
+        style={{ flex: 1 }}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={[styles.actionButton, 

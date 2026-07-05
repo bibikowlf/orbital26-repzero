@@ -1,8 +1,7 @@
-import { Tabs, useRouter } from 'expo-router'
+import { Tabs } from 'expo-router'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import Entypo from '@expo/vector-icons/Entypo'
 import SettingsButton from '../../components/settings-button'
-import { TouchableOpacity, Text } from 'react-native'
 
 export default function TabLayout() {
   return (
@@ -58,7 +57,7 @@ export default function TabLayout() {
 
       {/* Discussion Tab */}
       <Tabs.Screen
-        name="(community)/discussion-forum"
+        name="discussion-forum"
         options={{
           title: 'Discussion',
           tabBarIcon: ({ color }) => (
@@ -69,7 +68,7 @@ export default function TabLayout() {
 
       {/* Events Tab */}
       <Tabs.Screen
-        name="(community)/events"
+        name="events"
         options={{
           title: 'Events',
           tabBarIcon: ({ color }) => (
@@ -77,78 +76,6 @@ export default function TabLayout() {
           ),
         }}
       />
-
-      {/* Leaderboard (No Tab) */}
-      <Tabs.Screen
-        name="(community)/leaderboard"
-        options={{ href: null }}
-      />
-
-      {/* Create Event (No Tab) */}
-      <Tabs.Screen
-        name="(community)/create-event"
-        options={{ title: 'Create Event', href: null }}
-      />
-
-      {/* Event Details (No Tab) */}
-      <Tabs.Screen
-        name="(community)/event-detail"
-        options={{ title: 'Event Details', href: null }}
-      />
-
-      {/* My Events (No Tab) */}
-      <Tabs.Screen
-        name="(community)/my-events"
-        options={{ title: 'My Events', href: null }}
-      />
-
-      {/* My Event Detail (No Tab) */}
-      <Tabs.Screen
-        name="(community)/my-events-detail"
-        options={{ title: 'Event Details', href: null }}
-      />
-
-      {/* Profile (No Tab) */}
-      <Tabs.Screen
-        name="(settings)/profile"
-        options={{ title: 'Profile', href: null }}
-      />
-
-      {/* My Posts (No Tab) */}
-      <Tabs.Screen
-        name="(settings)/my-posts"
-        options={{ title: 'My Posts', href: null }}
-      />
-
-      {/* My Tutorials (No Tab) */}
-      <Tabs.Screen
-        name="(settings)/my-tutorials"
-        options={{ title: 'My Tutorials', href: null }}
-      />
-
-      {/* Change Password (No Tab) */}
-      <Tabs.Screen
-        name="change-password"
-        options={{ title: 'Change Password', href: null }}
-      />
-
-      {/* Workout Tutorials (No Tab) */}
-      <Tabs.Screen
-        name="tutorial"
-        options={{ href: null }}
-      />
-
-      {/* Add Post (No Tab) */}
-      <Tabs.Screen
-        name="(community)/add-post"
-        options={{ href: null }}
-      />
-
-      {/* Post (No Tab) */}
-      <Tabs.Screen
-        name="(community)/post"
-        options={{ href: null }}
-      />
     </Tabs>
-  );
+  )
 }

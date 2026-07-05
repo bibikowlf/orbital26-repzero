@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { View, Text, FlatList, ActivityIndicator, Alert } from 'react-native'
-import { appStyles } from '../../../styles/styles'
-import { supabase } from '../../../lib/supabase'
-import { useAuthContext } from '../../../hooks/auth-context'
-import Spacer from '../../../components/spacer'
+import { appStyles } from '../styles/styles'
+import { supabase } from '../lib/supabase'
+import { useAuthContext } from '../hooks/auth-context'
+import Spacer from '../components/spacer'
 
 export default function WorkoutTutorial() {
   const { claims } = useAuthContext()

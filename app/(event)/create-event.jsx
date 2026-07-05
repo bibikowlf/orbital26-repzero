@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { View, Text, TextInput, ScrollView, TouchableOpacity, Alert } from 'react-native'
-import { appStyles } from '../../../styles/styles'
-import { supabase } from '../../../lib/supabase'
+import { appStyles } from '../../styles/styles'
+import { supabase } from '../../lib/supabase'
 import { useRouter } from 'expo-router'
-import { useAuthContext } from '../../../hooks/auth-context'
+import { useAuthContext } from '../../hooks/auth-context'
 
 const CATEGORIES = ['Cardio', 'Strength', 'Flexibility', 'Social', 'Other']
 

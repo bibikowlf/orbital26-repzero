@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, StyleSheet, Modal, 
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, Modal, 
   KeyboardAvoidingView, FlatList, ActivityIndicator } from 'react-native'
 import { supabase } from '../../lib/supabase'
 import { useAuthContext } from '../../hooks/auth-context'

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { supabase } from '../../../lib/supabase'
-import { useAuthContext } from '../../../hooks/auth-context'
-import { appStyles } from '../../../styles/styles'
+import { supabase } from '../../lib/supabase'
+import { useAuthContext } from '../../hooks/auth-context'
+import { appStyles } from '../../styles/styles'
 
 const CATEGORY_COLORS = {
   Cardio: '#FF9500',

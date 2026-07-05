@@ -1,10 +1,10 @@
 import { useState, useCallback } from 'react'
 import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity, Alert } from 'react-native'
-import { appStyles } from '../../../styles/styles'
-import { supabase } from '../../../lib/supabase'
+import { appStyles } from '../../styles/styles'
+import { supabase } from '../../lib/supabase'
 import { useFocusEffect, Stack } from 'expo-router'
-import { useAuthContext } from '../../../hooks/auth-context'
-import TextInfo from '../../../components/text-info'
+import { useAuthContext } from '../../hooks/auth-context'
+import TextInfo from '../../components/text-info'
 
 export default function WorkoutTutorials() {
   const { claims } = useAuthContext()
