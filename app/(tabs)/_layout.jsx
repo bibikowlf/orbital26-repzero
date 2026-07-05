@@ -18,6 +18,12 @@ export default function TabLayout() {
         options={{ href: null }}
       />
 
+      {/* Settings (No Tab) */}
+      <Tabs.Screen
+        name="(settings)"
+        options={{ href: null }}
+      />
+
       {/* Exercise Plan Tab */}
       <Tabs.Screen
         name="(plan)"

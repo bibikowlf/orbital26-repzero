@@ -1,9 +1,9 @@
 import { useState, useCallback } from 'react'
 import { View, Text, FlatList, ActivityIndicator, TouchableOpacity, Alert } from 'react-native'
-import { appStyles } from '../../styles/styles'
-import { supabase } from '../../lib/supabase'
-import { Stack, router, useFocusEffect } from 'expo-router'
-import { useAuthContext } from '../../hooks/auth-context'
+import { appStyles } from '../../../styles/styles'
+import { supabase } from '../../../lib/supabase'
+import { router, useFocusEffect } from 'expo-router'
+import { useAuthContext } from '../../../hooks/auth-context'
 import Entypo from '@expo/vector-icons/Entypo'
 
 export default function DiscussionForum() {
@@ -49,7 +49,6 @@ export default function DiscussionForum() {
 
   return (
     <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10, flex: 1 }]}>
-      <Stack.Screen options={{ title: 'My Posts', headerBackVisible: false, headerTitleAlign: 'center' }}/>
       <FlatList
         data={posts}
         keyExtractor={(item) => item.id.toString()}

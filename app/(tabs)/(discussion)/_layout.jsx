@@ -5,7 +5,7 @@ import BackButton from '../../../components/back-button'
 export default function DiscussionLayout() {
   return (
     <Stack screenOptions={{ headerShown: true, 
-        headerTitleAlign: 'center', 
+        headerTitleAlign: 'center',
         headerBackVisible: false,
         headerLeftContainerStyle: { paddingLeft: 16 } }}
     >

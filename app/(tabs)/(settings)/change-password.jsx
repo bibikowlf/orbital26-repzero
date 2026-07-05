@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import { Alert, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import { supabase } from '../../lib/supabase'
-import { appStyles } from '../../styles/styles'
-import { Stack } from 'expo-router'
+import { supabase } from '../../../lib/supabase'
+import { appStyles } from '../../../styles/styles'
 
 export default function ChangePassword () {
   const [password, setPassword] = useState('')
@@ -33,7 +32,6 @@ export default function ChangePassword () {
 
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ title: 'Change Password', headerBackVisible: false, headerTitleAlign: 'center' }}/>
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Text style={styles.label}>Password</Text>
         <TextInput
