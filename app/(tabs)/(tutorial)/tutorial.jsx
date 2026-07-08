@@ -237,8 +237,9 @@ export default function WorkoutTutorials() {
                 padding: 12 }]}
           >
             {(editing === null || editing.id !== item.id) ? (
-              <Text style={{ fontSize: 16, marginBottom: 6, color: 'black' }}>{item.content}</Text>): (
-              <View style={{ marginBottom: 6 }}>
+              <Text style={{ fontSize: 16, marginBottom: 6, color: 'black' }}>{item.content}</Text>
+            ): (
+              <View style={{ marginBottom: 6, width: '100%' }}>
                 <TextInput 
                   value={editTutorial}
                   onChangeText={(text) => setEditTutorial(text)}
@@ -246,7 +247,7 @@ export default function WorkoutTutorials() {
                   multiline={true}
                   textAlignVertical='top'
                   numberOfLines={10}
-                  style={styles.input}
+                  style={[styles.input, { alignSelf: 'stretch', width: '100%'}]}
                 />
                 <TouchableOpacity
                   style={[styles.actionButton, 
