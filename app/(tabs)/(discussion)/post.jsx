@@ -10,6 +10,15 @@ import Comment from '../../../components/comment'
 import Spacer from '../../../components/spacer'
 import TextInfo from '../../../components/text-info'
 
+const CATEGORY_COLORS = {
+  Progress: '#FF9500',
+  Discussion: '#56b2d6',
+  Help: '#d4219b',
+  Motivation: '#34C759',
+  Equipment: '#9900ff', 
+  Other: '#f5120e'
+}
+
 export const buildCommentTree = (comments, votes) => {
   const map = {}
   const roots = []
@@ -315,6 +324,21 @@ export default function Post() {
           style={{ flex: 1 }}
           ListHeaderComponent={
             <View>
+              <View
+                style={{ paddingHorizontal: 14,
+                  paddingVertical: 6,
+                  borderRadius: 20,
+                  backgroundColor: CATEGORY_COLORS[post.category], 
+                  alignSelf: 'flex-start'}}
+              >
+                <Text style={{ fontSize: 11, 
+                  fontWeight: '600', 
+                  color: '#fff'}}
+                >
+                  {post.category}
+                </Text>
+              </View>
+              <Spacer height={10} />
               <Text style={{color: 'gray', fontSize: 12}}>
                 {post.user_id === userId ? 'You' : '@'+post.username}
               </Text>
