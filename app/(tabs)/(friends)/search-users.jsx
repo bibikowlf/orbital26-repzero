@@ -3,7 +3,6 @@ import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator } 
 import { supabase } from '../../../lib/supabase'
 import { useAuthContext } from '../../../hooks/auth-context'
 import { appStyles } from '../../../styles/styles'
-import BackButton from '../../../components/back-button'
 import Spacer from '../../../components/spacer'
 
 export function filterOutSelf(results, userId) {
@@ -50,10 +49,6 @@ export default function SearchUsers() {
 
   return (
     <View style={[appStyles.container, { paddingHorizontal: 15, paddingTop: 20 }]}>
-      <BackButton />
-      <Spacer />
-      <Text style={[appStyles.label, { fontSize: 22, fontWeight: 'bold' }]}>Find Friends</Text>
-      <Spacer />
 
       <TextInput
         style={appStyles.inlineInput}

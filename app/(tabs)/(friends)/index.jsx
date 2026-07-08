@@ -52,9 +52,7 @@ export default function FriendsHome() {
   }
 
   return (
-    <View style={[appStyles.container, { paddingHorizontal: 15, paddingTop: 20 }]}>
-      <Text style={[appStyles.label, { fontSize: 22, fontWeight: 'bold' }]}>Friends</Text>
-      <Spacer />
+    <View style={[appStyles.container, { paddingHorizontal: 15, paddingTop: 20, justifyContent: 'flex-start' }]}>
 
       {loading ? (
         <ActivityIndicator size="small" color="#000" />
@@ -70,8 +68,6 @@ export default function FriendsHome() {
           </View>
         </View>
       )}
-
-      <Spacer />
 
       <TouchableOpacity
         style={appStyles.fab}
