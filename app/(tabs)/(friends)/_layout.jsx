@@ -7,6 +7,7 @@ export default function FriendsLayout() {
         headerShown: false
       }}
     >
+      <Stack.Screen name="index" />
       <Stack.Screen name="search-users" />
     </Stack>
   )
