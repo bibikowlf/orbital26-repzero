@@ -5,6 +5,7 @@ import Ionicons from '@expo/vector-icons/Ionicons'
 
 const MENU_ITEMS = [
   { label: '👤  Profile', route: '/profile' },
+  { label: '🔖  Saved Posts', route: '/bookmark-posts' },
   { label: '📝  My Posts', route: '/my-posts' },
   { label: '🎥  My Tutorials', route: '/my-tutorials' },
   { label: '📅  My Events', route: '/my-events' },
