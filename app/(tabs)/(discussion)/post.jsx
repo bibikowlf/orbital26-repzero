@@ -6,6 +6,7 @@ import { supabase } from '../../../lib/supabase'
 import { useLocalSearchParams, router } from 'expo-router'
 import { useAuthContext } from '../../../hooks/auth-context'
 import Entypo from '@expo/vector-icons/Entypo'
+import Ionicons from '@expo/vector-icons/Ionicons'
 import Comment from '../../../components/comment'
 import Spacer from '../../../components/spacer'
 import TextInfo from '../../../components/text-info'
@@ -27,6 +28,7 @@ export default function Post() {
   const styles = appStyles
   const { width: windowWidth } = useWindowDimensions()
   const [post, setPost] = useState(null)
+  const [bookmark, setBookmark] = useState(null)
   const [comments, setComments] = useState(null)
   const [votes, setVotes] = useState(null)
   const [replyingTo, setReplyingTo] = useState(null)
@@ -51,32 +53,40 @@ export default function Post() {
     try {
       setLoading(true)
 
-      const [commentsResponse, votesResponse, postResponse, postVoteResponse] = await Promise.all([
-        supabase
-          .from('comments_with_votes')
-          .select('*')
-          .eq('post_id', postId),
-        supabase
-          .from('comment_votes')
-          .select('*')
-          .eq('user_id', userId),
-        supabase
-          .from('posts_with_votes')
-          .select('*')
-          .eq('id', postId),
-        supabase
-          .from('post_votes')
-          .select('*')
-          .eq('post_id', postId)
-          .eq('user_id', userId)])
+      const [commentsResponse, votesResponse, postResponse, postVoteResponse, bookmarkResponse] = 
+        await Promise.all([
+          supabase
+            .from('comments_with_votes')
+            .select('*')
+            .eq('post_id', postId),
+          supabase
+            .from('comment_votes')
+            .select('*')
+            .eq('user_id', userId),
+          supabase
+            .from('posts_with_votes')
+            .select('*')
+            .eq('id', postId),
+          supabase
+            .from('post_votes')
+            .select('*')
+            .eq('post_id', postId)
+            .eq('user_id', userId), 
+          supabase
+            .from('bookmarks')
+            .select('*')
+            .eq('user_id', userId)
+            .eq('post_id', postId)])
       if (commentsResponse.error) throw commentsResponse.error
       if (votesResponse.error) throw votesResponse.error
       if (postResponse.error) throw postResponse.error
       if (postVoteResponse.error) throw postVoteResponse.error
+      if (bookmarkResponse.error) throw bookmarkResponse.error
       if (commentsResponse.data) setComments(commentsResponse.data)
       if (votesResponse.data) setVotes(votesResponse.data)
       if (postResponse.data) setPost(postResponse.data[0])
       if (postVoteResponse.data && postVoteResponse.data[0]) setVotedPost(postVoteResponse.data[0].id)
+      if (bookmarkResponse.data && bookmarkResponse.data.length > 0) setBookmark(bookmarkResponse.data[0].id)
     } catch (error) {
       if (error instanceof Error) Alert.alert(error.message)
     } finally {
@@ -287,6 +297,35 @@ export default function Post() {
     }
   }
 
+  const handleBookmark = async () => {
+    try {
+      setLoading(true)
+
+      if (bookmark) {
+        const { error } = await supabase
+          .from('bookmarks')
+          .delete()
+          .eq('id', bookmark)
+        if (error) throw error
+        setBookmark(null)
+      } else {
+        const { data, error } = await supabase
+          .from('bookmarks')
+          .insert({
+            user_id: userId,
+            post_id: postId
+          })
+          .select()
+        if (error) throw error
+        if (data) setBookmark(data[0])
+      }
+    } catch (error) {
+      if (error instanceof Error) Alert.alert(error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   if (loading || !post) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
@@ -306,19 +345,32 @@ export default function Post() {
           style={{ flex: 1 }}
           ListHeaderComponent={
             <View>
-              <View
-                style={{ paddingHorizontal: 14,
-                  paddingVertical: 6,
-                  borderRadius: 20,
-                  backgroundColor: CATEGORY_COLORS[post.category], 
-                  alignSelf: 'flex-start'}}
-              >
-                <Text style={{ fontSize: 11, 
-                  fontWeight: '600', 
-                  color: '#fff'}}
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View
+                  style={{ paddingHorizontal: 14,
+                    paddingVertical: 6,
+                    borderRadius: 20,
+                    backgroundColor: CATEGORY_COLORS[post.category], 
+                    alignSelf: 'flex-start'}}
                 >
-                  {post.category}
-                </Text>
+                  <Text style={{ fontSize: 11, 
+                    fontWeight: '600', 
+                    color: '#fff'}}
+                  >
+                    {post.category}
+                  </Text>
+                </View>
+                <TouchableOpacity 
+                  onPress={handleBookmark}
+                  disabled={loading || userId === post.user_id}
+                  style={{ paddingRight: 12 }}
+                >
+                  <Ionicons 
+                    name={bookmark === null ? 'bookmark-outline' : 'bookmark'} 
+                    color={userId === post.user_id ? 'gray' : 'black'}
+                    size={30}
+                  />
+                </TouchableOpacity>
               </View>
               <Spacer height={10} />
               <Text style={{color: 'gray', fontSize: 12}}>
