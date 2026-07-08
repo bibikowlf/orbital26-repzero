@@ -6,6 +6,7 @@ import { supabase } from '../../../lib/supabase'
 import { useLocalSearchParams, router } from 'expo-router'
 import { useAuthContext } from '../../../hooks/auth-context'
 import Entypo from '@expo/vector-icons/Entypo'
+import Ionicons from '@expo/vector-icons/Ionicons'
 import Comment from '../../../components/comment'
 import Spacer from '../../../components/spacer'
 import TextInfo from '../../../components/text-info'
@@ -306,19 +307,27 @@ export default function MyPostsDetails() {
           style={{ flex: 1 }}
           ListHeaderComponent={
             <View>
-              <View
-                style={{ paddingHorizontal: 14,
-                  paddingVertical: 6,
-                  borderRadius: 20,
-                  backgroundColor: CATEGORY_COLORS[post.category], 
-                  alignSelf: 'flex-start'}}
-              >
-                <Text style={{ fontSize: 11, 
-                  fontWeight: '600', 
-                  color: '#fff'}}
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View
+                  style={{ paddingHorizontal: 14,
+                    paddingVertical: 6,
+                    borderRadius: 20,
+                    backgroundColor: CATEGORY_COLORS[post.category], 
+                    alignSelf: 'flex-start'}}
                 >
-                  {post.category}
-                </Text>
+                  <Text style={{ fontSize: 11, 
+                    fontWeight: '600', 
+                    color: '#fff'}}
+                  >
+                    {post.category}
+                  </Text>
+                </View>
+                <Ionicons 
+                  name='bookmark-outline'
+                  color='gray'
+                  size={30}
+                  style={{ paddingRight: 12 }}
+                />
               </View>
               <Spacer height={10} />
               <Text style={{color: 'gray', fontSize: 12}}>

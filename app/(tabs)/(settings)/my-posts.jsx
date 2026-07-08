@@ -89,16 +89,6 @@ export default function MyPosts() {
         placeholder='Search posts'
         onChangeText={setSearchQuery}
       />
-
-      <TouchableOpacity
-        style={[styles.actionButton, 
-          { backgroundColor: '#007AFF', flex: 0, marginTop: 10 }, 
-          loading && styles.buttonDisabled]}
-        onPress={() => router.navigate('/add-post')}
-        disabled={loading}
-      >
-        <Text style={styles.buttonText}>Add post</Text>
-      </TouchableOpacity>
       <Spacer height={10} />
       <ScrollView
         style={{height: 35, flexGrow: 0, flexShrink: 0}}
@@ -145,7 +135,7 @@ export default function MyPosts() {
                 marginBottom: 8,
                 height: 140,
                 padding: 12 }]}
-            onPress={() => router.navigate({ pathname: '/post', params: {postId: item.id} })}
+            onPress={() => router.navigate({ pathname: '/my-posts-detail', params: {postId: item.id} })}
             disabled={loading}
           >
             <View
