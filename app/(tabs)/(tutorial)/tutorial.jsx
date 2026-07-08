@@ -249,9 +249,10 @@ export default function WorkoutTutorials() {
                   numberOfLines={10}
                   style={[styles.input, { alignSelf: 'stretch', width: '100%'}]}
                 />
+                <View style={{ flexDirection: 'row', gap: 10 }}>
                 <TouchableOpacity
                   style={[styles.actionButton, 
-                    { backgroundColor: '#007AFF', flex: 0, marginTop: 10 }, 
+                    { backgroundColor: '#007AFF', marginTop: 10 }, 
                     loading && styles.buttonDisabled]}
                   onPress={handleEdit}
                   disabled={loading}
@@ -260,13 +261,14 @@ export default function WorkoutTutorials() {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.actionButton, 
-                    { backgroundColor: '#007AFF', flex: 0, marginTop: 10 }, 
+                    { backgroundColor: '#007AFF', marginTop: 10 }, 
                     loading && styles.buttonDisabled]}
                   onPress={() => setEditing(null)}
                   disabled={loading}
                 >
                   <Text style={styles.buttonText}>Cancel</Text>
                 </TouchableOpacity>
+                </View>
               </View>
             )}
             <TextInfo 
