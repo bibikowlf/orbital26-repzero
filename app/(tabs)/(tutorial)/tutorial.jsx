@@ -58,7 +58,10 @@ export default function WorkoutTutorials() {
   }
 
   const handleAdd = async () => {
-    if (!newTutorial.trim()) return
+    if (!newTutorial.trim()) {
+      Alert.alert('Tutorial cannot be empty')
+      return
+    }
 
     try {
       setLoading(true)
