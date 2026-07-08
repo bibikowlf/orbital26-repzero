@@ -207,7 +207,6 @@ export default function WorkoutTutorials() {
           onChangeText={setNewTutorial}
           multiline={true}
           textAlignVertical='top'
-          numberOfLines={5}
         />
         <TouchableOpacity
           style={[styles.button,
@@ -250,24 +249,24 @@ export default function WorkoutTutorials() {
                   style={[styles.input, { alignSelf: 'stretch', width: '100%'}]}
                 />
                 <View style={{ flexDirection: 'row', gap: 10 }}>
-                <TouchableOpacity
-                  style={[styles.actionButton, 
-                    { backgroundColor: '#007AFF', marginTop: 10 }, 
-                    loading && styles.buttonDisabled]}
-                  onPress={handleEdit}
-                  disabled={loading}
-                >
-                  <Text style={styles.buttonText}>Edit</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.actionButton, 
-                    { backgroundColor: '#007AFF', marginTop: 10 }, 
-                    loading && styles.buttonDisabled]}
-                  onPress={() => setEditing(null)}
-                  disabled={loading}
-                >
-                  <Text style={styles.buttonText}>Cancel</Text>
-                </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.actionButton, 
+                      { backgroundColor: '#007AFF', marginTop: 10 }, 
+                      loading && styles.buttonDisabled]}
+                    onPress={handleEdit}
+                    disabled={loading}
+                  >
+                    <Text style={styles.buttonText}>Edit</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.actionButton, 
+                      { backgroundColor: '#007AFF', marginTop: 10 }, 
+                      loading && styles.buttonDisabled]}
+                    onPress={() => setEditing(null)}
+                    disabled={loading}
+                  >
+                    <Text style={styles.buttonText}>Cancel</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             )}

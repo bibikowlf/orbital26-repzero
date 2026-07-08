@@ -439,6 +439,8 @@ export default function Post() {
                 onChangeText={(text) => setNewComment(text)}
                 style={styles.input}
                 placeholder='Enter comment'
+                multiline={true}
+                textAlignVertical='top'
               />
               <TouchableOpacity
                 style={[styles.button,

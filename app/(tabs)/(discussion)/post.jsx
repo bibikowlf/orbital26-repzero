@@ -400,7 +400,6 @@ export default function Post() {
                     autoCapitalize='none'
                     multiline={true}
                     textAlignVertical='top'
-                    numberOfLines={10}
                     style={styles.input}
                   />
                   <TouchableOpacity
@@ -439,6 +438,8 @@ export default function Post() {
                 onChangeText={(text) => setNewComment(text)}
                 style={styles.input}
                 placeholder='Enter comment'
+                multiline={true}
+                textAlignVertical='top'
               />
               <TouchableOpacity
                 style={[styles.button,
