@@ -4,8 +4,9 @@ import { useAuthContext } from '../hooks/auth-context'
 import Entypo from '@expo/vector-icons/Entypo'
 import { useEffect, useState } from 'react'
 import TextInfo from './text-info'
+import Spacer from './spacer'
 
-export default function Comment({ comment, depth, editing, loading, onReplyPress, onVotePress, onEditPress, onUpdatePress, onDeletePress }) {
+export default function Comment({ comment, depth, editing, loading, onReplyPress, onVotePress, onEditPress, onUpdatePress, onDeletePress, onCancelPress }) {
   const { claims } = useAuthContext()
   const userId = claims?.sub
   const indentation = Math.min(depth, 4) === 0 ? 0 : 1
@@ -33,7 +34,8 @@ export default function Comment({ comment, depth, editing, loading, onReplyPress
           {comment.user_id === userId ? 'You': '@' + comment.username}
         </Text>
         {editing !== comment.id ? (
-          <Text style={{ fontSize: 16, color: 'black' }}>{comment.content}</Text>): (
+          <Text style={{ fontSize: 16, color: 'black' }}>{comment.content}</Text>
+        ): (
           <View>
             <TextInput 
               value={editComment}
@@ -41,17 +43,27 @@ export default function Comment({ comment, depth, editing, loading, onReplyPress
               autoCapitalize='none'
               multiline={true}
               textAlignVertical='top'
-              numberOfLines={10}
               style={styles.input}
             />
-            <TouchableOpacity
-              style={[styles.actionButton, 
-                { backgroundColor: '#007AFF', flex: 0, marginTop: 10 }]}
-              onPress={() => onUpdatePress(editComment)}
-              disabled={loading}
-            >
-              <Text style={styles.buttonText}>Edit</Text>
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <TouchableOpacity
+                style={[styles.actionButton, 
+                  { backgroundColor: '#007AFF', marginTop: 10 }]}
+                onPress={() => onUpdatePress(editComment)}
+                disabled={loading}
+              >
+                <Text style={styles.buttonText}>Edit</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.actionButton, 
+                  { backgroundColor: '#007AFF', marginTop: 10 }]}
+                onPress={onCancelPress}
+                disabled={loading}
+              >
+                <Text style={styles.buttonText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+            <Spacer height={6} />
           </View>
         )}
         <TextInfo 
@@ -77,6 +89,7 @@ export default function Comment({ comment, depth, editing, loading, onReplyPress
           onEditPress={onEditPress}
           onUpdatePress={onUpdatePress}
           onDeletePress={onDeletePress}
+          onCancelPress={onCancelPress}
         />
       ))}
     </View>

@@ -99,7 +99,10 @@ export default function Post() {
   }, [votes, comments])
 
   const handleAdd = async () => {
-    if (!newComment.trim()) return
+    if (!newComment.trim()) {
+      Alert.alert('Comment cannot be empty')
+      return
+    }
 
     try {
       setLoading(true)
@@ -400,18 +403,29 @@ export default function Post() {
                     autoCapitalize='none'
                     multiline={true}
                     textAlignVertical='top'
-                    numberOfLines={10}
                     style={styles.input}
                   />
-                  <TouchableOpacity
-                    style={[styles.actionButton, 
-                      { backgroundColor: '#007AFF', flex: 0, marginTop: 10 }, 
-                      loading && styles.buttonDisabled]}
-                    onPress={() => handleEditPost()}
-                    disabled={loading}
-                  >
-                    <Text style={styles.buttonText}>Edit</Text>
-                  </TouchableOpacity>
+                  <View style={{ flexDirection: 'row', gap: 10 }}>
+                    <TouchableOpacity
+                      style={[styles.actionButton, 
+                        { backgroundColor: '#007AFF', marginTop: 10 }, 
+                        loading && styles.buttonDisabled]}
+                      onPress={handleEditPost}
+                      disabled={loading}
+                    >
+                      <Text style={styles.buttonText}>Edit</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.actionButton, 
+                        { backgroundColor: '#007AFF', marginTop: 10 }, 
+                        loading && styles.buttonDisabled]}
+                      onPress={() => setEditPost(null)}
+                      disabled={loading}
+                    >
+                      <Text style={styles.buttonText}>Cancel</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <Spacer height={6} />
                 </View>
               )}
               <TextInfo
@@ -439,6 +453,8 @@ export default function Post() {
                 onChangeText={(text) => setNewComment(text)}
                 style={styles.input}
                 placeholder='Enter comment'
+                multiline={true}
+                textAlignVertical='top'
               />
               <TouchableOpacity
                 style={[styles.button,
@@ -464,6 +480,7 @@ export default function Post() {
               }}
               onUpdatePress={(editComment) => handleEditComment(editComment)}
               onDeletePress={(commentId) => handleDeleteComment(commentId)}
+              onCancelPress={() => setEditingComment(null)}
             />
           )}
         />

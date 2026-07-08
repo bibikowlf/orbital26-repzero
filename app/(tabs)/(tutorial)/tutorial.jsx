@@ -58,7 +58,10 @@ export default function WorkoutTutorials() {
   }
 
   const handleAdd = async () => {
-    if (!newTutorial.trim()) return
+    if (!newTutorial.trim()) {
+      Alert.alert('Tutorial cannot be empty')
+      return
+    }
 
     try {
       setLoading(true)
@@ -204,7 +207,6 @@ export default function WorkoutTutorials() {
           onChangeText={setNewTutorial}
           multiline={true}
           textAlignVertical='top'
-          numberOfLines={5}
         />
         <TouchableOpacity
           style={[styles.button,
@@ -234,8 +236,9 @@ export default function WorkoutTutorials() {
                 padding: 12 }]}
           >
             {(editing === null || editing.id !== item.id) ? (
-              <Text style={{ fontSize: 16, marginBottom: 6, color: 'black' }}>{item.content}</Text>): (
-              <View style={{ marginBottom: 6 }}>
+              <Text style={{ fontSize: 16, marginBottom: 6, color: 'black' }}>{item.content}</Text>
+            ): (
+              <View style={{ marginBottom: 6, width: '100%' }}>
                 <TextInput 
                   value={editTutorial}
                   onChangeText={(text) => setEditTutorial(text)}
@@ -243,17 +246,28 @@ export default function WorkoutTutorials() {
                   multiline={true}
                   textAlignVertical='top'
                   numberOfLines={10}
-                  style={styles.input}
+                  style={[styles.input, { alignSelf: 'stretch', width: '100%'}]}
                 />
-                <TouchableOpacity
-                  style={[styles.actionButton, 
-                    { backgroundColor: '#007AFF', flex: 0, marginTop: 10 }, 
-                    loading && styles.buttonDisabled]}
-                  onPress={handleEdit}
-                  disabled={loading}
-                >
-                  <Text style={styles.buttonText}>Edit</Text>
-                </TouchableOpacity>
+                <View style={{ flexDirection: 'row', gap: 10 }}>
+                  <TouchableOpacity
+                    style={[styles.actionButton, 
+                      { backgroundColor: '#007AFF', marginTop: 10 }, 
+                      loading && styles.buttonDisabled]}
+                    onPress={handleEdit}
+                    disabled={loading}
+                  >
+                    <Text style={styles.buttonText}>Edit</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.actionButton, 
+                      { backgroundColor: '#007AFF', marginTop: 10 }, 
+                      loading && styles.buttonDisabled]}
+                    onPress={() => setEditing(null)}
+                    disabled={loading}
+                  >
+                    <Text style={styles.buttonText}>Cancel</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             )}
             <TextInfo 
