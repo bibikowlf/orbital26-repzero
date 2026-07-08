@@ -99,7 +99,10 @@ export default function Post() {
   }, [votes, comments])
 
   const handleAdd = async () => {
-    if (!newComment.trim()) return
+    if (!newComment.trim()) {
+      Alert.alert('Comment cannot be empty')
+      return
+    }
 
     try {
       setLoading(true)
