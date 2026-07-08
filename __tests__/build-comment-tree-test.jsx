@@ -1,4 +1,4 @@
-import { buildCommentTree } from '../app/(tabs)/(discussion)/post'
+import { buildCommentTree } from '../functions/build-comment-tree'
 
 jest.mock('@react-native-async-storage/async-storage', () => 
   require('@react-native-async-storage/async-storage/jest/async-storage-mock')
