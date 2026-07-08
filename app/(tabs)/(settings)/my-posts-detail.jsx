@@ -9,27 +9,18 @@ import Entypo from '@expo/vector-icons/Entypo'
 import Comment from '../../../components/comment'
 import Spacer from '../../../components/spacer'
 import TextInfo from '../../../components/text-info'
+import { buildCommentTree } from '../../../functions/build-comment-tree'
 
-export const buildCommentTree = (comments, votes) => {
-  const map = {}
-  const roots = []
-
-  comments.forEach(comment => map[comment.id] = { ...comment, voted: null, replies: []})
-  votes.forEach(vote => {
-    if (map[vote.comment_id]) map[vote.comment_id].voted = vote.id
-  })
-  comments.forEach(comment => {
-    const mappedComment = map[comment.id]
-    if (comment.parent_id) {
-        map[comment.parent_id].replies.push(mappedComment)
-    } else {
-        roots.push(mappedComment)
-    }
-  })
-  return roots
+const CATEGORY_COLORS = {
+  Progress: '#FF9500',
+  Discussion: '#56b2d6',
+  Help: '#d4219b',
+  Motivation: '#34C759',
+  Equipment: '#9900ff', 
+  Other: '#f5120e'
 }
 
-export default function Post() {
+export default function MyPostsDetails() {
   const { claims } = useAuthContext()
   const userId = claims?.sub
   const { postId } = useLocalSearchParams()
@@ -315,6 +306,21 @@ export default function Post() {
           style={{ flex: 1 }}
           ListHeaderComponent={
             <View>
+              <View
+                style={{ paddingHorizontal: 14,
+                  paddingVertical: 6,
+                  borderRadius: 20,
+                  backgroundColor: CATEGORY_COLORS[post.category], 
+                  alignSelf: 'flex-start'}}
+              >
+                <Text style={{ fontSize: 11, 
+                  fontWeight: '600', 
+                  color: '#fff'}}
+                >
+                  {post.category}
+                </Text>
+              </View>
+              <Spacer height={10} />
               <Text style={{color: 'gray', fontSize: 12}}>
                 {post.user_id === userId ? 'You' : '@'+post.username}
               </Text>
@@ -403,7 +409,6 @@ export default function Post() {
                     autoCapitalize='none'
                     multiline={true}
                     textAlignVertical='top'
-                    numberOfLines={10}
                     style={styles.input}
                   />
                   <View style={{ flexDirection: 'row', gap: 10 }}>

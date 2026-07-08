@@ -9,6 +9,7 @@ import Entypo from '@expo/vector-icons/Entypo'
 import Comment from '../../../components/comment'
 import Spacer from '../../../components/spacer'
 import TextInfo from '../../../components/text-info'
+import { buildCommentTree } from '../../../functions/build-comment-tree'
 
 const CATEGORY_COLORS = {
   Progress: '#FF9500',
@@ -17,25 +18,6 @@ const CATEGORY_COLORS = {
   Motivation: '#34C759',
   Equipment: '#9900ff', 
   Other: '#f5120e'
-}
-
-export const buildCommentTree = (comments, votes) => {
-  const map = {}
-  const roots = []
-
-  comments.forEach(comment => map[comment.id] = { ...comment, voted: null, replies: []})
-  votes.forEach(vote => {
-    if (map[vote.comment_id]) map[vote.comment_id].voted = vote.id
-  })
-  comments.forEach(comment => {
-    const mappedComment = map[comment.id]
-    if (comment.parent_id) {
-        map[comment.parent_id].replies.push(mappedComment)
-    } else {
-        roots.push(mappedComment)
-    }
-  })
-  return roots
 }
 
 export default function Post() {

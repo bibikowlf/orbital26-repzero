@@ -6,7 +6,7 @@ import { useFocusEffect } from 'expo-router'
 import { useAuthContext } from '../../../hooks/auth-context'
 import TextInfo from '../../../components/text-info'
 
-export default function WorkoutTutorials() {
+export default function MyTutorials() {
   const { claims } = useAuthContext()
   const userId = claims?.sub
   const styles = appStyles

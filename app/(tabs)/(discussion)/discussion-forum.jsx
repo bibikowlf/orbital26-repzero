@@ -5,6 +5,7 @@ import { supabase } from '../../../lib/supabase'
 import { router, useFocusEffect } from 'expo-router'
 import Spacer from '../../../components/spacer'
 import Entypo from '@expo/vector-icons/Entypo'
+import { cleanString } from '../../../functions/clean-string'
 
 const CATEGORY_COLORS = {
   All: '#0048ff',
@@ -39,6 +40,7 @@ export default function DiscussionForum() {
     try {
       setLoading(true)
       setSearchQuery('')
+      setCategory('All')
 
       const { data, error } = await supabase
         .from('posts_with_votes')
@@ -50,16 +52,10 @@ export default function DiscussionForum() {
         setFilteredPosts(sortedData)
       }
     } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert(error.message)
-      }
+      if (error instanceof Error) Alert.alert(error.message)
     } finally {
       setLoading(false)
     }
-  }
-
-  const cleanString = (s) => {
-    return s.toLowerCase().replace(/[^a-z]/g, '')
   }
 
   const handleFilter = () => {

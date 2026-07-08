@@ -1,15 +1,31 @@
-import { useState, useCallback } from 'react'
-import { View, Text, FlatList, ActivityIndicator, TouchableOpacity, Alert } from 'react-native'
+import { useState, useCallback, useEffect } from 'react'
+import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity, Alert, ScrollView } from 'react-native'
 import { appStyles } from '../../../styles/styles'
 import { supabase } from '../../../lib/supabase'
 import { router, useFocusEffect } from 'expo-router'
-import { useAuthContext } from '../../../hooks/auth-context'
+import Spacer from '../../../components/spacer'
 import Entypo from '@expo/vector-icons/Entypo'
+import { useAuthContext } from '../../../hooks/auth-context'
+import { cleanString } from '../../../functions/clean-string'
 
-export default function DiscussionForum() {
+const CATEGORY_COLORS = {
+  All: '#0048ff',
+  Progress: '#FF9500',
+  Discussion: '#56b2d6',
+  Help: '#d4219b',
+  Motivation: '#34C759',
+  Equipment: '#9900ff', 
+  Other: '#f5120e'
+}
+const CATEGORIES = ['All', 'Progress', 'Discussion', 'Help', 'Motivation', 'Equipment', 'Other']
+
+export default function MyPosts() {
   const { claims } = useAuthContext()
   const userId = claims?.sub
   const [posts, setPosts] = useState([])
+  const [filteredPosts, setFilteredPosts] = useState([])
+  const [searchQuery, setSearchQuery] = useState('')
+  const [category, setCategory] = useState('All')
   const [loading, setLoading] = useState(true)
   const styles = appStyles
 
@@ -19,9 +35,15 @@ export default function DiscussionForum() {
     }, [])
   )
 
+  useEffect(() => {
+    handleFilter()
+  }, [category, searchQuery])
+
   const fetchData = async () => {
     try {
       setLoading(true)
+      setSearchQuery('')
+      setCategory('All')
 
       const { data, error } = await supabase
         .from('posts_with_votes')
@@ -31,11 +53,23 @@ export default function DiscussionForum() {
       if (data) {
         const sortedData = data.sort((a, b) => b.score - a.score)
         setPosts(sortedData)
+        setFilteredPosts(sortedData)
       }
     } catch (error) {
       if (error instanceof Error) Alert.alert(error.message)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleFilter = () => {
+    if (searchQuery.trim() === '') {
+      setFilteredPosts(posts.filter((post) => category === 'All' || post.category === category))
+    } else {
+      const cleanQuery = cleanString(searchQuery)
+      setFilteredPosts(posts.filter((post) => {
+        return cleanString(post.title).includes(cleanQuery) && (category === 'All' || post.category === category)
+      }))
     }
   }
 
@@ -49,10 +83,55 @@ export default function DiscussionForum() {
 
   return (
     <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10, flex: 1 }]}>
+      <TextInput
+        style={[styles.input, { alignSelf: 'stretch' }]}
+        value={searchQuery}
+        placeholder='Search posts'
+        onChangeText={setSearchQuery}
+      />
+
+      <TouchableOpacity
+        style={[styles.actionButton, 
+          { backgroundColor: '#007AFF', flex: 0, marginTop: 10 }, 
+          loading && styles.buttonDisabled]}
+        onPress={() => router.navigate('/add-post')}
+        disabled={loading}
+      >
+        <Text style={styles.buttonText}>Add post</Text>
+      </TouchableOpacity>
+      <Spacer height={10} />
+      <ScrollView
+        style={{height: 35, flexGrow: 0, flexShrink: 0}}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 6, gap: 8 }}
+      >
+        {CATEGORIES.map(item => (
+          <TouchableOpacity
+            key={item}
+            onPress={() => setCategory(item)}
+            style={{ paddingHorizontal: 14,
+              paddingVertical: 6,
+              borderRadius: 20,
+              backgroundColor: category === item
+                ? (CATEGORY_COLORS[item])
+                : '#f2f2f2' }}
+          >
+            <Text style={{ fontSize: 13, 
+              fontWeight: '600', 
+              color: category === item ? '#fff' : '#444' }}
+            >
+              {item}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      <Spacer height={10} />
+
       <FlatList
-        data={posts}
+        data={filteredPosts}
         keyExtractor={(item) => item.id.toString()}
-        style={{ flex: 1 }}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={[styles.actionButton, 
@@ -64,11 +143,25 @@ export default function DiscussionForum() {
                 borderWidth: 1, 
                 borderColor: '#ced4da', 
                 marginBottom: 8,
-                height: 100,
+                height: 140,
                 padding: 12 }]}
-            onPress={() => router.navigate({ pathname: '/my-posts-detail', params: {postId: item.id} })}
+            onPress={() => router.navigate({ pathname: '/post', params: {postId: item.id} })}
             disabled={loading}
           >
+            <View
+              style={{ paddingHorizontal: 14,
+                paddingVertical: 6,
+                borderRadius: 20,
+                backgroundColor: CATEGORY_COLORS[item.category]}}
+            >
+              <Text style={{ fontSize: 11, 
+                fontWeight: '600', 
+                color: '#fff'}}
+              >
+                {item.category}
+              </Text>
+            </View>
+            <Spacer height={10} />
             <Text style={styles.title}>{item.title}</Text>
             <View style={[styles.row, { marginTop: 0, marginBottom: 0 }]}>
               <Entypo name='arrow-bold-up' size={16} color='black' />
