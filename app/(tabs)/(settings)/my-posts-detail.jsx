@@ -423,9 +423,9 @@ export default function Post() {
                       <Text style={styles.buttonText}>Cancel</Text>
                     </TouchableOpacity>
                   </View>
+                  <Spacer height={6} />
                 </View>
               )}
-              <Spacer height={6} />
               <TextInfo
                 marginBottom={10}
                 isAuthor={post.user_id === userId} 
@@ -478,6 +478,7 @@ export default function Post() {
               }}
               onUpdatePress={(editComment) => handleEditComment(editComment)}
               onDeletePress={(commentId) => handleDeleteComment(commentId)}
+              onCancelPress={() => setEditingComment(null)}
             />
           )}
         />
