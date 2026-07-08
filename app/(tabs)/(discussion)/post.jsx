@@ -402,17 +402,29 @@ export default function Post() {
                     textAlignVertical='top'
                     style={styles.input}
                   />
-                  <TouchableOpacity
-                    style={[styles.actionButton, 
-                      { backgroundColor: '#007AFF', flex: 0, marginTop: 10 }, 
-                      loading && styles.buttonDisabled]}
-                    onPress={() => handleEditPost()}
-                    disabled={loading}
-                  >
-                    <Text style={styles.buttonText}>Edit</Text>
-                  </TouchableOpacity>
+                  <View style={{ flexDirection: 'row', gap: 10 }}>
+                    <TouchableOpacity
+                      style={[styles.actionButton, 
+                        { backgroundColor: '#007AFF', marginTop: 10 }, 
+                        loading && styles.buttonDisabled]}
+                      onPress={handleEditPost}
+                      disabled={loading}
+                    >
+                      <Text style={styles.buttonText}>Edit</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.actionButton, 
+                        { backgroundColor: '#007AFF', marginTop: 10 }, 
+                        loading && styles.buttonDisabled]}
+                      onPress={() => setEditPost(null)}
+                      disabled={loading}
+                    >
+                      <Text style={styles.buttonText}>Cancel</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               )}
+              <Spacer height={6} />
               <TextInfo
                 marginBottom={10}
                 isAuthor={post.user_id === userId} 
