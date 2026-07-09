@@ -24,6 +24,12 @@ export default function FriendsLayout() {
       <Stack.Screen name='chat-list' 
         options={{ title: 'Messages', headerLeft: () => <BackButton /> }}
        />
+      <Stack.Screen name='chat-thread' 
+        options={({ route }) => ({
+          title: route.params?.recipientUsername || 'Chat',
+          headerLeft: () => <BackButton />
+        })}
+      />
     </Stack>
   )
 }

@@ -827,4 +827,58 @@ chatButton: {
   justifyContent: 'center',
   alignItems: 'center',
 },
+
+flexOne: {
+    flex: 1
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  messageListContent: {
+    paddingHorizontal: 15,
+    paddingVertical: 12
+  },
+  messageBubble: {
+    borderRadius: 14,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginVertical: 4,
+    maxWidth: '75%'
+  },
+  messageBubbleMine: {
+    alignSelf: 'flex-end',
+    backgroundColor: '#007AFF'
+  },
+  messageBubbleTheirs: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#E5E5E5'
+  },
+  messageTextMine: {
+    color: '#fff'
+  },
+  messageTextTheirs: {
+    color: '#000'
+  },
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E5E5'
+  },
+  textInput: {
+    flex: 1,
+    backgroundColor: '#F0F0F0',
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    marginRight: 8
+  },
+  sendButton: {
+    paddingHorizontal: 16,
+    backgroundColor: '#007AFF'
+  }
 })
