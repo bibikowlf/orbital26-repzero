@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react-native'
-import WorkoutTutorials from '../app/(tabs)/(tutorial)/tutorial'
-import { supabase } from '../lib/supabase'
+import WorkoutTutorials from '../../app/(tabs)/(tutorial)/tutorial'
+import { supabase } from '../../lib/supabase'
 
 const mockUserSubId = 'mock-user-123'
 const mockTutorial = {
@@ -14,7 +14,7 @@ const mockTutorial = {
 
 let mockActiveChains = {}
 
-jest.mock('../lib/supabase', () => ({
+jest.mock('../../lib/supabase', () => ({
   supabase: {
     from: jest.fn((table) => {
       if (!mockActiveChains[table]) {
@@ -41,7 +41,7 @@ jest.mock('../lib/supabase', () => ({
   }
 }))
 
-jest.mock('../hooks/auth-context', () => ({
+jest.mock('../../hooks/auth-context', () => ({
   useAuthContext: () => ({ claims: { sub: mockUserSubId } }),
 }))
 
@@ -51,7 +51,7 @@ jest.mock('expo-router', () => ({
   router: { navigate: jest.fn() }
 }))
 
-jest.mock('../components/text-info', () => {
+jest.mock('../../components/text-info', () => {
   const { View, Text, TouchableOpacity } = require('react-native')
   return function MockTextInfo({ score, onVotePress, onEditPress, onDeletePress }) {
     return (
