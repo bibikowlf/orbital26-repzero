@@ -3,9 +3,9 @@ import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity, A
 import { appStyles } from '../../../styles/styles'
 import { supabase } from '../../../lib/supabase'
 import { router, useFocusEffect } from 'expo-router'
-import { useAuthContext } from '../../../hooks/auth-context'
 import Spacer from '../../../components/spacer'
 import Entypo from '@expo/vector-icons/Entypo'
+import { useAuthContext } from '../../../hooks/auth-context'
 import { cleanString } from '../../../functions/clean-string'
 
 const CATEGORY_COLORS = {
@@ -19,7 +19,7 @@ const CATEGORY_COLORS = {
 }
 const CATEGORIES = ['All', 'Progress', 'Discussion', 'Help', 'Motivation', 'Equipment', 'Other']
 
-export default function DiscussionForum() {
+export default function BookmarkPosts() {
   const { claims } = useAuthContext()
   const userId = claims?.sub
   const [posts, setPosts] = useState([])
@@ -45,21 +45,21 @@ export default function DiscussionForum() {
       setSearchQuery('')
       setCategory('All')
 
-      const [postsResponse, reportResponse] = await Promise.all([
+      const [postsResponse, bookmarkResponse] = await Promise.all([
         supabase
           .from('posts_with_votes')
-          .select('*'),
+          .select('*'), 
         supabase
-          .from('report_posts')
+          .from('bookmarks')
           .select('*')
           .eq('user_id', userId)])
       if (postsResponse.error) throw postsResponse.error
-      if (reportResponse.error) throw reportResponse.error
-      if (postsResponse.data && reportResponse.data) {
-        const reports = new Set(reportResponse.data.map(item => item.post_id))
+      if (bookmarkResponse.error) throw bookmarkResponse.error
+      if (postsResponse.data && bookmarkResponse.data) {
+        const bookmarks = new Set(bookmarkResponse.data.map(item => item.post_id))
         const sortedData = postsResponse.data
           .sort((a, b) => b.score - a.score)
-          .filter(post => !reports.has(post.id))
+          .filter(post => bookmarks.has(post.id))
         setPosts(sortedData)
         setFilteredPosts(sortedData)
       }
@@ -97,16 +97,6 @@ export default function DiscussionForum() {
         placeholder='Search posts'
         onChangeText={setSearchQuery}
       />
-
-      <TouchableOpacity
-        style={[styles.actionButton, 
-          { backgroundColor: '#007AFF', flex: 0, marginTop: 10 }, 
-          loading && styles.buttonDisabled]}
-        onPress={() => router.navigate('/add-post')}
-        disabled={loading}
-      >
-        <Text style={styles.buttonText}>Add post</Text>
-      </TouchableOpacity>
       <Spacer height={10} />
       <ScrollView
         style={{height: 35, flexGrow: 0, flexShrink: 0}}
