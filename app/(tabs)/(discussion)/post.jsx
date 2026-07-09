@@ -31,6 +31,7 @@ export default function Post() {
   const [bookmark, setBookmark] = useState(null)
   const [comments, setComments] = useState(null)
   const [votes, setVotes] = useState(null)
+  const [reports, setReports] = useState(null)
   const [replyingTo, setReplyingTo] = useState(null)
   const [newComment, setNewComment] = useState('')
   const [votedPost, setVotedPost] = useState(null)
@@ -53,7 +54,7 @@ export default function Post() {
     try {
       setLoading(true)
 
-      const [commentsResponse, votesResponse, postResponse, postVoteResponse, bookmarkResponse] = 
+      const [commentsResponse, votesResponse, postResponse, postVoteResponse, bookmarkResponse, reportResponse] = 
         await Promise.all([
           supabase
             .from('comments_with_votes')
@@ -76,17 +77,23 @@ export default function Post() {
             .from('bookmarks')
             .select('*')
             .eq('user_id', userId)
-            .eq('post_id', postId)])
+            .eq('post_id', postId), 
+          supabase
+            .from('report_comments')
+            .select('*')
+            .eq('user_id', userId)])
       if (commentsResponse.error) throw commentsResponse.error
       if (votesResponse.error) throw votesResponse.error
       if (postResponse.error) throw postResponse.error
       if (postVoteResponse.error) throw postVoteResponse.error
       if (bookmarkResponse.error) throw bookmarkResponse.error
+      if (reportResponse.error) throw reportResponse.error
       if (commentsResponse.data) setComments(commentsResponse.data)
       if (votesResponse.data) setVotes(votesResponse.data)
       if (postResponse.data) setPost(postResponse.data[0])
       if (postVoteResponse.data && postVoteResponse.data[0]) setVotedPost(postVoteResponse.data[0].id)
       if (bookmarkResponse.data && bookmarkResponse.data.length > 0) setBookmark(bookmarkResponse.data[0].id)
+      if (reportResponse.data) setReports(new Set(reportResponse.data.map(item => item.comment_id)))
     } catch (error) {
       if (error instanceof Error) Alert.alert(error.message)
     } finally {
@@ -95,9 +102,9 @@ export default function Post() {
   }
 
   const commentTree = useMemo(() => {
-    if (votes === null || comments === null) return []
-    return buildCommentTree(comments, votes)
-  }, [votes, comments])
+    if (comments === null || votes === null || reports === null) return []
+    return buildCommentTree(comments, votes, reports)
+  }, [comments, votes, reports])
 
   const handleAdd = async () => {
     if (!newComment.trim()) {
@@ -358,7 +365,11 @@ export default function Post() {
           reason: reason
         })
       if (error) throw error
-      setComments(comments.filter(item => item.id !== commentId))
+      setReports(prevItem => {
+        const newItem = new Set(prevItem)
+        newItem.add(commentId)
+        return newItem
+      })
     } catch (error) {
       if (error instanceof Error) Alert.alert(error.message)
     } finally {

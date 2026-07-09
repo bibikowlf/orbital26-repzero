@@ -3,6 +3,7 @@ import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity, A
 import { appStyles } from '../../../styles/styles'
 import { supabase } from '../../../lib/supabase'
 import { router, useFocusEffect } from 'expo-router'
+import { useAuthContext } from '../../../hooks/auth-context'
 import Spacer from '../../../components/spacer'
 import Entypo from '@expo/vector-icons/Entypo'
 import { cleanString } from '../../../functions/clean-string'
@@ -19,6 +20,8 @@ const CATEGORY_COLORS = {
 const CATEGORIES = ['All', 'Progress', 'Discussion', 'Help', 'Motivation', 'Equipment', 'Other']
 
 export default function DiscussionForum() {
+  const { claims } = useAuthContext()
+  const userId = claims?.sub
   const [posts, setPosts] = useState([])
   const [filteredPosts, setFilteredPosts] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
@@ -42,12 +45,21 @@ export default function DiscussionForum() {
       setSearchQuery('')
       setCategory('All')
 
-      const { data, error } = await supabase
-        .from('posts_with_votes')
-        .select('*')
-      if (error) throw error
-      if (data) {
-        const sortedData = data.sort((a, b) => b.score - a.score)
+      const [postsResponse, reportResponse] = await Promise.all([
+        supabase
+          .from('posts_with_votes')
+          .select('*'),
+        supabase
+          .from('report_posts')
+          .select('*')
+          .eq('user_id', userId)])
+      if (postsResponse.error) throw postsResponse.error
+      if (reportResponse.error) throw reportResponse.error
+      if (postsResponse.data && reportResponse.data) {
+        const reports = new Set(reportResponse.data.map(item => item.post_id))
+        const sortedData = postsResponse.data
+          .sort((a, b) => b.score - a.score)
+          .filter(post => !reports.has(post.id))
         setPosts(sortedData)
         setFilteredPosts(sortedData)
       }

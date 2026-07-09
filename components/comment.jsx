@@ -29,57 +29,65 @@ export default function Comment({ comment, depth, editing, loading, onReplyPress
       paddingLeft: indentation * 12,
       marginTop: 6 }}
     >
-      <View style={{flex:1}}>
-        <Text style={{color: 'gray', fontSize: 12}}>
-          {comment.user_id === userId ? 'You': '@' + comment.username}
-        </Text>
-        {editing !== comment.id ? (
-          <Text style={{ fontSize: 16, color: 'black' }}>{comment.content}</Text>
+      <View style={{ flex:1 }}>
+        {comment.reported ? (
+          <Text style={{ fontSize: 16, color: 'gray', fontStyle: 'italic' }}>
+            This comment is hidden.
+          </Text>
         ): (
           <View>
-            <TextInput 
-              value={editComment}
-              onChangeText={(text) => setEditComment(text)}
-              autoCapitalize='none'
-              multiline={true}
-              textAlignVertical='top'
-              style={styles.input}
+            <Text style={{color: 'gray', fontSize: 12}}>
+              {comment.user_id === userId ? 'You': '@' + comment.username}
+            </Text>
+            {editing !== comment.id ? (
+              <Text style={{ fontSize: 16, color: 'black' }}>{comment.content}</Text>
+            ): (
+              <View>
+                <TextInput 
+                  value={editComment}
+                  onChangeText={(text) => setEditComment(text)}
+                  autoCapitalize='none'
+                  multiline={true}
+                  textAlignVertical='top'
+                  style={styles.input}
+                />
+                <View style={{ flexDirection: 'row', gap: 10 }}>
+                  <TouchableOpacity
+                    style={[styles.actionButton, 
+                      { backgroundColor: '#007AFF', marginTop: 10 }]}
+                    onPress={() => onUpdatePress(editComment)}
+                    disabled={loading}
+                  >
+                    <Text style={styles.buttonText}>Edit</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.actionButton, 
+                      { backgroundColor: '#007AFF', marginTop: 10 }]}
+                    onPress={onCancelPress}
+                    disabled={loading}
+                  >
+                    <Text style={styles.buttonText}>Cancel</Text>
+                  </TouchableOpacity>
+                </View>
+                <Spacer height={6} />
+              </View>
+            )}
+            <TextInfo 
+              marginBottom={10}
+              isAuthor={comment.user_id === userId} 
+              canReply={true} 
+              score={comment.score} 
+              loading={loading}
+              editing={editing === comment.id}
+              hasVoted={comment.voted !== null} 
+              onVotePress={() => onVotePress(comment)} 
+              onEditPress={() => onEditPress(comment)} 
+              onDeletePress={() => onDeletePress(comment.id)} 
+              onReplyPress={() => onReplyPress(comment)}
+              onReportPress={(reason) => onReportPress(comment.id, reason)}
             />
-            <View style={{ flexDirection: 'row', gap: 10 }}>
-              <TouchableOpacity
-                style={[styles.actionButton, 
-                  { backgroundColor: '#007AFF', marginTop: 10 }]}
-                onPress={() => onUpdatePress(editComment)}
-                disabled={loading}
-              >
-                <Text style={styles.buttonText}>Edit</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.actionButton, 
-                  { backgroundColor: '#007AFF', marginTop: 10 }]}
-                onPress={onCancelPress}
-                disabled={loading}
-              >
-                <Text style={styles.buttonText}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-            <Spacer height={6} />
           </View>
         )}
-        <TextInfo 
-          marginBottom={10}
-          isAuthor={comment.user_id === userId} 
-          canReply={true} 
-          score={comment.score} 
-          loading={loading}
-          editing={editing === comment.id}
-          hasVoted={comment.voted !== null} 
-          onVotePress={() => onVotePress(comment)} 
-          onEditPress={() => onEditPress(comment)} 
-          onDeletePress={() => onDeletePress(comment.id)} 
-          onReplyPress={() => onReplyPress(comment)}
-          onReportPress={(reason) => onReportPress(comment.id, reason)}
-        />
       </View>
       {comment.replies && comment.replies.map(reply => (
         <Comment 
