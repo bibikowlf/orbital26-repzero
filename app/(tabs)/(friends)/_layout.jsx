@@ -12,6 +12,9 @@ export default function FriendsLayout() {
       <Stack.Screen name='index' 
        options={{ title: 'Friends', headerLeft: () => <SettingsButton /> }}
        />
+      <Stack.Screen name="search-users" 
+        options={{ title: 'Find Friends', headerLeft: () => <BackButton /> }}
+      />
       <Stack.Screen name='follow-list' 
         options={({ route }) => ({
           title: route.params?.mode === 'followers' ? 'Followers' : 'Following',
