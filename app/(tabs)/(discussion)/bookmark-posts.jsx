@@ -19,7 +19,7 @@ const CATEGORY_COLORS = {
 }
 const CATEGORIES = ['All', 'Progress', 'Discussion', 'Help', 'Motivation', 'Equipment', 'Other']
 
-export default function MyPosts() {
+export default function BookmarkPosts() {
   const { claims } = useAuthContext()
   const userId = claims?.sub
   const [posts, setPosts] = useState([])
@@ -45,13 +45,21 @@ export default function MyPosts() {
       setSearchQuery('')
       setCategory('All')
 
-      const { data, error } = await supabase
-        .from('posts_with_votes')
-        .select('*')
-        .eq('user_id', userId)
-      if (error) throw error
-      if (data) {
-        const sortedData = data.sort((a, b) => b.score - a.score)
+      const [postsResponse, bookmarkResponse] = await Promise.all([
+        supabase
+          .from('posts_with_votes')
+          .select('*'), 
+        supabase
+          .from('bookmarks')
+          .select('*')
+          .eq('user_id', userId)])
+      if (postsResponse.error) throw postsResponse.error
+      if (bookmarkResponse.error) throw bookmarkResponse.error
+      if (postsResponse.data && bookmarkResponse.data) {
+        const bookmarks = new Set(bookmarkResponse.data.map(item => item.post_id))
+        const sortedData = postsResponse.data
+          .sort((a, b) => b.score - a.score)
+          .filter(post => bookmarks.has(post.id))
         setPosts(sortedData)
         setFilteredPosts(sortedData)
       }
@@ -135,7 +143,7 @@ export default function MyPosts() {
                 marginBottom: 8,
                 height: 140,
                 padding: 12 }]}
-            onPress={() => router.navigate({ pathname: '/my-posts-detail', params: {postId: item.id} })}
+            onPress={() => router.navigate({ pathname: '/post', params: {postId: item.id} })}
             disabled={loading}
           >
             <View
