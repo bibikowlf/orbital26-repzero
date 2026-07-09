@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react-native'
-import Profile from '../app/(tabs)/(settings)/profile'
-import { supabase } from '../lib/supabase'
+import Profile from '../../app/(tabs)/(settings)/profile'
+import { supabase } from '../../lib/supabase'
 
 const mockUserId = 'mock-user-777'
 const mockInitialProfile = {
