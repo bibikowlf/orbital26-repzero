@@ -31,7 +31,7 @@ jest.mock('../../styles/styles', () => ({
   appStyles: {},
 }))
 
-describe('Login Authentication Tests', () => {
+describe('Login Test', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })

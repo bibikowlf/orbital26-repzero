@@ -15,7 +15,7 @@ jest.mock('../../styles/styles', () => ({
   appStyles: {},
 }))
 
-describe('SignOutButton Tests', () => {
+describe('Signout Test', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })

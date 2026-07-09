@@ -21,7 +21,7 @@ const mockInitialProfile = {
 
 let mockActiveChains = {}
 
-jest.mock('../lib/supabase', () => ({
+jest.mock('../../lib/supabase', () => ({
   supabase: {
     from: jest.fn((table) => {
       if (!mockActiveChains[table]) {
@@ -45,7 +45,7 @@ jest.mock('../lib/supabase', () => ({
   }
 }))
 
-jest.mock('../hooks/auth-context', () => ({
+jest.mock('../../hooks/auth-context', () => ({
   useAuthContext: () => ({
     claims: { sub: mockUserId, email: 'mock@gmail.com' }
   })
@@ -55,14 +55,14 @@ jest.mock('expo-router', () => ({
   router: { navigate: jest.fn() }
 }))
 
-jest.mock('../components/signout-button', () => {
+jest.mock('../../components/signout-button', () => {
   const { Text } = require('react-native')
   return () => <Text>Sign Out Button</Text>
 })
 
-jest.mock('../components/spacer', () => () => null)
+jest.mock('../../components/spacer', () => () => null)
 
-jest.mock('../functions/numeric-input', () => ({
+jest.mock('../../functions/numeric-input', () => ({
   handleNumericInput: (text) => parseInt(text, 10) || 0
 }))
 
@@ -82,13 +82,13 @@ jest.mock('react-native-element-dropdown', () => {
   }
 })
 
-describe('Profile Integration Tests', () => {
+describe('Profile Test', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockActiveChains = {}
   })
 
-  it('fetches existing profile data on mount and updates it', async () => {
+  it('new data is correctly added into database after pressing update button', async () => {
     await act(async () => render(<Profile />))
     await waitFor(() => expect(screen.getByDisplayValue('initial_gym_bro')).toBeTruthy())
 
