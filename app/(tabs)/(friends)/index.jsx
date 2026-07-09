@@ -58,15 +58,21 @@ export default function FriendsHome() {
         <ActivityIndicator size="small" color="#000" />
       ) : (
         <View style={{ flexDirection: 'row', justifyContent: 'space-around', gap: 40 }}>
-          <View style={{ alignItems: 'center' }}>
-            <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{followerCount}</Text>
-            <Text style={{ color: '#666' }}>Followers</Text>
-          </View>
-          <View style={{ alignItems: 'center' }}>
-            <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{followingCount}</Text>
-            <Text style={{ color: '#666' }}>Following</Text>
-          </View>
-        </View>
+        <TouchableOpacity
+          style={{ alignItems: 'center' }}
+          onPress={() => router.push({ pathname: '/follow-list', params: { mode: 'followers' } })}
+        >
+          <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{followerCount}</Text>
+          <Text style={{ color: '#666' }}>Followers</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{ alignItems: 'center' }}
+          onPress={() => router.push({ pathname: '/follow-list', params: { mode: 'following' } })}
+        >
+          <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{followingCount}</Text>
+          <Text style={{ color: '#666' }}>Following</Text>
+        </TouchableOpacity>
+      </View>
       )}
 
       <TouchableOpacity

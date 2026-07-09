@@ -19,6 +19,12 @@ export default function EventLayout() {
       <Stack.Screen name='event-detail' 
         options={{ title: 'Event Details', headerLeft: () => <BackButton /> }}
       />
+      <Stack.Screen name='follow-list' 
+        options={({ route }) => ({
+          title: route.params?.mode === 'followers' ? 'Followers' : 'Following',
+          headerLeft: () => <BackButton />
+        })}
+      />
     </Stack>
   )
 }
