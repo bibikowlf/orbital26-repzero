@@ -1,6 +1,6 @@
 import React from 'react'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react-native'
-import WorkoutTutorials from '../../app/(tabs)/(tutorial)/tutorial'
+import MyTutorials from '../../app/(tabs)/(settings)/my-tutorials'
 import { supabase } from '../../lib/supabase'
 import { Alert } from 'react-native'
 
@@ -46,11 +46,19 @@ jest.mock('../../hooks/auth-context', () => ({
   useAuthContext: () => ({ claims: { sub: mockUserSubId } }),
 }))
 
-jest.mock('expo-router', () => ({
-  useLocalSearchParams: () => ({ id: 'workout-abc', name: 'Chest Press' }),
-  Stack: { Screen: () => null },
-  router: { navigate: jest.fn() }
-}))
+jest.mock('expo-router', () => {
+  const ReactModule = require('react')
+  return {
+    useFocusEffect: (callback) => {
+      ReactModule.useEffect(() => {
+        callback()
+      }, [callback])
+    },
+    useLocalSearchParams: () => ({ id: 'workout-abc', name: 'Chest Press' }),
+    Stack: { Screen: () => null },
+    router: { navigate: jest.fn() }
+  }
+})
 
 jest.mock('../../components/text-info', () => {
   const { View, Text, TouchableOpacity } = require('react-native')
@@ -66,34 +74,11 @@ jest.mock('../../components/text-info', () => {
   }
 })
 
-describe('Tutorial Test', () => {
+describe('MyTutorial Test', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockActiveChains = {}
     jest.spyOn(Alert, 'alert').mockImplementation(() => {})
-  })
-
-  it('new tutorial is correctly added and displayed', async () => {
-    const tableBuilder = {
-      insert: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      then: jest.fn().mockImplementation((resolve) => 
-        Promise.resolve(resolve({ data: [{ id: 'new-id-000', content: 'Fresh Muscle Tutorial', score: 0 }], error: null }))
-      )
-    }
-    mockActiveChains['workout_tutorials'] = tableBuilder
-
-    await act(async () => render(<WorkoutTutorials />))
-    await waitFor(() => expect(screen.getByText('Original Form Tutorial Content')).toBeTruthy())
-
-    const input = screen.getByPlaceholderText('Enter tutorial')
-    await act(async () => fireEvent.changeText(input, 'Fresh Muscle Tutorial'))
-    await act(async () => fireEvent.press(screen.getByText('Add')))
-
-    await waitFor(() => {
-      expect(supabase.from).toHaveBeenCalledWith('workout_tutorials')
-      expect(screen.getByText('Fresh Muscle Tutorial')).toBeTruthy()
-    })
   })
 
   it('tutorial is updated after editing', async () => {
@@ -103,7 +88,7 @@ describe('Tutorial Test', () => {
     }
     mockActiveChains['workout_tutorials'] = tableBuilder
 
-    await act(async () => render(<WorkoutTutorials />))
+    await act(async () => render(<MyTutorials />))
     await waitFor(() => expect(screen.getByText('Original Form Tutorial Content')).toBeTruthy())
 
     await act(async () => fireEvent.press(screen.getByText('Edit Mock Button')))
@@ -140,7 +125,7 @@ describe('Tutorial Test', () => {
       return builder
     })
 
-    await act(async () => render(<WorkoutTutorials />))
+    await act(async () => render(<MyTutorials />))
     await waitFor(() => expect(screen.getByText('Score Counter: 10')).toBeTruthy())
 
     const writeBuilder = {
@@ -164,7 +149,7 @@ describe('Tutorial Test', () => {
     }
     mockActiveChains['workout_tutorials'] = tableBuilder
 
-    await act(async () => render(<WorkoutTutorials />))
+    await act(async () => render(<MyTutorials />))
     await waitFor(() => expect(screen.getByText('Original Form Tutorial Content')).toBeTruthy())
 
     await act(async () => fireEvent.press(screen.getByText('Delete Mock Button')))
@@ -175,22 +160,8 @@ describe('Tutorial Test', () => {
     })
   })
 
-  it('empty tutorial triggers alert and is not added', async () => {
-    await act(async () => render(<WorkoutTutorials />))
-    await waitFor(() => expect(screen.getByText('Original Form Tutorial Content')).toBeTruthy())
-
-    const input = screen.getByPlaceholderText('Enter tutorial')
-    await act(async () => fireEvent.changeText(input, '    '))
-    
-    const addBtn = screen.getByText('Add')
-    await act(async () => fireEvent.press(addBtn))
-
-    expect(Alert.alert).toHaveBeenCalledWith('Tutorial cannot be empty')
-    expect(supabase.from).not.toHaveBeenCalledWith('workout_tutorials')
-  })
-
   it('tutorial cannot be updated to empty tutorial', async () => {
-    await act(async () => render(<WorkoutTutorials />))
+    await act(async () => render(<MyTutorials />))
     await waitFor(() => expect(screen.getByText('Original Form Tutorial Content')).toBeTruthy())
 
     await act(async () => fireEvent.press(screen.getByText('Edit Mock Button')))

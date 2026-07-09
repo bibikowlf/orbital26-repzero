@@ -74,7 +74,7 @@ describe('WorkoutTutorial Test', () => {
     expect(Alert.alert).toHaveBeenCalledWith('Cannot add empty workout')
   })
 
-  it('new tutorial is correctly added and displayed', async () => {
+  it('new workout is correctly added and displayed', async () => {
     await act(async () => render(<WorkoutTutorial />))
 
     const newWorkoutInput = screen.getByPlaceholderText('Enter new workout')
