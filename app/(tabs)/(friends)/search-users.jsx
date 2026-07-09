@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { Ionicons } from '@expo/vector-icons'
 import { supabase } from '../../../lib/supabase'
 import { useAuthContext } from '../../../hooks/auth-context'
 import { appStyles } from '../../../styles/styles'
@@ -102,14 +103,24 @@ export default function SearchUsers() {
   }
 
   return (
-    <View style={[appStyles.container, { paddingHorizontal: 15, paddingTop: 20, justifyContent: 'flex-start' }]}>
-      <TextInput
-        style={appStyles.inlineInput}
-        placeholder="Search by username"
-        value={query}
-        onChangeText={handleSearch}
-        autoCapitalize="none"
-      />
+    <View style={{ flex: 1, paddingHorizontal: 15, paddingTop: 12 }}>
+      <View style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#F0F0F0',
+        borderRadius: 10,
+        paddingHorizontal: 12,
+        height: 46
+      }}>
+        <Ionicons name="search" size={20} color="#8E8E93" />
+        <TextInput
+          style={{ flex: 1, marginLeft: 8, fontSize: 16 }}
+          placeholder="Search by username"
+          value={query}
+          onChangeText={handleSearch}
+          autoCapitalize="none"
+        />
+      </View>
       <Spacer />
 
       {loading && <ActivityIndicator size="small" color="#000" />}
@@ -124,14 +135,27 @@ export default function SearchUsers() {
         renderItem={({ item }) => {
           const isFollowing = followingIds.includes(item.id)
           return (
-            <View style={[appStyles.exerciseRow, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              width: '100%',
+              paddingVertical: 14,
+              paddingHorizontal: 4,
+              borderBottomWidth: 1,
+              borderBottomColor: '#E5E5E5'
+            }}>
               <Text style={appStyles.exerciseName}>{item.username}</Text>
               <TouchableOpacity
-                style={[appStyles.actionButton, { backgroundColor: isFollowing ? '#8E8E93' : '#007AFF' }]}
+                style={[appStyles.actionButton, {
+                    backgroundColor: isFollowing ? '#8E8E93' : '#007AFF',
+                    width: 90,
+                    alignItems: 'center'
+                }]}
                 onPress={() => isFollowing ? handleUnfollow(item.id) : handleFollow(item.id)}
-              >
+                >
                 <Text style={appStyles.buttonText}>{isFollowing ? 'Unfollow' : 'Follow'}</Text>
-              </TouchableOpacity>
+                </TouchableOpacity>
             </View>
           )
         }}
