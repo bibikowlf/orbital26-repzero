@@ -817,4 +817,14 @@ tabRow: { flexDirection: 'row', borderBottomWidth: 1, borderColor: '#e9ecef' },
   tabButtonActive: { borderBottomWidth: 2, borderBottomColor: '#007AFF' },
   tabText: { fontSize: 15, fontWeight: '600', color: '#8E8E93' },
   tabTextActive: { color: '#007AFF' },
+
+//friends tab
+chatButton: {
+  width: '20%',
+  height: 20,
+  backgroundColor: '#34C759',
+  borderRadius: 8,
+  justifyContent: 'center',
+  alignItems: 'center',
+},
 })

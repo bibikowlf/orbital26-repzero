@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { View, Text, TouchableOpacity, ActivityIndicator, Pressable } from 'react-native'
 import { useRouter, useFocusEffect } from 'expo-router'
 import { supabase } from '../../../lib/supabase'
 import { useAuthContext } from '../../../hooks/auth-context'
@@ -83,13 +83,13 @@ export default function FriendsHome() {
       </TouchableOpacity>
 
       <Spacer />
-
-        <TouchableOpacity
-          style={[appStyles.actionButton, { backgroundColor: '#34C759' }]}
-          onPress={() => router.push('/chat-list')}
-        >
-          <Text>+</Text>
-        </TouchableOpacity>
+      
+      <Pressable
+        style={appStyles.chatButton}
+        onPress={() => router.push('/chat-list')}
+      >
+        <Text style={appStyles.buttonText}>Chats</Text>
+      </Pressable>
     </View>
   )
 }
