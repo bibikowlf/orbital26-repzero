@@ -276,7 +276,7 @@ export default function Post() {
       if (error instanceof Error) Alert.alert(error.message)
     } finally {
       setLoading(false)
-      router.navigate('/discussion-forum')
+      router.back()
     }
   }
 
@@ -343,6 +343,26 @@ export default function Post() {
     } finally {
       setLoading(false)
       router.back()
+    }
+  }
+
+  const handleReportComment = async (commentId, reason) => {
+    try {
+      setLoading(true)
+
+      const { error } = await supabase
+        .from('report_comments')
+        .insert({
+          user_id: userId,
+          comment_id: commentId,
+          reason: reason
+        })
+      if (error) throw error
+      setComments(comments.filter(item => item.id !== commentId))
+    } catch (error) {
+      if (error instanceof Error) Alert.alert(error.message)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -560,9 +580,7 @@ export default function Post() {
               onUpdatePress={(editComment) => handleEditComment(editComment)}
               onDeletePress={(commentId) => handleDeleteComment(commentId)}
               onCancelPress={() => setEditingComment(null)}
-              onReportPress={() => {
-                return
-              }}
+              onReportPress={(commentId, reason) => handleReportComment(commentId, reason)}
             />
           )}
         />

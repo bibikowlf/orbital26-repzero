@@ -78,7 +78,7 @@ export default function Comment({ comment, depth, editing, loading, onReplyPress
           onEditPress={() => onEditPress(comment)} 
           onDeletePress={() => onDeletePress(comment.id)} 
           onReplyPress={() => onReplyPress(comment)}
-          onReportPress={() => onReportPress(comment.id)}
+          onReportPress={(reason) => onReportPress(comment.id, reason)}
         />
       </View>
       {comment.replies && comment.replies.map(reply => (
