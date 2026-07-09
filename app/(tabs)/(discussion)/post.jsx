@@ -326,6 +326,26 @@ export default function Post() {
     }
   }
 
+  const handleReportPost = async (reason) => {
+    try {
+      setLoading(true)
+
+      const { error } = await supabase
+        .from('report_posts')
+        .insert({
+          user_id: userId,
+          post_id: postId,
+          reason: reason
+        })
+      if (error) throw error
+    } catch (error) {
+      if (error instanceof Error) Alert.alert(error.message)
+    } finally {
+      setLoading(false)
+      router.back()
+    }
+  }
+
   if (loading || !post) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
@@ -501,6 +521,7 @@ export default function Post() {
                 }} 
                 onDeletePress={handleDeletePost} 
                 onReplyPress={() => setReplyingTo(null)}
+                onReportPress={(reason) => handleReportPost(reason)}
               />
               <Text style={{color: 'gray', fontSize: 12}}>
                 Replying to {replyingTo === null ? 'post' : replyingTo.user_id === userId ? 'yourself' : '@'+replyingTo.username}
@@ -539,6 +560,9 @@ export default function Post() {
               onUpdatePress={(editComment) => handleEditComment(editComment)}
               onDeletePress={(commentId) => handleDeleteComment(commentId)}
               onCancelPress={() => setEditingComment(null)}
+              onReportPress={() => {
+                return
+              }}
             />
           )}
         />

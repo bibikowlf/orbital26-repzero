@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 import TextInfo from './text-info'
 import Spacer from './spacer'
 
-export default function Comment({ comment, depth, editing, loading, onReplyPress, onVotePress, onEditPress, onUpdatePress, onDeletePress, onCancelPress }) {
+export default function Comment({ comment, depth, editing, loading, onReplyPress, onVotePress, onEditPress, onUpdatePress, onDeletePress, onCancelPress, onReportPress }) {
   const { claims } = useAuthContext()
   const userId = claims?.sub
   const indentation = Math.min(depth, 4) === 0 ? 0 : 1
@@ -78,6 +78,7 @@ export default function Comment({ comment, depth, editing, loading, onReplyPress
           onEditPress={() => onEditPress(comment)} 
           onDeletePress={() => onDeletePress(comment.id)} 
           onReplyPress={() => onReplyPress(comment)}
+          onReportPress={() => onReportPress(comment.id)}
         />
       </View>
       {comment.replies && comment.replies.map(reply => (
@@ -90,6 +91,7 @@ export default function Comment({ comment, depth, editing, loading, onReplyPress
           onUpdatePress={onUpdatePress}
           onDeletePress={onDeletePress}
           onCancelPress={onCancelPress}
+          onReportPress={onReportPress}
         />
       ))}
     </View>
