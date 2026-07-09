@@ -52,7 +52,7 @@ export const appStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 20,
-  },
+  }, 
   avatar: {
     borderRadius: 5,
     overflow: 'hidden',

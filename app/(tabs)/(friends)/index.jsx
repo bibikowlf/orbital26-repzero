@@ -81,6 +81,15 @@ export default function FriendsHome() {
       >
         <Text>+</Text>
       </TouchableOpacity>
+
+      <Spacer />
+
+        <TouchableOpacity
+          style={[appStyles.actionButton, { backgroundColor: '#34C759' }]}
+          onPress={() => router.push('/chat-list')}
+        >
+          <Text>+</Text>
+        </TouchableOpacity>
     </View>
   )
 }

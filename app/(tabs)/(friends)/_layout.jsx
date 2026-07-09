@@ -21,6 +21,9 @@ export default function FriendsLayout() {
           headerLeft: () => <BackButton />
         })}
       />
+      <Stack.Screen name='chat-list' 
+        options={{ title: 'Messages', headerLeft: () => <BackButton /> }}
+       />
     </Stack>
   )
 }
