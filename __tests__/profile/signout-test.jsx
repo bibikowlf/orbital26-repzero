@@ -16,9 +16,7 @@ jest.mock('../../styles/styles', () => ({
 }))
 
 describe('Signout Test', () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
+  beforeEach(() => jest.clearAllMocks())
 
   it('supabase.auth.signOut is called after pressing signout button', async () => {
     await act(async () => render(<SignOutButton />))
