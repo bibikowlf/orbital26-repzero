@@ -18,6 +18,8 @@ export default function ChatThread() {
   const [sending, setSending] = useState(false)
 
   const [showInviteModal, setShowInviteModal] = useState(false)
+  const [inviteDate, setInviteDate] = useState(new Date())
+  const [inviteNote, setInviteNote] = useState('')
 
   useEffect(() => {
     if (userId && recipientId)
@@ -103,6 +105,7 @@ export default function ChatThread() {
   }
 
   return (
+  <>
     <KeyboardAvoidingView
       style={appStyles.flexOne}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -149,5 +152,28 @@ export default function ChatThread() {
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
-  )
+
+    <Modal
+      visible={showInviteModal}
+      transparent
+      animationType="fade"
+    >
+      <View style={appStyles.modalOverlay}>
+        <View style={appStyles.modalContent}>
+          <Text style={appStyles.modalTitle}>
+            Invite to Workout
+          </Text>
+
+          <TouchableOpacity
+            onPress={() => setShowInviteModal(false)}
+          >
+            <Text style={appStyles.modalCancelText}>
+              Cancel
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  </>
+)
 }
