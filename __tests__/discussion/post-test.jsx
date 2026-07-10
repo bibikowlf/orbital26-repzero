@@ -1,10 +1,10 @@
 import React from 'react'
 import { render, screen, waitFor, fireEvent, act } from '@testing-library/react-native'
-import Post from '../app/(tabs)/(discussion)/post'
-import { supabase } from '../lib/supabase'
+import Post from '../../app/(tabs)/(discussion)/post'
+import { supabase } from '../../lib/supabase'
 import * as ReactNative from 'react-native'
 import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity, Alert, Image } from 'react-native'
-global.IS_REACT_ACT_ENVIRONMENT = true
+
 const mockPost = {
   id: 'mock-post-123',
   title: 'Test Post Title',
@@ -26,7 +26,7 @@ jest.spyOn(Alert, 'alert').mockImplementation(() => {})
 jest.mock('@react-native-async-storage/async-storage', () => 
   require('@react-native-async-storage/async-storage/jest/async-storage-mock')
 )
-jest.mock('../lib/supabase', () => {
+jest.mock('../../lib/supabase', () => {
   return {
     supabase: {
       from: jest.fn((table) => {
@@ -42,7 +42,7 @@ jest.mock('../lib/supabase', () => {
                 return Promise.resolve(resolve({ data: [mockPost], error: null }))
               } else if (table === 'comments_with_votes') {
                 return Promise.resolve(resolve({ data: mockComments, error: null }))
-              } else if (table === 'comment_votes' || table === 'post_votes') {
+              } else if (table === 'comment_votes' || table === 'post_votes' || table === 'report_comments' || table === 'bookmarks') {
                 return Promise.resolve(resolve({ data: [], error: null }))
               }
               return Promise.resolve(resolve({ data: [], error: null }))
@@ -69,13 +69,13 @@ jest.mock('expo-router', () => {
   }
 })
 
-jest.mock('../hooks/auth-context', () => ({
+jest.mock('../../hooks/auth-context', () => ({
   useAuthContext: () => ({ claims: { sub: 'mock-user-456' } }),
 }))
 
-jest.mock('../components/comment', () => {
+jest.mock('../../components/comment', () => {
   const { TouchableOpacity, Text, View } = require('react-native')
-  return function MockComment({ comment, onReplyPress, onVotePress, onEditPress, onDeletePress, onUpdatePress }) {
+  return function MockComment({ comment, onReplyPress, onVotePress, onEditPress, onDeletePress, onUpdatePress, onReportPress }) {
     return (
       <View testID={`comment-${comment.id}`}>
         <Text>{comment.content}</Text>
@@ -83,27 +83,30 @@ jest.mock('../components/comment', () => {
         <TouchableOpacity onPress={() => onVotePress && onVotePress(comment)}><Text>Vote Comment</Text></TouchableOpacity>
         <TouchableOpacity onPress={() => onEditPress && onEditPress(comment)}><Text>Edit Comment Button</Text></TouchableOpacity>
         <TouchableOpacity onPress={() => onUpdatePress && onUpdatePress('Updated Content String Text')}><Text>Update Comment</Text></TouchableOpacity>
+        <TouchableOpacity onPress={() => onUpdatePress && onUpdatePress(' ')}><Text>Update Comment With Empty Text</Text></TouchableOpacity>
         <TouchableOpacity onPress={() => onDeletePress && onDeletePress(comment.id)}><Text>Delete Comment Button</Text></TouchableOpacity>
+        <TouchableOpacity onPress={() => onReportPress && onReportPress(comment.id, 'Spam')}><Text>Report Comment Button</Text></TouchableOpacity>
       </View>
     )
   }
 })
 
-jest.mock('../components/text-info', () => {
+jest.mock('../../components/text-info', () => {
   const { TouchableOpacity, Text, View } = require('react-native')
-  return function MockTextInfo({ onVotePress, onEditPress, onDeletePress, score }) {
+  return function MockTextInfo({ onVotePress, onEditPress, onDeletePress, onReportPress, score }) {
     return (
       <View testID='post-actions'>
         <Text>Post Score: {score}</Text>
         <TouchableOpacity onPress={onVotePress}><Text>Vote Post Button</Text></TouchableOpacity>
         <TouchableOpacity onPress={onEditPress}><Text>Edit Post Button</Text></TouchableOpacity>
         <TouchableOpacity onPress={onDeletePress}><Text>Delete Post Button</Text></TouchableOpacity>
+        <TouchableOpacity onPress={() => onReportPress && onReportPress('Inappropriate')}><Text>Report Post Button</Text></TouchableOpacity>
       </View>
     )
   }
 })
 
-describe('Post Integration Tests', () => {
+describe('Post Test', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockActiveChains = {}
@@ -116,7 +119,7 @@ describe('Post Integration Tests', () => {
     }))
   })
 
-  it('updates index indicator text when carousel chevrons are pressed', async () => {
+  it('images indices are updated after clicking left/right', async () => {
     await act(async () => render(<Post />))
     await waitFor(() => expect(screen.getByText('Test Post Title')).toBeTruthy())
     
@@ -126,7 +129,7 @@ describe('Post Integration Tests', () => {
     }
   })
 
-  it('toggles voting mutation score modifications on the post header', async () => {
+  it('vote is added/deleted after upvoting/retracting upvote for post', async () => {
     await act(async () => render(<Post />))
     await waitFor(() => expect(screen.getByText('Post Score: 10')).toBeTruthy())
 
@@ -140,7 +143,7 @@ describe('Post Integration Tests', () => {
   })
 
 
-  it('allows editing post markdown details inline', async () => {
+  it('post is updated after editing', async () => {
     const postsBuilder = {
       select: jest.fn().mockImplementation(() => postsBuilder),
       update: jest.fn().mockImplementation(() => postsBuilder),
@@ -168,7 +171,7 @@ describe('Post Integration Tests', () => {
     await waitFor(() => expect(supabase.from).toHaveBeenCalledWith('posts'))
   })
 
-  it('triggers delete network transactions and navigates backward safely', async () => {
+  it('post is deleted after pressing delete button', async () => {
     mockActiveChains['posts'] = {
       ...mockActiveChains['posts'],
       then: jest.fn().mockImplementation((resolve) => 
@@ -183,7 +186,7 @@ describe('Post Integration Tests', () => {
     expect(supabase.from).toHaveBeenCalledWith('posts')
   })
 
-  it('adds a new comment to the FlatList rendering tree', async () => {
+  it('new comment is added correctly', async () => {
     await act(async () => render(<Post />))
     await waitFor(() => expect(screen.getByText('First Root Comment')).toBeTruthy())
 
@@ -209,7 +212,7 @@ describe('Post Integration Tests', () => {
     await waitFor(() => expect(screen.getByText('Brand New Comment Text')).toBeTruthy())
   })
 
-  it('saves edits made to a comment row entity', async () => {
+  it('comment is updated after editing', async () => {
     await act(async () => render(<Post />))
     await waitFor(() => expect(screen.getByText('First Root Comment')).toBeTruthy())
 
@@ -233,7 +236,7 @@ describe('Post Integration Tests', () => {
     })
   })
 
-  it('removes comment row reference objects upon confirmation', async () => {
+  it('comment is deleted after pressing delete button', async () => {
     await act(async () => render(<Post />))
     await waitFor(() => expect(screen.getByText('First Root Comment')).toBeTruthy())
 
@@ -253,6 +256,115 @@ describe('Post Integration Tests', () => {
     await waitFor(() => {
       expect(supabase.from).toHaveBeenCalledWith('comments')
       expect(screen.queryByText('First Root Comment')).toBeFalsy()
+    })
+  })
+
+  it('vote is added/deleted after upvoting/retracting upvote for comment', async () => {
+    await act(async () => render(<Post />))
+    await waitFor(() => expect(screen.getByText('First Root Comment')).toBeTruthy())
+
+    const commentVotesBuilder = {
+      insert: jest.fn().mockReturnThis(),
+      delete: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      select: jest.fn().mockReturnThis(),
+      then: jest.fn().mockImplementation((resolve) => 
+        Promise.resolve(resolve({ data: [{ id: 'new-vote-id' }], error: null }))
+      )
+    }
+    mockActiveChains['comment_votes'] = commentVotesBuilder
+
+    const voteBtn = screen.getByText('Vote Comment')
+    await act(async () => fireEvent.press(voteBtn))
+    expect(supabase.from).toHaveBeenCalledWith('comment_votes')
+  })
+
+  it('empty comment triggers alert and is not added', async () => {
+    await act(async () => render(<Post />))
+    await waitFor(() => expect(screen.getByText('First Root Comment')).toBeTruthy())
+
+    jest.clearAllMocks()
+
+    const input = screen.getByPlaceholderText('Enter comment')
+    await act(async () => fireEvent.changeText(input, '    '))
+
+    const addBtn = screen.getByText('Add')
+    await act(async () => fireEvent.press(addBtn))
+
+    expect(Alert.alert).toHaveBeenCalledWith('Comment cannot be empty')
+    expect(supabase.from).not.toHaveBeenCalledWith('comments')
+  })
+
+  it('post cannot be updated to empty content', async () => {
+    await act(async () => render(<Post />))
+    await waitFor(() => expect(screen.getByText('Test Post Title')).toBeTruthy())
+
+    jest.clearAllMocks()
+
+    const editPostBtn = screen.getByText('Edit Post Button')
+    await act(async () => fireEvent.press(editPostBtn))
+
+    const input = await screen.findByDisplayValue('Original Post Body')
+    await act(async () => fireEvent.changeText(input, ''))
+
+    const submitBtn = screen.getByText(/^Edit$/)
+    await act(async () => fireEvent.press(submitBtn))
+
+    expect(Alert.alert).toHaveBeenCalledWith('Post cannot be empty')
+    expect(supabase.from).not.toHaveBeenCalledWith('posts')
+  })
+
+  it('comment cannot be updated to empty comment', async () => {
+    await act(async () => render(<Post />))
+    await waitFor(() => expect(screen.getByText('First Root Comment')).toBeTruthy())
+
+    jest.clearAllMocks()
+
+    await act(async () => fireEvent.press(screen.getByText('Edit Comment Button')))
+    await act(async () => fireEvent.press(screen.getByText('Update Comment With Empty Text')))
+
+    expect(Alert.alert).toHaveBeenCalledWith('Comment cannot be empty')
+    expect(supabase.from).not.toHaveBeenCalledWith('comments')
+  })
+
+  it('report is added after reporting post', async () => {
+    const reportPostsBuilder = {
+      insert: jest.fn().mockReturnThis(),
+      then: jest.fn().mockImplementation((resolve) => Promise.resolve(resolve({ error: null })))
+    }
+    mockActiveChains['report_posts'] = reportPostsBuilder
+
+    await act(async () => render(<Post />))
+    await waitFor(() => expect(screen.getByText('Test Post Title')).toBeTruthy())
+
+    const reportPostBtn = screen.getByText('Report Post Button')
+    await act(async () => fireEvent.press(reportPostBtn))
+
+    expect(supabase.from).toHaveBeenCalledWith('report_posts')
+    expect(mockActiveChains['report_posts'].insert).toHaveBeenCalledWith({
+      user_id: 'mock-user-456',
+      post_id: 'mock-post-123',
+      reason: 'Inappropriate'
+    })
+  })
+
+  it('report is added after reporting comment', async () => {
+    await act(async () => render(<Post />))
+    await waitFor(() => expect(screen.getByText('First Root Comment')).toBeTruthy())
+const reportPostsBuilder = {
+      insert: jest.fn().mockReturnThis(),
+      then: jest.fn().mockImplementation((resolve) => Promise.resolve(resolve({ error: null })))
+    }
+    mockActiveChains['report_posts'] = reportPostsBuilder
+
+    const reportPostBtn = screen.getByText('Report Post Button')
+    await act(async () => fireEvent.press(reportPostBtn))
+
+    expect(supabase.from).toHaveBeenCalledWith('report_posts')
+    expect(mockActiveChains['report_posts'].insert).toHaveBeenCalledWith({
+      user_id: 'mock-user-456',
+      post_id: 'mock-post-123',
+      reason: 'Inappropriate'
     })
   })
 })
