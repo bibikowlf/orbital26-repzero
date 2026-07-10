@@ -20,6 +20,33 @@ export default function ChatThread() {
       fetchMessages()
   }, [userId, recipientId])
 
+  useEffect(() => {
+    if (!userId || !recipientId)
+      return
+
+    const channel = supabase
+      .channel(`chat-${userId}-${recipientId}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'messages' },
+        (payload) => {
+          const newMsg = payload.new
+          const isRelevant =
+            (newMsg.sender_id === userId && newMsg.receiver_id === recipientId) ||
+            (newMsg.sender_id === recipientId && newMsg.receiver_id === userId)
+
+          if (isRelevant) {
+            setMessages((prev) => [...prev, newMsg])
+          }
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [userId, recipientId])
+
   async function fetchMessages() {
     try {
       setLoading(true)
@@ -56,7 +83,6 @@ export default function ChatThread() {
         throw error
 
       setText('')
-      await fetchMessages()
     } catch (error) {
       console.error('Error sending message:', error)
     } finally {
