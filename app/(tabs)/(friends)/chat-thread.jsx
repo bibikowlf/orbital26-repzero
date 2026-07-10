@@ -79,17 +79,22 @@ export default function ChatThread() {
     if (!text.trim())
       return
 
+    const messageText = text.trim()
+    setText('')
+
     try {
       setSending(true)
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('messages')
-        .insert({ sender_id: userId, receiver_id: recipientId, content: text.trim() })
+        .insert({ sender_id: userId, receiver_id: recipientId, content: messageText })
+        .select()
+        .single()
 
       if (error)
         throw error
 
-      setText('')
+      setMessages((prev) => prev.some((m) => m.id === data.id) ? prev : [...prev, data])
     } catch (error) {
       console.error('Error sending message:', error)
     } finally {
@@ -180,11 +185,7 @@ export default function ChatThread() {
       </View>
     </KeyboardAvoidingView>
 
-    <Modal
-      visible={showInviteModal}
-      transparent
-      animationType="fade"
-    >
+    <Modal visible={showInviteModal} transparent animationType="fade">
       <View style={appStyles.modalOverlay}>
         <View style={appStyles.modalContent}>
           <Text style={appStyles.modalTitle}>Invite to Workout</Text>
