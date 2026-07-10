@@ -156,6 +156,39 @@ describe('Tutorial Test', () => {
     await waitFor(() => expect(screen.getByText('Score Counter: 11')).toBeTruthy())
   })
 
+  it('vote is deleted after retracting upvote', async () => {
+    supabase.from.mockImplementation((table) => {
+      const builder = {
+        select: jest.fn().mockReturnThis(),
+        insert: jest.fn().mockReturnThis(),
+        delete: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        then: jest.fn().mockImplementation((resolve) => {
+          if (table === 'workout_tutorials_with_votes') {
+            return Promise.resolve(resolve({ data: [mockTutorial], error: null }))
+          }
+          if (table === 'workout_tutorial_votes') {
+            return Promise.resolve(resolve({ data: [{ id: 'existing-vote-111', user_id: mockUserSubId, comment_id: 'tutorial-999' }], error: null }))
+          }
+          return Promise.resolve(resolve({ data: [], error: null }))
+        })
+      }
+      mockActiveChains[table] = builder
+      return builder
+    })
+
+    await act(async () => render(<WorkoutTutorials />))
+    await waitFor(() => expect(screen.getByText('Score Counter: 10')).toBeTruthy())
+
+    await act(async () => fireEvent.press(screen.getByText('Vote Mock Button')))
+
+    await waitFor(() => {
+      expect(supabase.from).toHaveBeenCalledWith('workout_tutorial_votes')
+      expect(mockActiveChains['workout_tutorial_votes'].delete).toHaveBeenCalled()
+      expect(screen.getByText('Score Counter: 9')).toBeTruthy()
+    })
+  })
+
   it('tutorial is deleted after pressing delete button', async () => {
     const tableBuilder = {
       delete: jest.fn().mockReturnThis(),
