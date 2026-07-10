@@ -1,14 +1,14 @@
-import { getCurrentWeekDays, getWeekRangeLabel } from '../app/(tabs)/(log)/exercise-log'
+import { getCurrentWeekDays, getWeekRangeLabel } from '../../app/(tabs)/(log)/exercise-log'
 
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock')
 )
 
-jest.mock('../lib/supabase', () => ({
+jest.mock('../../lib/supabase', () => ({
   supabase: { from: jest.fn() }
 }))
 
-jest.mock('../hooks/auth-context', () => ({
+jest.mock('../../hooks/auth-context', () => ({
   useAuthContext: () => ({ claims: { sub: 'test-user-id' } }),
 }))
 

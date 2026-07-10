@@ -1,14 +1,14 @@
-import { addExerciseToDay, deleteExerciseFromDay, updateExerciseField } from '../app/(tabs)/(plan)/generate-plan'
+import { addExerciseToDay, deleteExerciseFromDay, updateExerciseField } from '../../app/(tabs)/(plan)/generate-plan'
 
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock')
 )
 
-jest.mock('../lib/supabase', () => ({
+jest.mock('../../lib/supabase', () => ({
   supabase: { from: jest.fn() }
 }))
 
-jest.mock('../hooks/auth-context', () => ({
+jest.mock('../../hooks/auth-context', () => ({
   useAuthContext: () => ({ claims: { sub: 'test-user-id' } }),
 }))
 
@@ -17,7 +17,7 @@ jest.mock('expo-router', () => ({
   useFocusEffect: jest.fn(),
 }))
 
-jest.mock('../components/spacer.jsx', () => 'Spacer')
+jest.mock('../../components/spacer.jsx', () => 'Spacer')
 
 const MOCK_PLAN = [
   {
