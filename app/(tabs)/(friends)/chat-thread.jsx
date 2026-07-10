@@ -20,6 +20,7 @@ export default function ChatThread() {
   const [showInviteModal, setShowInviteModal] = useState(false)
   const [inviteDate, setInviteDate] = useState(new Date())
   const [inviteNote, setInviteNote] = useState('')
+  const [sendingInvite, setSendingInvite] = useState(false)
 
   useEffect(() => {
     if (userId && recipientId)
@@ -93,6 +94,32 @@ export default function ChatThread() {
       console.error('Error sending message:', error)
     } finally {
       setSending(false)
+    }
+  }
+
+  async function handleSendInvite() {
+    try {
+      setSendingInvite(true)
+
+      const { error } = await supabase
+        .from('workout_invites')
+        .insert({
+          sender_id: userId,
+          receiver_id: recipientId,
+          proposed_date: inviteDate.toISOString(),
+          message: inviteNote.trim() || null
+        })
+
+      if (error)
+        throw error
+
+      setShowInviteModal(false)
+      setInviteNote('')
+      Alert.alert('Invite Sent', 'Your workout invite has been sent!')
+    } catch (error) {
+      Alert.alert('Error', error.message)
+    } finally {
+      setSendingInvite(false)
     }
   }
 
