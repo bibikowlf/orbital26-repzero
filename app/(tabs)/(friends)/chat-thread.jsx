@@ -208,11 +208,14 @@ export default function ChatThread() {
             multiline
           />
 
-          <TouchableOpacity
-            onPress={() => setShowInviteModal(false)}
-          >
-            <Text style={appStyles.modalCancelText}>Cancel</Text>
-          </TouchableOpacity>
+          <View style={appStyles.modalButtonRow}>
+            <TouchableOpacity onPress={() => setShowInviteModal(false)}>
+              <Text style={appStyles.modalCancelText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleSendInvite} disabled={sendingInvite}>
+              <Text style={appStyles.modalSendText}>{sendingInvite ? 'Sending...' : 'Send Invite'}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </Modal>
