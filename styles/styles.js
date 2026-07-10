@@ -880,5 +880,57 @@ flexOne: {
   sendButton: {
     paddingHorizontal: 16,
     backgroundColor: '#007AFF'
+  },
+  //sending invites
+
+  inviteButton: {
+    marginHorizontal: 15,
+    marginBottom: 8,
+    paddingVertical: 8,
+    alignItems: 'center',
+    backgroundColor: '#5856D6',
+    borderRadius: 8
+  },
+  inviteButtonText: {
+    color: '#fff',
+    fontWeight: '600'
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  modalContent: {
+    width: '85%',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 20
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10
+  },
+  modalNoteInput: {
+    backgroundColor: '#F0F0F0',
+    borderRadius: 8,
+    padding: 10,
+    marginTop: 10,
+    minHeight: 60,
+    textAlignVertical: 'top'
+  },
+  modalButtonRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 15
+  },
+  modalCancelText: {
+    color: '#666',
+    marginRight: 20
+  },
+  modalSendText: {
+    color: '#007AFF',
+    fontWeight: 'bold'
   }
 })

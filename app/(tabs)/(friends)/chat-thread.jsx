@@ -17,6 +17,8 @@ export default function ChatThread() {
   const [loading, setLoading] = useState(false)
   const [sending, setSending] = useState(false)
 
+  const [showInviteModal, setShowInviteModal] = useState(false)
+
   useEffect(() => {
     if (userId && recipientId)
       fetchMessages()
@@ -122,6 +124,13 @@ export default function ChatThread() {
           <Text style={appStyles.fallbackText}>No messages yet. Say hi!</Text>
         }
       />
+
+      <TouchableOpacity
+        style={appStyles.inviteButton}
+        onPress={() => setShowInviteModal(true)}
+      >
+        <Text style={appStyles.inviteButtonText}>+ Invite to Workout</Text>
+      </TouchableOpacity>
 
       <View style={appStyles.inputRow}>
         <TextInput
