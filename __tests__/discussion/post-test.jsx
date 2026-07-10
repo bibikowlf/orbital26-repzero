@@ -142,6 +142,30 @@ describe('Post Test', () => {
     })
   })
 
+  it('vote is deleted after retracting upvote for post', async () => {
+    const postVotesBuilder = {
+      insert: jest.fn().mockReturnThis(),
+      delete: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      select: jest.fn().mockReturnThis(),
+      then: jest.fn().mockImplementation((resolve) => 
+        Promise.resolve(resolve({ data: [{ id: 'existing-post-vote-999', user_id: 'mock-user-456' }], error: null }))
+      )
+    }
+    mockActiveChains['post_votes'] = postVotesBuilder
+
+    await act(async () => render(<Post />))
+    await waitFor(() => expect(screen.getByText('Post Score: 10')).toBeTruthy())
+
+    const voteBtn = screen.getByText('Vote Post Button')
+    await act(async () => fireEvent.press(voteBtn))
+
+    await waitFor(() => {
+      expect(supabase.from).toHaveBeenCalledWith('post_votes')
+      expect(mockActiveChains['post_votes'].delete).toHaveBeenCalled()
+      expect(screen.getByText('Post Score: 9')).toBeTruthy()
+    })
+  })
 
   it('post is updated after editing', async () => {
     const postsBuilder = {
@@ -279,6 +303,30 @@ describe('Post Test', () => {
     expect(supabase.from).toHaveBeenCalledWith('comment_votes')
   })
 
+  it('vote is deleted after retracting upvote for comment', async () => {
+    const commentVotesBuilder = {
+      insert: jest.fn().mockReturnThis(),
+      delete: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      select: jest.fn().mockReturnThis(),
+      then: jest.fn().mockImplementation((resolve) => 
+        Promise.resolve(resolve({ data: [{ id: 'existing-comment-vote-888', user_id: 'mock-user-456', comment_id: 1 }], error: null }))
+      )
+    }
+    mockActiveChains['comment_votes'] = commentVotesBuilder
+
+    await act(async () => render(<Post />))
+    await waitFor(() => expect(screen.getByText('First Root Comment')).toBeTruthy())
+
+    const voteBtn = screen.getByText('Vote Comment')
+    await act(async () => fireEvent.press(voteBtn))
+
+    await waitFor(() => {
+      expect(supabase.from).toHaveBeenCalledWith('comment_votes')
+      expect(mockActiveChains['comment_votes'].delete).toHaveBeenCalled()
+    })
+  })
+
   it('empty comment triggers alert and is not added', async () => {
     await act(async () => render(<Post />))
     await waitFor(() => expect(screen.getByText('First Root Comment')).toBeTruthy())
@@ -352,20 +400,20 @@ describe('Post Test', () => {
     await act(async () => render(<Post />))
     await waitFor(() => expect(screen.getByText('First Root Comment')).toBeTruthy())
 
-    const reportPostsBuilder = {
+    const reportCommentsBuilder = {
       insert: jest.fn().mockReturnThis(),
       then: jest.fn().mockImplementation((resolve) => Promise.resolve(resolve({ error: null })))
     }
-    mockActiveChains['report_posts'] = reportPostsBuilder
+    mockActiveChains['report_comments'] = reportCommentsBuilder
 
-    const reportPostBtn = screen.getByText('Report Post Button')
-    await act(async () => fireEvent.press(reportPostBtn))
+    const reportCommentBtn = screen.getByText('Report Comment Button')
+    await act(async () => fireEvent.press(reportCommentBtn))
 
-    expect(supabase.from).toHaveBeenCalledWith('report_posts')
-    expect(mockActiveChains['report_posts'].insert).toHaveBeenCalledWith({
+    expect(supabase.from).toHaveBeenCalledWith('report_comments')
+    expect(mockActiveChains['report_comments'].insert).toHaveBeenCalledWith({
       user_id: 'mock-user-456',
-      post_id: 'mock-post-123',
-      reason: 'Inappropriate'
+      comment_id: 1,
+      reason: 'Spam'
     })
   })
 
@@ -393,6 +441,35 @@ describe('Post Test', () => {
     expect(mockActiveChains['bookmarks'].insert).toHaveBeenCalledWith({
       user_id: 'mock-user-456',
       post_id: 'mock-post-123'
+    })
+
+    mockPost.user_id = 'mock-user-456'
+  })
+
+  it('Post is unsaved after retracting bookmark', async () => {
+    mockPost.user_id = 'some-other-user-789'
+
+    const bookmarksBuilder = {
+      insert: jest.fn().mockReturnThis(),
+      delete: jest.fn().mockReturnThis(),
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      then: jest.fn().mockImplementation((resolve) => 
+        Promise.resolve(resolve({ data: [{ id: 'active-bookmark-777' }], error: null }))
+      )
+    }
+    mockActiveChains['bookmarks'] = bookmarksBuilder
+
+    await act(async () => render(<Post />))
+    await waitFor(() => expect(screen.getByText('Test Post Title')).toBeTruthy())
+
+    const bookmarkIconText = screen.getByRole('button')
+    await act(async () => fireEvent.press(bookmarkIconText))
+
+    await waitFor(() => {
+      expect(supabase.from).toHaveBeenCalledWith('bookmarks')
+      expect(mockActiveChains['bookmarks'].delete).toHaveBeenCalled()
+      expect(mockActiveChains['bookmarks'].eq).toHaveBeenCalledWith('id', 'active-bookmark-777')
     })
 
     mockPost.user_id = 'mock-user-456'
