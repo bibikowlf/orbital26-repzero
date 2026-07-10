@@ -415,6 +415,7 @@ export default function Post() {
                   onPress={handleBookmark}
                   disabled={loading || userId === post.user_id}
                   style={{ paddingRight: 12 }}
+                  accessibilityRole="button"
                 >
                   <Ionicons 
                     name={bookmark === null ? 'bookmark-outline' : 'bookmark'} 

@@ -120,7 +120,7 @@ describe('Tutorial Test', () => {
     })
   })
 
-  it('vote is added/deleted after upvoting/retracting upvote', async () => {
+  it('vote is added after upvoting/retracting upvote', async () => {
     supabase.from.mockImplementation((table) => {
       const builder = {
         select: jest.fn().mockReturnThis(),

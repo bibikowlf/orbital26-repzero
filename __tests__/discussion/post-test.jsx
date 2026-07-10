@@ -129,7 +129,7 @@ describe('Post Test', () => {
     }
   })
 
-  it('vote is added/deleted after upvoting/retracting upvote for post', async () => {
+  it('vote is added after upvoting post', async () => {
     await act(async () => render(<Post />))
     await waitFor(() => expect(screen.getByText('Post Score: 10')).toBeTruthy())
 
@@ -148,7 +148,7 @@ describe('Post Test', () => {
       select: jest.fn().mockImplementation(() => postsBuilder),
       update: jest.fn().mockImplementation(() => postsBuilder),
       delete: jest.fn().mockImplementation(() => postsBuilder),
-      upsert: jest.fn().mockImplementation(() => postsBuilder), // handles handleEditPost execution safely
+      upsert: jest.fn().mockImplementation(() => postsBuilder),
       eq: jest.fn().mockImplementation(() => postsBuilder),
       then: jest.fn().mockImplementation((resolve) => 
         Promise.resolve(resolve({ data: [{ ...mockPost, content: 'Revised Body Payload' }], error: null }))
@@ -259,7 +259,7 @@ describe('Post Test', () => {
     })
   })
 
-  it('vote is added/deleted after upvoting/retracting upvote for comment', async () => {
+  it('vote is added after upvoting comment', async () => {
     await act(async () => render(<Post />))
     await waitFor(() => expect(screen.getByText('First Root Comment')).toBeTruthy())
 
@@ -351,7 +351,8 @@ describe('Post Test', () => {
   it('report is added after reporting comment', async () => {
     await act(async () => render(<Post />))
     await waitFor(() => expect(screen.getByText('First Root Comment')).toBeTruthy())
-const reportPostsBuilder = {
+
+    const reportPostsBuilder = {
       insert: jest.fn().mockReturnThis(),
       then: jest.fn().mockImplementation((resolve) => Promise.resolve(resolve({ error: null })))
     }
@@ -366,5 +367,34 @@ const reportPostsBuilder = {
       post_id: 'mock-post-123',
       reason: 'Inappropriate'
     })
+  })
+
+  it('post is saved after pressing bookmark', async () => {
+    mockPost.user_id = 'some-other-user-789'
+
+    await act(async () => render(<Post />))
+    await waitFor(() => expect(screen.getByText('Test Post Title')).toBeTruthy())
+
+    const bookmarksBuilder = {
+      insert: jest.fn().mockReturnThis(),
+      delete: jest.fn().mockReturnThis(),
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      then: jest.fn().mockImplementation((resolve) => 
+        Promise.resolve(resolve({ data: [{ id: 'new-bookmark-123' }], error: null }))
+      )
+    }
+    mockActiveChains['bookmarks'] = bookmarksBuilder
+
+    const bookmarkBtn = screen.getByRole('button')
+    await act(async () => fireEvent.press(bookmarkBtn))
+
+    expect(supabase.from).toHaveBeenCalledWith('bookmarks')
+    expect(mockActiveChains['bookmarks'].insert).toHaveBeenCalledWith({
+      user_id: 'mock-user-456',
+      post_id: 'mock-post-123'
+    })
+
+    mockPost.user_id = 'mock-user-456'
   })
 })
