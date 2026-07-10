@@ -172,6 +172,7 @@ export default function AddPost() {
           textAlignVertical='top'
           numberOfLines={1}
           style={styles.input}
+          testID='title-input'
         />
         <Text style={styles.label}>Category</Text>
         <ScrollView
@@ -209,6 +210,7 @@ export default function AddPost() {
           textAlignVertical='top'
           numberOfLines={10}
           style={styles.input}
+          testID='content-input'
         />
         <View style={[styles.row, { marginVertical: 6, justifyContent: 'space-between' }]}>
           <Text style={styles.label}>Images ({images.length}/10)</Text>
