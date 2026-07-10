@@ -160,16 +160,31 @@ export default function ChatThread() {
     >
       <View style={appStyles.modalOverlay}>
         <View style={appStyles.modalContent}>
-          <Text style={appStyles.modalTitle}>
-            Invite to Workout
-          </Text>
+          <Text style={appStyles.modalTitle}>Invite to Workout</Text>
+
+          <DateTimePicker
+            value={inviteDate}
+            mode="datetime"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={(event, selectedDate) => {
+              if (selectedDate) {
+                setInviteDate(selectedDate)
+              }
+            }}
+          />
+
+          <TextInput
+            style={appStyles.modalNoteInput}
+            placeholder="Add a note (optional)"
+            value={inviteNote}
+            onChangeText={setInviteNote}
+            multiline
+          />
 
           <TouchableOpacity
             onPress={() => setShowInviteModal(false)}
           >
-            <Text style={appStyles.modalCancelText}>
-              Cancel
-            </Text>
+            <Text style={appStyles.modalCancelText}>Cancel</Text>
           </TouchableOpacity>
         </View>
       </View>
