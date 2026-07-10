@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
-import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native'
+import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator, 
+  KeyboardAvoidingView, Platform, StyleSheet, Modal, Alert } from 'react-native'
 import { useLocalSearchParams } from 'expo-router'
 import { supabase } from '../../../lib/supabase'
 import { useAuthContext } from '../../../hooks/auth-context'
 import { appStyles } from '../../../styles/styles'
+import DateTimePicker from '@react-native-community/datetimepicker'
 
 export default function ChatThread() {
   const { recipientId } = useLocalSearchParams()
