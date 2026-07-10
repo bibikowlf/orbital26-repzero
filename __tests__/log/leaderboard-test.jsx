@@ -62,13 +62,13 @@ jest.mock('expo-router', () => {
   }
 })
 
-describe('Leaderboard Integration Tests', () => {
+describe('Leaderboard Test', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockActiveChains = {}
   })
 
-  it('correctly filters, renders ranks 1 through 10, and omits rank 11', async () => {
+  it('leaderboard renders ranks 1 through 10 and omits rank 11', async () => {
     await act(async () => render(<ExerciseLog />))
     await waitFor(() => expect(screen.getByText('Leaderboard')).toBeTruthy())
 
