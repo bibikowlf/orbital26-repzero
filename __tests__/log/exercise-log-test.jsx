@@ -1,24 +1,66 @@
-import { getCurrentWeekDays, getWeekRangeLabel } from '../../app/(tabs)/(log)/exercise-log'
+import React from 'react'
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react-native'
+import ExerciseLog, { getWeekRangeLabel, getCurrentWeekDays } from '../../app/(tabs)/(log)/exercise-log'
+import { supabase } from '../../lib/supabase'
+import { Alert } from 'react-native'
 
-jest.mock('@react-native-async-storage/async-storage', () =>
-  require('@react-native-async-storage/async-storage/jest/async-storage-mock')
-)
+let mockActiveChains = {}
+const mockUserSubId = 'user-abc-123'
+const mockDateToday = new Date().toISOString().split('T')[0]
+
+const mockLogData = {
+  id: 'log-999',
+  user_id: mockUserSubId,
+  log_date: mockDateToday,
+  exercises: [{ name: 'Squats', sets: '4', reps: '8', weight_kg: '100' }],
+  notes: 'Felt heavy',
+  duration_minutes: 45
+}
+
+const mockProfilePlan = {
+  workout_plan: [
+    {
+      day: new Date().toLocaleDateString('en-US', { weekday: 'long' }),
+      exercises: [{ name: 'Deadlift', sets: 3, reps: '5' }]
+    }
+  ]
+}
 
 jest.mock('../../lib/supabase', () => ({
-  supabase: { from: jest.fn() }
+  supabase: {
+    from: jest.fn((table) => {
+      if (!mockActiveChains[table]) {
+        const builder = {
+          select: jest.fn().mockImplementation(() => builder),
+          eq: jest.fn().mockImplementation(() => builder),
+          single: jest.fn().mockImplementation(() => builder),
+          delete: jest.fn().mockImplementation(() => builder),
+          upsert: jest.fn().mockImplementation(() => builder),
+          then: jest.fn().mockImplementation((resolve) => {
+            return Promise.resolve(resolve({ data: null, error: null }))
+          })
+        }
+        mockActiveChains[table] = builder
+      }
+      return mockActiveChains[table]
+    })
+  }
 }))
 
 jest.mock('../../hooks/auth-context', () => ({
-  useAuthContext: () => ({ claims: { sub: 'test-user-id' } }),
+  useAuthContext: () => ({ claims: { sub: mockUserSubId } }),
+}))
+
+jest.mock('../../functions/numeric-input', () => ({
+  handleNumericInput: (val) => val
 }))
 
 jest.mock('expo-router', () => ({
-  useRouter: () => ({ push: jest.fn() }),
-  useFocusEffect: jest.fn(),
+  useFocusEffect: (cb) => cb()
 }))
 
-describe('getCurrentWeekDays', () => {
-  test('returns exactly 7 days', () => {
+describe('GetCurrentWeekDays Test', () => {
+test('returns exactly 7 days', () => {
     const days = getCurrentWeekDays(0)
     expect(days.length).toBe(7)
   })
@@ -69,7 +111,7 @@ describe('getCurrentWeekDays', () => {
   })
 })
 
-describe('getWeekRangeLabel', () => {
+describe('GetWeekRangeLabel Test', () => {
   test('returns empty string for empty array', () => {
     const result = getWeekRangeLabel([])
     expect(result).toBe('')
@@ -123,5 +165,180 @@ describe('getWeekRangeLabel', () => {
     const result = getWeekRangeLabel(days)
     expect(result).toContain('June')
     expect(result.indexOf('June')).toBe(result.lastIndexOf('June'))
+  })
+})
+
+describe('ExerciseLog Test', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockActiveChains = {}
+    jest.spyOn(Alert, 'alert').mockImplementation(() => {})
+
+    mockActiveChains['workout_logs'] = {
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      single: jest.fn().mockImplementation(() => Promise.resolve({ data: null, error: null })),
+      delete: jest.fn().mockReturnThis(),
+      upsert: jest.fn().mockReturnThis(),
+      then: jest.fn().mockImplementation((res) => res({ data: null, error: null }))
+    }
+
+    mockActiveChains['profiles'] = {
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      single: jest.fn().mockImplementation(() => Promise.resolve({ data: null, error: null })),
+      then: jest.fn().mockImplementation((res) => res({ data: null, error: null }))
+    }
+  })
+
+  it('displays correct log for one date', async () => {
+    mockActiveChains['workout_logs'].single = jest.fn().mockResolvedValue({ data: mockLogData, error: null })
+
+    await act(async () => render(<ExerciseLog />))
+
+    await waitFor(() => {
+      expect(screen.getByText('Squats')).toBeTruthy()
+      expect(screen.getByText(/4 sets × 8 reps/i)).toBeTruthy()
+      expect(screen.getByText('45 minutes')).toBeTruthy()
+    })
+  })
+
+  it('exercise is added after adding it', async () => {
+    await act(async () => render(<ExerciseLog />))
+
+    const addExerciseBtn = screen.getByText('+ Add Exercise')
+    await act(async () => fireEvent.press(addExerciseBtn))
+
+    const inputs = screen.getAllByPlaceholderText('Exercise name')
+    expect(inputs).toHaveLength(1)
+  })
+
+  it('exercise is deleted after deleting it', async () => {
+    mockActiveChains['workout_logs'].single = jest.fn().mockResolvedValue({ data: mockLogData, error: null })
+
+    await act(async () => render(<ExerciseLog />))
+
+    const editLogBtn = screen.getByText(/Edit Log/i)
+    await act(async () => fireEvent.press(editLogBtn))
+
+    const removeBtn = screen.getByText('Remove')
+    await act(async () => fireEvent.press(removeBtn))
+
+    expect(screen.queryByPlaceholderText('Exercise name')).toBeNull()
+  })
+
+  it('log is deleted after deleting it', async () => {
+    mockActiveChains['workout_logs'].single = jest.fn().mockResolvedValue({ data: mockLogData, error: null })
+    mockActiveChains['workout_logs'].delete = jest.fn().mockReturnThis()
+
+    await act(async () => render(<ExerciseLog />))
+    
+    await act(async () => fireEvent.press(screen.getByText(/Edit Log/i)))
+    await act(async () => fireEvent.press(screen.getByText('Delete Log')))
+
+    const deleteAction = Alert.alert.mock.calls[0][2].find(btn => btn.text === 'Delete')
+    await act(async () => deleteAction.onPress())
+
+    expect(supabase.from).toHaveBeenCalledWith('workout_logs')
+    expect(Alert.alert).toHaveBeenCalledWith('Deleted', 'Workout log deleted.')
+  })
+
+  it('log is imported after pressing import from exercise plan', async () => {
+    mockActiveChains['profiles'].single = jest.fn().mockResolvedValue({ data: mockProfilePlan, error: null })
+
+    await act(async () => render(<ExerciseLog />))
+
+    const importBtn = screen.getByText(/Import from Workout Plan/i)
+    await act(async () => fireEvent.press(importBtn))
+
+    await waitFor(() => expect(screen.getByText('Import These Exercises')).toBeTruthy())
+    await act(async () => fireEvent.press(screen.getByText('Import These Exercises')))
+
+    const confirmAction = Alert.alert.mock.calls[0][2].find(btn => btn.text === 'Import')
+    await act(async () => confirmAction.onPress())
+
+    expect(screen.getByDisplayValue('Deadlift')).toBeTruthy()
+  })
+
+  it('log is saved after pressing on save log', async () => {
+    mockActiveChains['workout_logs'].single = jest.fn().mockResolvedValue({ data: null, error: null })
+    mockActiveChains['profiles'].single = jest.fn().mockResolvedValue({ data: { workout_plan: [] }, error: null })
+
+    await act(async () => render(<ExerciseLog />))
+
+    const addExerciseBtn = screen.getByText('+ Add Exercise')
+    await act(async () => fireEvent.press(addExerciseBtn))
+
+    await act(async () => fireEvent.changeText(screen.getByPlaceholderText('Exercise name'), 'Bench Press'))
+    await act(async () => fireEvent.changeText(screen.getByPlaceholderText('Sets'), '4'))
+    await act(async () => fireEvent.changeText(screen.getByPlaceholderText('Reps'), '12'))
+
+    const saveBtn = screen.getByText('Save Log')
+    await act(async () => fireEvent.press(saveBtn))
+
+    await waitFor(() => {
+      expect(supabase.from).toHaveBeenCalledWith('workout_logs')
+      expect(Alert.alert).toHaveBeenCalledWith('Saved', 'Workout log saved!')
+    })
+  })
+
+  it('empty log with no exercise triggers alert and is not saved', async () => {
+    mockActiveChains['workout_logs'].single = jest.fn().mockResolvedValue({ data: null, error: null })
+    mockActiveChains['profiles'].single = jest.fn().mockResolvedValue({ data: { workout_plan: [] }, error: null })
+
+    await act(async () => render(<ExerciseLog />))
+
+    const saveBtn = screen.getByText('Save Log')
+    await act(async () => fireEvent.press(saveBtn))
+
+    await waitFor(() => expect(Alert.alert).toHaveBeenCalledWith('No Exercises', expect.any(String)))
+  })
+
+  it('empty exercise with no name triggers alert and is not saved', async () => {
+    mockActiveChains['workout_logs'].single = jest.fn().mockResolvedValue({ data: null, error: null })
+    mockActiveChains['profiles'].single = jest.fn().mockResolvedValue({ data: { workout_plan: [] }, error: null })
+
+    await act(async () => render(<ExerciseLog />))
+
+    const addExerciseBtn = screen.getByText('+ Add Exercise')
+    await act(async () => fireEvent.press(addExerciseBtn))
+
+    const saveBtn = screen.getByText('Save Log')
+    await act(async () => fireEvent.press(saveBtn))
+
+    await waitFor(() => expect(Alert.alert).toHaveBeenCalledWith('No Exercises', expect.any(String)))
+  })
+
+  it('empty exercise with no sets triggers alert and is not saved', async () => {
+    mockActiveChains['workout_logs'].single = jest.fn().mockResolvedValue({ data: null, error: null })
+    mockActiveChains['profiles'].single = jest.fn().mockResolvedValue({ data: { workout_plan: [] }, error: null })
+
+    await act(async () => render(<ExerciseLog />))
+
+    const addExerciseBtn = screen.getByText('+ Add Exercise')
+    await act(async () => fireEvent.press(addExerciseBtn))
+    await act(async () => fireEvent.changeText(screen.getByPlaceholderText('Exercise name'), 'Bench Press'))
+    
+    const saveBtn = screen.getByText('Save Log')
+    await act(async () => fireEvent.press(saveBtn))
+
+    await waitFor(() => expect(Alert.alert).toHaveBeenCalledWith('No Exercises', expect.any(String)))
+  })
+
+  it('empty exercise with no reps triggers alert and is not saved', async () => {
+    mockActiveChains['workout_logs'].single = jest.fn().mockResolvedValue({ data: null, error: null })
+    mockActiveChains['profiles'].single = jest.fn().mockResolvedValue({ data: { workout_plan: [] }, error: null })
+
+    await act(async () => render(<ExerciseLog />))
+
+    const addExerciseBtn = screen.getByText('+ Add Exercise')
+    await act(async () => fireEvent.press(addExerciseBtn))
+    await act(async () => fireEvent.changeText(screen.getByPlaceholderText('Exercise name'), 'Bench Press'))
+    await act(async () => fireEvent.changeText(screen.getByPlaceholderText('Sets'), '4'))
+    
+    const saveBtn = screen.getByText('Save Log')
+    await act(async () => fireEvent.press(saveBtn))
+
+    await waitFor(() => expect(Alert.alert).toHaveBeenCalledWith('No Exercises', expect.any(String)))
   })
 })
