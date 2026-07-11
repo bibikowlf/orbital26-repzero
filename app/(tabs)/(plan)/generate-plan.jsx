@@ -118,33 +118,31 @@ export default function GeneratePlan() {
 
       const { data: edgeData, error: edgeError } = await supabase.functions.invoke('generate-workout', {
         body: { profile: profile, notes: notes || null },
-      });
+      })
 
     if (edgeError) 
       throw edgeError
 
-      console.log("EDGE DATA RECEIVED:", JSON.stringify(edgeData, null, 2))
+      // console.log("EDGE DATA RECEIVED:", JSON.stringify(edgeData, null, 2))
 
-      // Bulletproof Defensive Parsing Strategy
-      let parsedPlan = null;
+      let parsedPlan = null
 
       if (Array.isArray(edgeData)) {
-        parsedPlan = edgeData;
+        parsedPlan = edgeData
       } else if (typeof edgeData === 'string') {
-        let cleanText = edgeData.trim();
+        let cleanText = edgeData.trim()
         if (cleanText.startsWith('```')) {
-          cleanText = cleanText.replace(/^```json\s*/i, '').replace(/```$/, '').trim();
+          cleanText = cleanText.replace(/^```json\s*/i, '').replace(/```$/, '').trim()
         }
-        parsedPlan = JSON.parse(cleanText);
+        parsedPlan = JSON.parse(cleanText)
       } else if (edgeData && typeof edgeData === 'object') {
-        // Fallback check if it ever returns wrapped in raw Gemini object structure
-        const rawText = edgeData?.candidates?.[0]?.content?.parts?.[0]?.text;
+        const rawText = edgeData?.candidates?.[0]?.content?.parts?.[0]?.text
         if (rawText) {
-          let cleanText = rawText.trim();
+          let cleanText = rawText.trim()
           if (cleanText.startsWith('```')) {
-            cleanText = cleanText.replace(/^```json\s*/i, '').replace(/```$/, '').trim();
+            cleanText = cleanText.replace(/^```json\s*/i, '').replace(/```$/, '').trim()
           }
-          parsedPlan = JSON.parse(cleanText);
+          parsedPlan = JSON.parse(cleanText)
         }
       }
 
@@ -309,6 +307,7 @@ export default function GeneratePlan() {
               onChangeText={setRegenNotes}
               multiline
               numberOfLines={4}
+              testID='regen-notes-input'
             />
             <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 15 }}>
               <TouchableOpacity onPress={handleCancelRegenModal} style={{ marginRight: 20 }}>

@@ -1,106 +1,218 @@
-import { addExerciseToDay, deleteExerciseFromDay, updateExerciseField } from '../../app/(tabs)/(plan)/generate-plan'
+import React from 'react'
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react-native'
+import GeneratePlan, { addExerciseToDay, deleteExerciseFromDay, updateExerciseField } from '../../app/(tabs)/(plan)/generate-plan'
+import { supabase } from '../../lib/supabase'
+import { Alert } from 'react-native'
 
-jest.mock('@react-native-async-storage/async-storage', () =>
-  require('@react-native-async-storage/async-storage/jest/async-storage-mock')
-)
+let mockActiveChains = {}
+const mockUserSubId = 'mock-user-555'
+
+const mockInitialPlan = [
+  {
+    day: 'Monday',
+    exercises: [{ name: 'Bench Press', sets: 3, reps: '10', notes: 'Chest focus' }]
+  }
+]
 
 jest.mock('../../lib/supabase', () => ({
-  supabase: { from: jest.fn() }
+  supabase: {
+    from: jest.fn((table) => {
+      if (!mockActiveChains[table]) {
+        const builder = {
+          select: jest.fn().mockImplementation(() => builder),
+          eq: jest.fn().mockImplementation(() => builder),
+          single: jest.fn().mockImplementation(() => builder),
+          update: jest.fn().mockImplementation(() => builder),
+          then: jest.fn().mockImplementation((resolve) => {
+            return Promise.resolve(resolve({ data: null, error: null }))
+          })
+        }
+        mockActiveChains[table] = builder
+      }
+      return mockActiveChains[table]
+    }),
+    functions: {
+      invoke: jest.fn()
+    }
+  }
 }))
 
 jest.mock('../../hooks/auth-context', () => ({
-  useAuthContext: () => ({ claims: { sub: 'test-user-id' } }),
+  useAuthContext: () => ({ claims: { sub: mockUserSubId } }),
 }))
 
-jest.mock('expo-router', () => ({
-  useRouter: () => ({ push: jest.fn() }),
-  useFocusEffect: jest.fn(),
-}))
+describe('GeneratePlan Function Test', () => {
+  const MOCK_PLAN = [
+    {
+        day: 'Monday: Push Day',
+        exercises: [
+        { name: 'Bench Press', sets: 4, reps: '8-10', notes: '' },
+        { name: 'Shoulder Press', sets: 3, reps: '10-12', notes: '' },
+        ],
+    },
+    {
+        day: 'Tuesday: Pull Day',
+        exercises: [
+        { name: 'Deadlift', sets: 4, reps: '6-8', notes: '' },
+        ],
+    },
+  ]
 
-jest.mock('../../components/spacer.jsx', () => 'Spacer')
+  it('exercise is added after adding it when customizing', () => {
+    const result1 = addExerciseToDay(MOCK_PLAN, 0)
+    expect(result1[0].exercises.length).toBe(3)
+    expect(result1[1].exercises.length).toBe(1)
 
-const MOCK_PLAN = [
-  {
-    day: 'Monday: Push Day',
-    exercises: [
-      { name: 'Bench Press', sets: 4, reps: '8-10', notes: '' },
-      { name: 'Shoulder Press', sets: 3, reps: '10-12', notes: '' },
-    ],
-  },
-  {
-    day: 'Tuesday: Pull Day',
-    exercises: [
-      { name: 'Deadlift', sets: 4, reps: '6-8', notes: '' },
-    ],
-  },
-]
-
-describe('addExerciseToDay', () => {
-  test('adds a blank exercise to the correct day', () => {
-    const result = addExerciseToDay(MOCK_PLAN, 0)
-    expect(result[0].exercises.length).toBe(3)
-    expect(result[1].exercises.length).toBe(1) // other day unchanged
-  })
-
-  test('new exercise has empty fields', () => {
-    const result = addExerciseToDay(MOCK_PLAN, 0)
-    const newEx = result[0].exercises[2]
+    const result2 = addExerciseToDay(MOCK_PLAN, 0)
+    const newEx = result2[0].exercises[2]
     expect(newEx.name).toBe('')
     expect(newEx.sets).toBe('')
     expect(newEx.reps).toBe('')
     expect(newEx.notes).toBe('')
-  })
 
-  test('does not mutate original plan', () => {
     const original = JSON.parse(JSON.stringify(MOCK_PLAN))
     addExerciseToDay(MOCK_PLAN, 0)
     expect(MOCK_PLAN[0].exercises.length).toBe(original[0].exercises.length)
   })
-})
 
-describe('deleteExerciseFromDay', () => {
-  test('removes the correct exercise', () => {
-    const result = deleteExerciseFromDay(MOCK_PLAN, 0, 0)
-    expect(result[0].exercises.length).toBe(1)
-    expect(result[0].exercises[0].name).toBe('Shoulder Press')
-  })
+  it('exercise is deleted after deleting it when customizing', () => {
+    const result1 = deleteExerciseFromDay(MOCK_PLAN, 0, 0)
+    expect(result1[0].exercises.length).toBe(1)
+    expect(result1[0].exercises[0].name).toBe('Shoulder Press')
 
-  test('other days are unaffected', () => {
-    const result = deleteExerciseFromDay(MOCK_PLAN, 0, 0)
-    expect(result[1].exercises.length).toBe(1)
-  })
+    const result2 = deleteExerciseFromDay(MOCK_PLAN, 0, 0)
+    expect(result2[1].exercises.length).toBe(1)
 
-  test('does not mutate original plan', () => {
     const original = JSON.parse(JSON.stringify(MOCK_PLAN))
     deleteExerciseFromDay(MOCK_PLAN, 0, 0)
     expect(MOCK_PLAN[0].exercises.length).toBe(original[0].exercises.length)
   })
-})
 
-describe('updateExerciseField', () => {
-  test('updates the correct field', () => {
-    const result = updateExerciseField(MOCK_PLAN, 0, 0, 'name', 'Incline Press')
-    expect(result[0].exercises[0].name).toBe('Incline Press')
-  })
+  it('exercise is updated correctly after modifying', () => {
+    const result1 = updateExerciseField(MOCK_PLAN, 0, 0, 'name', 'Incline Press')
+    expect(result1[0].exercises[0].name).toBe('Incline Press')
 
-  test('does not affect other exercises', () => {
-    const result = updateExerciseField(MOCK_PLAN, 0, 0, 'name', 'Incline Press')
-    expect(result[0].exercises[1].name).toBe('Shoulder Press')
-  })
+    const result2 = updateExerciseField(MOCK_PLAN, 0, 0, 'name', 'Incline Press')
+    expect(result2[0].exercises[1].name).toBe('Shoulder Press')
 
-  test('does not affect other days', () => {
-    const result = updateExerciseField(MOCK_PLAN, 0, 0, 'name', 'Incline Press')
-    expect(result[1].exercises[0].name).toBe('Deadlift')
-  })
+    const result3 = updateExerciseField(MOCK_PLAN, 0, 0, 'name', 'Incline Press')
+    expect(result3[1].exercises[0].name).toBe('Deadlift')
 
-  test('updates sets field correctly', () => {
-    const result = updateExerciseField(MOCK_PLAN, 0, 0, 'sets', 5)
-    expect(result[0].exercises[0].sets).toBe(5)
-  })
+    const result4 = updateExerciseField(MOCK_PLAN, 0, 0, 'sets', 5)
+    expect(result4[0].exercises[0].sets).toBe(5)
 
-  test('does not mutate original plan', () => {
     const original = JSON.parse(JSON.stringify(MOCK_PLAN))
     updateExerciseField(MOCK_PLAN, 0, 0, 'name', 'Incline Press')
     expect(MOCK_PLAN[0].exercises[0].name).toBe(original[0].exercises[0].name)
+  })
+})
+
+describe('GeneratePlan Test', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockActiveChains = {}
+    jest.spyOn(Alert, 'alert').mockImplementation(() => {})
+    
+    mockActiveChains['profiles'] = {
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      single: jest.fn().mockImplementation(() => Promise.resolve({ data: { workout_plan: [] }, error: null })),
+      update: jest.fn().mockReturnThis(),
+      then: jest.fn().mockImplementation((res) => res({ data: { workout_plan: [] }, error: null }))
+    }
+  })
+
+  it('generate plan correctly calls function with all information', async () => {
+    const mockProfileInfo = { id: mockUserSubId, name: 'John Doe', fitness_level: 'Intermediate' }
+    
+    mockActiveChains['profiles'].single = jest.fn().mockResolvedValue({ data: mockProfileInfo, error: null })
+    
+    supabase.functions.invoke.mockResolvedValue({ data: mockInitialPlan, error: null })
+
+    await act(async () => render(<GeneratePlan />))
+
+    const generateBtn = screen.getByText('AI Generate')
+    await act(async () => fireEvent.press(generateBtn))
+
+    const confirmBtn = screen.getByText('Generate')
+    await act(async () => fireEvent.press(confirmBtn))
+
+    await waitFor(() => {
+      expect(supabase.functions.invoke).toHaveBeenCalledWith('generate-workout', {
+        body: { profile: mockProfileInfo, notes: null }
+      })
+    })
+  })
+
+  it('plan is added correctly after pressing on generate plan', async () => {
+    mockActiveChains['profiles'].single = jest.fn().mockResolvedValue({ data: {}, error: null })
+    supabase.functions.invoke.mockResolvedValue({ data: mockInitialPlan, error: null })
+
+    await act(async () => render(<GeneratePlan />))
+
+    await act(async () => fireEvent.press(screen.getByText('AI Generate')))
+    await act(async () => fireEvent.press(screen.getByText('Generate')))
+
+    await waitFor(() => {
+      expect(screen.getByText('Bench Press')).toBeTruthy()
+      expect(screen.getByText('3 Sets x 10 Reps')).toBeTruthy()
+    })
+  })
+
+  it('regenerate with comments enabled with existing plan', async () => {
+    const existingPlanProfile = { 
+        id: mockUserSubId, 
+        workout_plan: mockInitialPlan 
+    }
+
+    mockActiveChains['profiles'].single = jest.fn()
+      .mockResolvedValueOnce({ data: { workout_plan: mockInitialPlan }, error: null })
+      .mockResolvedValueOnce({ data: existingPlanProfile, error: null })
+
+    supabase.functions.invoke.mockResolvedValue({ data: mockInitialPlan, error: null })
+
+    await act(async () => render(<GeneratePlan />))
+
+    await waitFor(() => expect(screen.getByText('Bench Press')).toBeTruthy())
+
+    const openModalBtn = screen.getByText('AI Regenerate')
+    await act(async () => fireEvent.press(openModalBtn))
+
+    const notesInput = screen.getByTestId('regen-notes-input')
+    await act(async () => fireEvent.changeText(notesInput, 'Focus heavily on arms'))
+
+    const submitRegenBtn = screen.getByText('Regenerate')
+    await act(async () => fireEvent.press(submitRegenBtn))
+
+    await waitFor(() => {
+      expect(supabase.functions.invoke).toHaveBeenCalledWith('generate-workout', {
+        body: {
+          profile: existingPlanProfile,
+          notes: 'Focus heavily on arms'
+        }
+      })
+    })
+  })
+
+  it('data is updated correctly after pressing on save customization', async () => {
+    mockActiveChains['profiles'].single = jest.fn().mockResolvedValue({ 
+      data: { workout_plan: mockInitialPlan }, 
+      error: null 
+    })
+
+    mockActiveChains['profiles'].update = jest.fn().mockReturnThis()
+    mockActiveChains['profiles'].eq = jest.fn().mockReturnThis()
+    mockActiveChains['profiles'].then = jest.fn().mockImplementation((resolve) => 
+      Promise.resolve(resolve({ error: null }))
+    )
+
+    await act(async () => render(<GeneratePlan />))
+    await waitFor(() => expect(screen.getByText('Modify Items')).toBeTruthy())
+
+    await act(async () => fireEvent.press(screen.getByText('Modify Items')))
+
+    await act(async () => fireEvent.press(screen.getByText('Save Customizations')))
+
+    await waitFor(() => expect(Alert.alert).toHaveBeenCalledWith('Saved', expect.any(String)))
   })
 })
