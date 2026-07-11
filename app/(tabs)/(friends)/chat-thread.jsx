@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator, 
-  KeyboardAvoidingView, Platform, StyleSheet, Modal, Alert } from 'react-native'
+  KeyboardAvoidingView, Platform, StyleSheet, Modal, Alert, TouchableWithoutFeedback, Keyboard } from 'react-native'
 import { useLocalSearchParams } from 'expo-router'
 import { supabase } from '../../../lib/supabase'
 import { useAuthContext } from '../../../hooks/auth-context'
@@ -185,10 +185,23 @@ export default function ChatThread() {
       </View>
     </KeyboardAvoidingView>
 
-    <Modal visible={showInviteModal} transparent animationType="fade">
-      <View style={appStyles.modalOverlay}>
-        <View style={appStyles.modalContent}>
-          <Text style={appStyles.modalTitle}>Invite to Workout</Text>
+    <Modal
+      visible={showInviteModal}
+      transparent
+      animationType="fade"
+      onRequestClose={() => setShowInviteModal(false)}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+          <View style={appStyles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={appStyles.modalContent}>
+                <Text style={appStyles.modalTitle}>
+                  Invite to Workout
+                </Text>
 
           <DateTimePicker
             value={inviteDate}
@@ -206,19 +219,34 @@ export default function ChatThread() {
             placeholder="Add a note (optional)"
             value={inviteNote}
             onChangeText={setInviteNote}
-            multiline
+            returnKeyType="done"
+            onSubmitEditing={Keyboard.dismiss}
+            blurOnSubmit
           />
 
-          <View style={appStyles.modalButtonRow}>
-            <TouchableOpacity onPress={() => setShowInviteModal(false)}>
-              <Text style={appStyles.modalCancelText}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleSendInvite} disabled={sendingInvite}>
-              <Text style={appStyles.modalSendText}>{sendingInvite ? 'Sending...' : 'Send Invite'}</Text>
-            </TouchableOpacity>
+                <View style={appStyles.modalButtonRow}>
+                  <TouchableOpacity
+                    onPress={() => setShowInviteModal(false)}
+                  >
+                    <Text style={appStyles.modalCancelText}>
+                      Cancel
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={handleSendInvite}
+                    disabled={sendingInvite}
+                  >
+                    <Text style={appStyles.modalSendText}>
+                      {sendingInvite ? 'Sending...' : 'Send Invite'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
           </View>
-        </View>
-      </View>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
     </Modal>
   </>
 )
