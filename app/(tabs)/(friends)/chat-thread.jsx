@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator, 
-  KeyboardAvoidingView, Platform, StyleSheet, Modal, Alert, TouchableWithoutFeedback, Keyboard } from 'react-native'
+  KeyboardAvoidingView, Platform, Modal, Alert, TouchableWithoutFeedback, Keyboard } from 'react-native'
 import { useLocalSearchParams } from 'expo-router'
 import { supabase } from '../../../lib/supabase'
 import { useAuthContext } from '../../../hooks/auth-context'
@@ -193,33 +193,34 @@ export default function ChatThread() {
       onRequestClose={() => setShowInviteModal(false)}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        >
-          <View style={appStyles.modalOverlay}>
+        <View style={appStyles.modalOverlay}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          >
             <TouchableWithoutFeedback>
               <View style={appStyles.modalContent}>
                 <Text style={appStyles.modalTitle}>
                   Invite to Workout
                 </Text>
 
-                <View style={{ 
-                  backgroundColor: '#F2F2F7', 
-                  borderRadius: 8, 
-                  padding: 8, 
-                  marginVertical: 12,
-                  width: '100%',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}></View>
-
+                {/* Combined Button Style that centers beautifully on both Android and iOS */}
                 <TouchableOpacity
-                  style={appStyles.dateButton}
+                  style={{
+                    backgroundColor: '#F2F2F7', 
+                    borderRadius: 10, 
+                    paddingVertical: 14, 
+                    paddingHorizontal: 15,
+                    marginVertical: 15,
+                    width: '100%',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderWidth: 1,
+                    borderColor: '#E5E5EA'
+                  }}
                   onPress={() => setShowDatePicker(true)}
                 >
-                  <Text style={appStyles.dateButtonText}>
-                    {inviteDate.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                  <Text style={{ fontSize: 16, color: '#000000', fontWeight: '600' }}>
+                    📅 {inviteDate.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
                   </Text>
                 </TouchableOpacity>
 
@@ -228,27 +229,35 @@ export default function ChatThread() {
                     value={inviteDate}
                     mode="datetime"
                     display={Platform.OS === 'ios' ? 'inline' : 'default'}
+                    textColor="#000000" // Prevents dark mode invisible white text
                     onChange={(event, selectedDate) => {
-                      setShowDatePicker(Platform.OS === 'ios')
-                      if (selectedDate)
+                      // Android needs to close immediately after selection
+                      if (Platform.OS === 'android' || event.type === 'dismissed') {
+                        setShowDatePicker(false)
+                      }
+                      if (selectedDate) {
                         setInviteDate(selectedDate)
+                      }
                     }}
                   />
                 )}
 
-          <TextInput
-            style={appStyles.modalNoteInput}
-            placeholder="Add a note (optional)"
-            value={inviteNote}
-            onChangeText={setInviteNote}
-            returnKeyType="done"
-            onSubmitEditing={Keyboard.dismiss}
-            blurOnSubmit
-          />
+                <TextInput
+                  style={appStyles.modalNoteInput}
+                  placeholder="Add a note (optional)"
+                  value={inviteNote}
+                  onChangeText={setInviteNote}
+                  returnKeyType="done"
+                  onSubmitEditing={Keyboard.dismiss}
+                  blurOnSubmit
+                />
 
                 <View style={appStyles.modalButtonRow}>
                   <TouchableOpacity
-                    onPress={() => setShowInviteModal(false)}
+                    onPress={() => {
+                      setShowInviteModal(false);
+                      setShowDatePicker(false);
+                    }}
                   >
                     <Text style={appStyles.modalCancelText}>
                       Cancel
@@ -266,10 +275,10 @@ export default function ChatThread() {
                 </View>
               </View>
             </TouchableWithoutFeedback>
-          </View>
-        </KeyboardAvoidingView>
+          </KeyboardAvoidingView>
+        </View>
       </TouchableWithoutFeedback>
     </Modal>
   </>
-)
+  )
 }

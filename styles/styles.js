@@ -958,5 +958,16 @@ flexOne: {
   datePicker: {
     backgroundColor: '#fff',
     width: '100%'
-  }
+  },
+  inviteCard: {
+  borderRadius: 14,
+  paddingVertical: 10,
+  paddingHorizontal: 14,
+  marginVertical: 4,
+  maxWidth: '80%'
+},
+inviteCardTitle: {
+  fontWeight: 'bold',
+  fontSize: 15
+}
 })
