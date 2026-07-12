@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { View, Text, TouchableOpacity, ActivityIndicator, Pressable } from 'react-native'
+import { View, Text, TouchableOpacity, ActivityIndicator, Pressable, FlatList } from 'react-native'
 import { useRouter, useFocusEffect } from 'expo-router'
 import { supabase } from '../../../lib/supabase'
 import { useAuthContext } from '../../../hooks/auth-context'
@@ -14,11 +14,15 @@ export default function FriendsHome() {
   const [followerCount, setFollowerCount] = useState(0)
   const [followingCount, setFollowingCount] = useState(0)
   const [loading, setLoading] = useState(false)
+  const [chatsLoading, setChatsLoading] = useState(false)
+  const [chats, setChats] = useState([])
 
   useFocusEffect(
     useCallback(() => {
-      if (userId)
+      if (userId) {
         fetchCounts()
+        fetchChats()
+      }
     }, [userId])
   )
 
@@ -51,6 +55,41 @@ export default function FriendsHome() {
     }
   }
 
+  async function fetchChats() {
+    try {
+      setChatsLoading(true)
+
+      const { data: followRows, error: followError } = await supabase
+        .from('follows')
+        .select('following_id')
+        .eq('follower_id', userId)
+
+      if (followError)
+        throw followError
+
+      const ids = (followRows || []).map((row) => row.following_id)
+
+      if (ids.length === 0) {
+        setChats([])
+        return
+      }
+
+      const { data: profiles, error: profileError } = await supabase
+        .from('profiles')
+        .select('id, username')
+        .in('id', ids)
+
+      if (profileError)
+        throw profileError
+
+      setChats(profiles || [])
+    } catch (error) {
+      console.error('Error fetching chats:', error)
+    } finally {
+      setChatsLoading(false)
+    }
+  }
+
   return (
     <View style={[appStyles.container, { paddingHorizontal: 15, paddingTop: 20, justifyContent: 'flex-start' }]}>
 
@@ -75,6 +114,8 @@ export default function FriendsHome() {
       </View>
       )}
 
+      <Spacer />
+
       <TouchableOpacity
         style={appStyles.fab}
         onPress={() => router.push('/search-users')}
@@ -83,13 +124,33 @@ export default function FriendsHome() {
       </TouchableOpacity>
 
       <Spacer />
-      
-      <Pressable
-        style={appStyles.chatButton}
-        onPress={() => router.push('/chat-list')}
-      >
-        <Text style={appStyles.buttonText}>Chats</Text>
-      </Pressable>
+
+      <Text style={[appStyles.label, { fontSize: 18, fontWeight: 'bold' }]}>Chats</Text>
+      <Spacer />
+
+      {chatsLoading && <ActivityIndicator size="small" color="#000" />}
+
+      {!chatsLoading && chats.length === 0 && (
+        <Text style={appStyles.fallbackText}>Follow someone to start chatting.</Text>
+      )}
+
+      <FlatList
+        data={chats}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={{
+              paddingVertical: 14,
+              paddingHorizontal: 4,
+              borderBottomWidth: 1,
+              borderBottomColor: '#E5E5E5'
+            }}
+            onPress={() => router.push({ pathname: '/chat-thread', params: { recipientId: item.id, recipientUsername: item.username } })}
+          >
+            <Text style={appStyles.exerciseName}>{item.username}</Text>
+          </TouchableOpacity>
+        )}
+      />
     </View>
   )
 }
