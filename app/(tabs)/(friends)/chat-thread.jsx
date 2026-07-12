@@ -21,6 +21,7 @@ export default function ChatThread() {
   const [inviteDate, setInviteDate] = useState(new Date())
   const [inviteNote, setInviteNote] = useState('')
   const [sendingInvite, setSendingInvite] = useState(false)
+  const [showDatePicker, setShowDatePicker] = useState(false)
 
   useEffect(() => {
     if (userId && recipientId)
@@ -203,16 +204,37 @@ export default function ChatThread() {
                   Invite to Workout
                 </Text>
 
-          <DateTimePicker
-            value={inviteDate}
-            mode="datetime"
-            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-            onChange={(event, selectedDate) => {
-              if (selectedDate) {
-                setInviteDate(selectedDate)
-              }
-            }}
-          />
+                <View style={{ 
+                  backgroundColor: '#F2F2F7', 
+                  borderRadius: 8, 
+                  padding: 8, 
+                  marginVertical: 12,
+                  width: '100%',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}></View>
+
+                <TouchableOpacity
+                  style={appStyles.dateButton}
+                  onPress={() => setShowDatePicker(true)}
+                >
+                  <Text style={appStyles.dateButtonText}>
+                    {inviteDate.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                  </Text>
+                </TouchableOpacity>
+
+                {showDatePicker && (
+                  <DateTimePicker
+                    value={inviteDate}
+                    mode="datetime"
+                    display={Platform.OS === 'ios' ? 'inline' : 'default'}
+                    onChange={(event, selectedDate) => {
+                      setShowDatePicker(Platform.OS === 'ios')
+                      if (selectedDate)
+                        setInviteDate(selectedDate)
+                    }}
+                  />
+                )}
 
           <TextInput
             style={appStyles.modalNoteInput}

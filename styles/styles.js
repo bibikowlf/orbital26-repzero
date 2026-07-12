@@ -932,5 +932,18 @@ flexOne: {
   modalSendText: {
     color: '#007AFF',
     fontWeight: 'bold'
+  },
+
+  dateButton: {
+    backgroundColor: '#F0F0F0',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    marginTop: 10,
+    alignItems: 'center'
+  },
+  dateButtonText: {
+    fontSize: 16,
+    color: '#000'
   }
 })
