@@ -16,7 +16,7 @@ jest.mock('../../styles/styles', () => ({
   appStyles: {},
 }))
 
-describe('ChangePassword Tests', () => {
+describe('ChangePassword Unit Test', () => {
   beforeEach(() => jest.clearAllMocks())
 
   it('password is correctly updated and signs out user after pressing change password button', async () => {

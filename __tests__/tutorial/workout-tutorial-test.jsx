@@ -43,7 +43,7 @@ jest.mock('expo-router', () => ({
 jest.mock('../../components/spacer', () => () => null)
 jest.mock('../../styles/styles', () => ({ appStyles: {} }))
 
-describe('WorkoutTutorial Test', () => {
+describe('WorkoutTutorial Unit Test', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     jest.spyOn(Alert, 'alert').mockImplementation(() => {})

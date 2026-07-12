@@ -1,6 +1,6 @@
 import { handleNumericInput } from '../../functions/numeric-input'
 
-describe('handleNumericInput Test', () => {
+describe('handleNumericInput Unit Test', () => {
   it('handleNumericInput cleans string to numeric characters and handles edge cases', () => {
     expect(handleNumericInput('123')).toBe(123)
     expect(handleNumericInput('abc124def!')).toBe(124)

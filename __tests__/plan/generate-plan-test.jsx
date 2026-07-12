@@ -41,7 +41,7 @@ jest.mock('../../hooks/auth-context', () => ({
   useAuthContext: () => ({ claims: { sub: mockUserSubId } }),
 }))
 
-describe('GeneratePlan Function Test', () => {
+describe('GeneratePlan Function Unit Test', () => {
   const MOCK_PLAN = [
     {
         day: 'Monday: Push Day',
@@ -107,7 +107,7 @@ describe('GeneratePlan Function Test', () => {
   })
 })
 
-describe('GeneratePlan Test', () => {
+describe('GeneratePlan Unit Test', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockActiveChains = {}

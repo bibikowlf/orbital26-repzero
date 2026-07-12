@@ -15,7 +15,7 @@ jest.mock('../../styles/styles', () => ({
   appStyles: {},
 }))
 
-describe('Signout Test', () => {
+describe('Signout Unit Test', () => {
   beforeEach(() => jest.clearAllMocks())
 
   it('supabase.auth.signOut is called after pressing signout button', async () => {

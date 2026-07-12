@@ -48,7 +48,7 @@ jest.mock('expo-image-picker', () => ({
 
 jest.mock('@expo/vector-icons/Entypo', () => 'Entypo')
 
-describe('AddPost Validation & Submission Tests', () => {
+describe('AddPost Unit Tests', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockActiveChains = {}

@@ -59,7 +59,7 @@ jest.mock('expo-router', () => ({
   useFocusEffect: (cb) => cb()
 }))
 
-describe('GetCurrentWeekDays Test', () => {
+describe('GetCurrentWeekDays Unit Test', () => {
 test('returns exactly 7 days', () => {
     const days = getCurrentWeekDays(0)
     expect(days.length).toBe(7)
@@ -111,7 +111,7 @@ test('returns exactly 7 days', () => {
   })
 })
 
-describe('GetWeekRangeLabel Test', () => {
+describe('GetWeekRangeLabel Unit Test', () => {
   test('returns empty string for empty array', () => {
     const result = getWeekRangeLabel([])
     expect(result).toBe('')
@@ -168,7 +168,7 @@ describe('GetWeekRangeLabel Test', () => {
   })
 })
 
-describe('ExerciseLog Test', () => {
+describe('ExerciseLog Unit Test', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockActiveChains = {}

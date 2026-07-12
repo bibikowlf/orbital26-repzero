@@ -46,7 +46,7 @@ jest.mock('../../functions/clean-string', () => ({
   cleanString: (str) => str.toLowerCase().replace(/[^a-z]/g, '')
 }))
 
-describe('DiscussionForum Test', () => {
+describe('DiscussionForum Unit Test', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockActiveChains = {}

@@ -50,19 +50,18 @@ jest.mock('../../hooks/auth-context', () => ({
 }))
 
 jest.mock('expo-router', () => {
-  const actual = jest.requireActual('expo-router')
+  const ReactModule = require('react')
   return {
-    ...actual,
+    router: { navigate: jest.fn() },
     useFocusEffect: (callback) => {
-      const React = require('react')
-      React.useEffect(() => {
+      ReactModule.useEffect(() => {
         callback()
       }, [callback])
-    },
+    }
   }
 })
 
-describe('Leaderboard Test', () => {
+describe('Leaderboard Unit Test', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockActiveChains = {}

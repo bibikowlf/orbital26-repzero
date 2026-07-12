@@ -1,6 +1,6 @@
 import { cleanString } from '../../functions/clean-string'
 
-describe('cleanString Test', () => {
+describe('cleanString Unit Test', () => {
   it('cleanString correctly removes non alphabetic characters from string and lowercases it', () => {
     expect(cleanString('GymBro')).toBe('gymbro')
     expect(cleanString('Hello World')).toBe('helloworld')

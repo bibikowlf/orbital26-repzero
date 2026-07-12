@@ -31,7 +31,7 @@ jest.mock('../../styles/styles', () => ({
   appStyles: {},
 }))
 
-describe('Login Test', () => {
+describe('Login Unit Test', () => {
   beforeEach(() => jest.clearAllMocks())
 
   it('supabase.signUp is called after pressing signup button', async () => {

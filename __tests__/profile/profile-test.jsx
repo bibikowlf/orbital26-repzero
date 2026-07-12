@@ -82,7 +82,7 @@ jest.mock('react-native-element-dropdown', () => {
   }
 })
 
-describe('Profile Test', () => {
+describe('Profile Unit Test', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockActiveChains = {}

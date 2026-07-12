@@ -74,7 +74,7 @@ jest.mock('../../components/text-info', () => {
   }
 })
 
-describe('MyTutorial Test', () => {
+describe('MyTutorial Unit Test', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockActiveChains = {}
