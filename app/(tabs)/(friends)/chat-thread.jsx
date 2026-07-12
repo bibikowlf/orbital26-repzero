@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator, 
-  KeyboardAvoidingView, Platform, Modal, Alert, TouchableWithoutFeedback, Keyboard } from 'react-native'
+  KeyboardAvoidingView, Platform, StyleSheet, Modal, Alert, TouchableWithoutFeedback, Keyboard } from 'react-native'
 import { useLocalSearchParams } from 'expo-router'
 import { supabase } from '../../../lib/supabase'
 import { useAuthContext } from '../../../hooks/auth-context'
@@ -22,6 +22,7 @@ export default function ChatThread() {
   const [inviteNote, setInviteNote] = useState('')
   const [sendingInvite, setSendingInvite] = useState(false)
   const [showDatePicker, setShowDatePicker] = useState(false)
+  const [inviteStatuses, setInviteStatuses] = useState({})
 
   useEffect(() => {
     if (userId && recipientId)
@@ -69,6 +70,22 @@ export default function ChatThread() {
         throw error
 
       setMessages(data || [])
+
+      const inviteIds = (data || []).filter((m) => m.invite_id).map((m) => m.invite_id)
+
+      if (inviteIds.length > 0) {
+        const { data: invites, error: inviteError } = await supabase
+          .from('workout_invites')
+          .select('id, status, proposed_date, message, receiver_id')
+          .in('id', inviteIds)
+
+        if (inviteError)
+          throw inviteError
+
+        const statusMap = {}
+        invites.forEach((inv) => { statusMap[inv.id] = inv })
+        setInviteStatuses(statusMap)
+      }
     } catch (error) {
       console.error('Error fetching messages:', error)
     } finally {
@@ -107,7 +124,7 @@ export default function ChatThread() {
     try {
       setSendingInvite(true)
 
-      const { error } = await supabase
+      const { data: invite, error } = await supabase
         .from('workout_invites')
         .insert({
           sender_id: userId,
@@ -115,9 +132,26 @@ export default function ChatThread() {
           proposed_date: inviteDate.toISOString(),
           message: inviteNote.trim() || null
         })
+        .select()
+        .single()
 
       if (error)
         throw error
+
+      const { error: messageError } = await supabase
+        .from('messages')
+        .insert({
+          sender_id: userId,
+          receiver_id: recipientId,
+          content: 'Workout invite sent',
+          message_type: 'invite',
+          invite_id: invite.id
+        })
+
+        console.log("MESSAGE ERROR:", messageError)
+
+      if (messageError)
+        throw messageError
 
       setShowInviteModal(false)
       setInviteNote('')
@@ -126,6 +160,22 @@ export default function ChatThread() {
       Alert.alert('Error', error.message)
     } finally {
       setSendingInvite(false)
+    }
+  }
+
+  async function handleRespondToInvite(inviteId, status) {
+    try {
+      const { error } = await supabase
+        .from('workout_invites')
+        .update({ status })
+        .eq('id', inviteId)
+
+      if (error)
+        throw error
+
+      setInviteStatuses((prev) => ({ ...prev, [inviteId]: { ...prev[inviteId], status } }))
+    } catch (error) {
+      Alert.alert('Error', error.message)
     }
   }
 
@@ -150,6 +200,54 @@ export default function ChatThread() {
         contentContainerStyle={appStyles.messageListContent}
         renderItem={({ item }) => {
           const isMine = item.sender_id === userId
+
+          if (item.message_type === 'invite') {
+            const invite = inviteStatuses[item.invite_id]
+            const isReceiver = invite?.receiver_id === userId
+            const status = invite?.status || 'pending'
+
+            return (
+              <View style={[appStyles.inviteCard, isMine ? appStyles.messageBubbleMine : appStyles.messageBubbleTheirs]}>
+                <Text style={[appStyles.inviteCardTitle, { color: isMine ? '#fff' : '#000' }]}>
+                  🏋️ Workout Invite
+                </Text>
+                {invite?.proposed_date && (
+                  <Text style={{ color: isMine ? '#fff' : '#000', marginTop: 4 }}>
+                    {new Date(invite.proposed_date).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                  </Text>
+                )}
+                {invite?.message && (
+                  <Text style={{ color: isMine ? '#fff' : '#000', marginTop: 4, fontStyle: 'italic' }}>
+                    "{invite.message}"
+                  </Text>
+                )}
+
+                {isReceiver && status === 'pending' && (
+                  <View style={{ flexDirection: 'row', marginTop: 10 }}>
+                    <TouchableOpacity
+                      style={[appStyles.actionButton, { backgroundColor: '#34C759', marginRight: 8, paddingHorizontal: 14 }]}
+                      onPress={() => handleRespondToInvite(item.invite_id, 'accepted')}
+                    >
+                      <Text style={appStyles.buttonText}>Accept</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[appStyles.actionButton, { backgroundColor: '#FF3B30', paddingHorizontal: 14 }]}
+                      onPress={() => handleRespondToInvite(item.invite_id, 'declined')}
+                    >
+                      <Text style={appStyles.buttonText}>Decline</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+
+                {status !== 'pending' && (
+                  <Text style={{ color: isMine ? '#fff' : '#000', marginTop: 8, fontWeight: 'bold' }}>
+                    {status === 'accepted' ? '✅ Accepted' : '❌ Declined'}
+                  </Text>
+                )}
+              </View>
+            )
+          }
+
           return (
             <View style={[appStyles.messageBubble, isMine ? appStyles.messageBubbleMine : appStyles.messageBubbleTheirs]}>
               <Text style={isMine ? appStyles.messageTextMine : appStyles.messageTextTheirs}>{item.content}</Text>
@@ -193,34 +291,33 @@ export default function ChatThread() {
       onRequestClose={() => setShowInviteModal(false)}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={appStyles.modalOverlay}>
-          <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          >
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+          <View style={appStyles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={appStyles.modalContent}>
                 <Text style={appStyles.modalTitle}>
                   Invite to Workout
                 </Text>
 
-                {/* Combined Button Style that centers beautifully on both Android and iOS */}
+                <View style={{ 
+                  backgroundColor: '#F2F2F7', 
+                  borderRadius: 8, 
+                  padding: 8, 
+                  marginVertical: 12,
+                  width: '100%',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}></View>
+
                 <TouchableOpacity
-                  style={{
-                    backgroundColor: '#F2F2F7', 
-                    borderRadius: 10, 
-                    paddingVertical: 14, 
-                    paddingHorizontal: 15,
-                    marginVertical: 15,
-                    width: '100%',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderWidth: 1,
-                    borderColor: '#E5E5EA'
-                  }}
+                  style={appStyles.dateButton}
                   onPress={() => setShowDatePicker(true)}
                 >
-                  <Text style={{ fontSize: 16, color: '#000000', fontWeight: '600' }}>
-                    📅 {inviteDate.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                  <Text style={appStyles.dateButtonText}>
+                    {inviteDate.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
                   </Text>
                 </TouchableOpacity>
 
@@ -229,16 +326,12 @@ export default function ChatThread() {
                     value={inviteDate}
                     mode="datetime"
                     display={Platform.OS === 'ios' ? 'inline' : 'default'}
-                    textColor="#000000" // Prevents dark mode invisible white text
                     onChange={(event, selectedDate) => {
-                      // Android needs to close immediately after selection
-                      if (Platform.OS === 'android' || event.type === 'dismissed') {
-                        setShowDatePicker(false)
-                      }
-                      if (selectedDate) {
+                      setShowDatePicker(Platform.OS === 'ios')
+                      if (selectedDate)
                         setInviteDate(selectedDate)
-                      }
                     }}
+                    style = {appStyles.datePicker}
                   />
                 )}
 
@@ -254,10 +347,7 @@ export default function ChatThread() {
 
                 <View style={appStyles.modalButtonRow}>
                   <TouchableOpacity
-                    onPress={() => {
-                      setShowInviteModal(false);
-                      setShowDatePicker(false);
-                    }}
+                    onPress={() => setShowInviteModal(false)}
                   >
                     <Text style={appStyles.modalCancelText}>
                       Cancel
@@ -275,10 +365,10 @@ export default function ChatThread() {
                 </View>
               </View>
             </TouchableWithoutFeedback>
-          </KeyboardAvoidingView>
-        </View>
+          </View>
+        </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
     </Modal>
   </>
-  )
+)
 }
