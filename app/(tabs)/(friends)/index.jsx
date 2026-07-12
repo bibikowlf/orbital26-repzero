@@ -90,6 +90,15 @@ export default function FriendsHome() {
       >
         <Text style={appStyles.buttonText}>Chats</Text>
       </Pressable>
+
+      <Spacer />
+
+      <Pressable
+        style={[appStyles.invitesButton]}
+        onPress={() => router.push('/invite-inbox')}
+      >
+        <Text style={appStyles.buttonText}>Workout Invites</Text>
+      </Pressable>
     </View>
   )
 }

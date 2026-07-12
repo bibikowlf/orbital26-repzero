@@ -828,6 +828,15 @@ chatButton: {
   alignItems: 'center',
 },
 
+invitesButton: {
+  width: '50%',
+  height: 20,
+  backgroundColor: '#5856D6',
+  borderRadius: 8,
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+
 flexOne: {
     flex: 1
   },
@@ -945,5 +954,9 @@ flexOne: {
   dateButtonText: {
     fontSize: 16,
     color: '#000'
+  },
+  datePicker: {
+    backgroundColor: '#fff',
+    width: '100%'
   }
 })
