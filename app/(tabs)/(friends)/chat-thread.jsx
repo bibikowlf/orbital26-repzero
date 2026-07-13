@@ -174,7 +174,7 @@ export default function ChatThread() {
       if (error)
         throw error
 
-      const { error: messageError } = await supabase
+      const { data:msg, error: messageError } = await supabase
         .from('messages')
         .insert({
           sender_id: userId,
@@ -183,11 +183,14 @@ export default function ChatThread() {
           message_type: 'invite',
           invite_id: invite.id
         })
-
-        console.log("MESSAGE ERROR:", messageError)
+        .select()
+        .single()
 
       if (messageError)
         throw messageError
+
+      setMessages((prev) => prev.some((m) => m.id === msg.id) ? prev : [...prev, msg])
+      setInviteStatuses((prev) => ({ ...prev, [invite.id]: invite }))
 
       setShowInviteModal(false)
       setInviteNote('')
@@ -250,7 +253,7 @@ export default function ChatThread() {
     try {
       setSendingEventInvite(true)
 
-      const { error } = await supabase
+      const { data:msg, error } = await supabase
         .from('messages')
         .insert({
           sender_id: userId,
@@ -259,9 +262,14 @@ export default function ChatThread() {
           message_type: 'event_invite',
           event_id: event.id
         })
+        .select()
+        .single()
 
       if (error)
         throw error
+
+      setMessages((prev) => prev.some((m) => m.id === msg.id) ? prev : [...prev, msg])
+      setEventDetails((prev) => ({ ...prev, [event.id]: event }))
 
       setShowEventModal(false)
       Alert.alert('Invite Sent', `Invited to "${event.title}"`)
