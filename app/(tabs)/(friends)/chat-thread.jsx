@@ -29,6 +29,9 @@ export default function ChatThread() {
   const [loadingEvents, setLoadingEvents] = useState(false)
   const [sendingEventInvite, setSendingEventInvite] = useState(false)
 
+  const [eventDetails, setEventDetails] = useState({})
+  const [eventRsvpStatuses, setEventRsvpStatuses] = useState({})
+
   useEffect(() => {
     if (userId && recipientId)
       fetchMessages()
@@ -77,6 +80,7 @@ export default function ChatThread() {
       setMessages(data || [])
 
       const inviteIds = (data || []).filter((m) => m.invite_id).map((m) => m.invite_id)
+      const eventIds = (data || []).filter((m) => m.event_id).map((m) => m.event_id)
 
       if (inviteIds.length > 0) {
         const { data: invites, error: inviteError } = await supabase
@@ -90,6 +94,33 @@ export default function ChatThread() {
         const statusMap = {}
         invites.forEach((inv) => { statusMap[inv.id] = inv })
         setInviteStatuses(statusMap)
+      }
+
+      if (eventIds.length > 0) {
+        const { data: events, error: eventError } = await supabase
+          .from('events')
+          .select('id, title, event_date, location')
+          .in('id', eventIds)
+
+        if (eventError)
+          throw eventError
+
+        const eventMap = {}
+        events.forEach((ev) => { eventMap[ev.id] = ev })
+        setEventDetails(eventMap)
+
+        const { data: rsvps, error: rsvpError } = await supabase
+          .from('event_rsvps')
+          .select('event_id, status')
+          .eq('user_id', userId)
+          .in('event_id', eventIds)
+
+        if (rsvpError)
+          throw rsvpError
+
+        const rsvpMap = {}
+        rsvps.forEach((r) => { rsvpMap[r.event_id] = r.status })
+        setEventRsvpStatuses(rsvpMap)
       }
     } catch (error) {
       console.error('Error fetching messages:', error)
@@ -241,6 +272,24 @@ export default function ChatThread() {
     }
   }
 
+  async function handleRespondToEventInvite(eventId, status) {
+    try {
+      const { error } = await supabase
+        .from('event_rsvps')
+        .upsert(
+          { event_id: eventId, user_id: userId, status },
+          { onConflict: 'event_id,user_id' }
+        )
+
+      if (error)
+        throw error
+
+      setEventRsvpStatuses((prev) => ({ ...prev, [eventId]: status }))
+    } catch (error) {
+      Alert.alert('Error', error.message)
+    }
+  }
+
   return (
   <>
     <KeyboardAvoidingView
@@ -296,6 +345,58 @@ export default function ChatThread() {
                 {status !== 'pending' && (
                   <Text style={{ color: isMine ? '#fff' : '#000', marginTop: 8, fontWeight: 'bold' }}>
                     {status === 'accepted' ? '✅ Accepted' : '❌ Declined'}
+                  </Text>
+                )}
+              </View>
+            )
+          }
+
+          if (item.message_type === 'event_invite') {
+            const event = eventDetails[item.event_id]
+            const rsvpStatus = eventRsvpStatuses[item.event_id] || null
+            const isReceiver = item.receiver_id === userId
+
+            return (
+              <View style={[appStyles.inviteCard, isMine ? appStyles.messageBubbleMine : appStyles.messageBubbleTheirs]}>
+                <Text style={[appStyles.inviteCardTitle, { color: isMine ? '#fff' : '#000' }]}>
+                  📅 Event Invite
+                </Text>
+                {event && (
+                  <>
+                    <Text style={{ color: isMine ? '#fff' : '#000', marginTop: 4, fontWeight: '600' }}>
+                      {event.title}
+                    </Text>
+                    <Text style={{ color: isMine ? '#fff' : '#000', marginTop: 2 }}>
+                      {new Date(event.event_date).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                    </Text>
+                    {event.location && (
+                      <Text style={{ color: isMine ? '#fff' : '#000', marginTop: 2 }}>
+                        📍 {event.location}
+                      </Text>
+                    )}
+                  </>
+                )}
+
+                {isReceiver && !rsvpStatus && (
+                  <View style={{ flexDirection: 'row', marginTop: 10 }}>
+                    <TouchableOpacity
+                      style={[appStyles.actionButton, { backgroundColor: '#34C759', marginRight: 8, paddingHorizontal: 14 }]}
+                      onPress={() => handleRespondToEventInvite(item.event_id, 'going')}
+                    >
+                      <Text style={appStyles.buttonText}>RSVP</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[appStyles.actionButton, { backgroundColor: '#FF3B30', paddingHorizontal: 14 }]}
+                      onPress={() => handleRespondToEventInvite(item.event_id, 'declined')}
+                    >
+                      <Text style={appStyles.buttonText}>Decline</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+
+                {rsvpStatus && (
+                  <Text style={{ color: isMine ? '#fff' : '#000', marginTop: 8, fontWeight: 'bold' }}>
+                    {rsvpStatus === 'going' ? '✅ Going' : '❌ Declined'}
                   </Text>
                 )}
               </View>
