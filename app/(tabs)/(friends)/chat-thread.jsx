@@ -336,13 +336,13 @@ export default function ChatThread() {
                 {isReceiver && status === 'pending' && (
                   <View style={{ flexDirection: 'row', marginTop: 10 }}>
                     <TouchableOpacity
-                      style={[appStyles.actionButton, { backgroundColor: '#34C759', marginRight: 8, paddingHorizontal: 14 }]}
+                      style={[appStyles.actionButton, { flex: undefined, minWidth: 90, backgroundColor: '#34C759', marginRight: 8, paddingHorizontal: 14 }]}
                       onPress={() => handleRespondToInvite(item.invite_id, 'accepted')}
                     >
                       <Text style={appStyles.buttonText}>Accept</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                      style={[appStyles.actionButton, { backgroundColor: '#FF3B30', paddingHorizontal: 14 }]}
+                      style={[appStyles.actionButton, { flex: undefined, minWidth: 90, backgroundColor: '#FF3B30', paddingHorizontal: 14 }]}
                       onPress={() => handleRespondToInvite(item.invite_id, 'declined')}
                     >
                       <Text style={appStyles.buttonText}>Decline</Text>
@@ -388,13 +388,13 @@ export default function ChatThread() {
                 {isReceiver && !rsvpStatus && (
                   <View style={{ flexDirection: 'row', marginTop: 10 }}>
                     <TouchableOpacity
-                      style={[appStyles.actionButton, { backgroundColor: '#34C759', marginRight: 8, paddingHorizontal: 14 }]}
+                      style={[appStyles.actionButton, { flex: undefined, minWidth: 90, backgroundColor: '#34C759', marginRight: 8, paddingHorizontal: 14 }]}
                       onPress={() => handleRespondToEventInvite(item.event_id, 'going')}
                     >
                       <Text style={appStyles.buttonText}>RSVP</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                      style={[appStyles.actionButton, { backgroundColor: '#FF3B30', paddingHorizontal: 14 }]}
+                      style={[appStyles.actionButton, { flex: undefined, minWidth: 90, backgroundColor: '#FF3B30', paddingHorizontal: 14 }]}
                       onPress={() => handleRespondToEventInvite(item.event_id, 'declined')}
                     >
                       <Text style={appStyles.buttonText}>Decline</Text>
