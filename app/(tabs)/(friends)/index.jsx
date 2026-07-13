@@ -58,7 +58,6 @@ export default function FriendsHome() {
   async function fetchChats() {
     try {
       setChatsLoading(true)
-      console.log("FETCHING CHATS...")
 
       const { data: followRows, error: followError } = await supabase
         .from('follows')
@@ -106,6 +105,15 @@ export default function FriendsHome() {
         lastMessage: lastMessageMap[profile.id] || null
       }))
 
+      merged.sort((a, b) => {
+        if (!a.lastMessage && !b.lastMessage) 
+          return 0
+        if (!a.lastMessage) 
+          return 1
+        if (!b.lastMessage) 
+          return -1
+        return new Date(b.lastMessage.created_at) - new Date(a.lastMessage.created_at)
+      })
 
       setChats(merged)
     } catch (error) {
