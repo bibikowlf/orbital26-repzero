@@ -447,7 +447,7 @@ export default function ChatThread() {
             style={{ maxHeight: 250, marginTop: 10 }}
             renderItem={({ item }) => (
               <TouchableOpacity
-                style={styles.eventOptionRow}
+                style={appStyles.eventOptionRow}
                 onPress={() => handleSendEventInvite(item)}
                 disabled={sendingEventInvite}
               >
