@@ -58,6 +58,7 @@ export default function FriendsHome() {
   async function fetchChats() {
     try {
       setChatsLoading(true)
+      console.log("FETCHING CHATS...")
 
       const { data: followRows, error: followError } = await supabase
         .from('follows')
@@ -106,7 +107,7 @@ export default function FriendsHome() {
       }))
 
 
-      setChats(profiles || [])
+      setChats(merged)
     } catch (error) {
       console.error('Error fetching chats:', error)
     } finally {
