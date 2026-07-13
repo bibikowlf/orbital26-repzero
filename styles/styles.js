@@ -5,7 +5,7 @@ export const appStyles = StyleSheet.create({
     marginTop: 40,
     padding: 12,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'stretch',
   },
   verticallySpaced: {
     paddingTop: 4,
@@ -52,7 +52,7 @@ export const appStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 20,
-  },
+  }, 
   avatar: {
     borderRadius: 5,
     overflow: 'hidden',
@@ -817,4 +817,317 @@ tabRow: { flexDirection: 'row', borderBottomWidth: 1, borderColor: '#e9ecef' },
   tabButtonActive: { borderBottomWidth: 2, borderBottomColor: '#007AFF' },
   tabText: { fontSize: 15, fontWeight: '600', color: '#8E8E93' },
   tabTextActive: { color: '#007AFF' },
+
+//friends tab
+chatButton: {
+  width: '20%',
+  height: 20,
+  backgroundColor: '#34C759',
+  borderRadius: 8,
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+
+invitesButton: {
+  width: '50%',
+  height: 20,
+  backgroundColor: '#5856D6',
+  borderRadius: 8,
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+
+flexOne: {
+    flex: 1
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  messageListContent: {
+    paddingHorizontal: 15,
+    paddingVertical: 12
+  },
+  messageBubble: {
+    borderRadius: 14,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginVertical: 4,
+    maxWidth: '75%'
+  },
+  messageBubbleMine: {
+    alignSelf: 'flex-end',
+    backgroundColor: '#007AFF'
+  },
+  messageBubbleTheirs: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#E5E5E5'
+  },
+  messageTextMine: {
+    color: '#fff'
+  },
+  messageTextTheirs: {
+    color: '#000'
+  },
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E5E5'
+  },
+  textInput: {
+    flex: 1,
+    backgroundColor: '#F0F0F0',
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    marginRight: 8
+  },
+  sendButton: {
+    paddingHorizontal: 16,
+    backgroundColor: '#007AFF'
+  },
+  //sending invites
+
+  inviteButton: {
+    marginHorizontal: 15,
+    marginBottom: 8,
+    paddingVertical: 8,
+    alignItems: 'center',
+    backgroundColor: '#5856D6',
+    borderRadius: 8
+  },
+  inviteButtonText: {
+    color: '#fff',
+    fontWeight: '600'
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  modalContent: {
+    width: '85%',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 20
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10
+  },
+  modalNoteInput: {
+    backgroundColor: '#F0F0F0',
+    borderRadius: 8,
+    padding: 10,
+    marginTop: 10,
+    minHeight: 60,
+    textAlignVertical: 'top'
+  },
+  modalButtonRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 15
+  },
+  modalCancelText: {
+    color: '#666',
+    marginRight: 20
+  },
+  modalSendText: {
+    color: '#007AFF',
+    fontWeight: 'bold'
+  },
+
+  dateButton: {
+    backgroundColor: '#F0F0F0',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    marginTop: 10,
+    alignItems: 'center'
+  },
+  dateButtonText: {
+    fontSize: 16,
+    color: '#000'
+  },
+  datePicker: {
+    backgroundColor: '#fff',
+    width: '100%'
+  },
+  inviteCard: {
+  borderRadius: 14,
+  paddingVertical: 10,
+  paddingHorizontal: 14,
+  marginVertical: 4,
+  maxWidth: '80%'
+},
+inviteCardTitle: {
+  fontWeight: 'bold',
+  fontSize: 15
+},
+  metricsCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    paddingVertical: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+    marginBottom: 24,
+    marginTop: 10,
+    width: '100%',
+  },
+
+  metricItem: {
+    flex: 1,
+    alignItems: 'center',
+    flexDirection: 'column',
+  },
+
+  metricNumber: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#1F2937',
+  },
+
+  metricLabel: {
+    fontSize: 13,
+    color: '#6B7280',
+    marginTop: 3,
+    fontWeight: '500',
+  },
+
+  metricDivider: {
+    width: 1,
+    height: 32,
+    backgroundColor: '#E5E7EB',
+  },
+
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 14,
+    width: '100%',
+  },
+
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1F2937',
+  },
+
+  addButton: {
+    backgroundColor: '#EEF2FF',
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 20,
+  },
+
+  addButtonText: {
+    color: '#4F46E5',
+    fontWeight: '600',
+    fontSize: 13,
+  },
+
+  chatRow: {
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    padding: 14,
+    borderRadius: 14,
+    alignItems: 'center',
+    marginBottom: 10,
+    width: '100%',
+    alignSelf: 'stretch', 
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.02,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+
+  avatarPlaceholder: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 14,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+
+  avatarText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#4B5563',
+  },
+
+  chatInfo: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+
+  chatHeaderLine: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    marginBottom: 4,
+    width: '100%', 
+  },
+
+  usernameText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+
+  timeText: {
+    fontSize: 11,
+    color: '#9CA3AF',
+  },
+
+  previewText: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  inviteButtonRow: {
+    flexDirection: 'row',
+    marginHorizontal: 15,
+    marginBottom: 8
+  },
+  eventOptionRow: {
+    paddingVertical: 12,
+    paddingHorizontal: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E5E5'
+  },
+  systemMessageContainer: {
+    alignSelf: 'center',
+    marginVertical: 6,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    backgroundColor: '#F0F0F0',
+    borderRadius: 10
+  },
+  systemMessageText: {
+    color: '#666',
+    fontSize: 12
+  }
 })
