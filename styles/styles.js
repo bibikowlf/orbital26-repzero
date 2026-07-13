@@ -1117,5 +1117,17 @@ inviteCardTitle: {
     paddingHorizontal: 4,
     borderBottomWidth: 1,
     borderBottomColor: '#E5E5E5'
+  },
+  systemMessageContainer: {
+    alignSelf: 'center',
+    marginVertical: 6,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    backgroundColor: '#F0F0F0',
+    borderRadius: 10
+  },
+  systemMessageText: {
+    color: '#666',
+    fontSize: 12
   }
 })

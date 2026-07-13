@@ -213,6 +213,22 @@ export default function ChatThread() {
         throw error
 
       setInviteStatuses((prev) => ({ ...prev, [inviteId]: { ...prev[inviteId], status } }))
+
+      const { data: msg, error: msgError } = await supabase
+        .from('messages')
+        .insert({
+          sender_id: userId,
+          receiver_id: recipientId,
+          content: `${status === 'accepted' ? 'Accepted' : 'Declined'} the workout invite`,
+          message_type: 'system'
+        })
+        .select()
+        .single()
+
+      if (msgError)
+        throw msgError
+
+      setMessages((prev) => prev.some((m) => m.id === msg.id) ? prev : [...prev, msg])
     } catch (error) {
       Alert.alert('Error', error.message)
     }
@@ -293,6 +309,24 @@ export default function ChatThread() {
         throw error
 
       setEventRsvpStatuses((prev) => ({ ...prev, [eventId]: status }))
+
+      const eventTitle = eventDetails[eventId]?.title || 'the event'
+
+      const { data: msg, error: msgError } = await supabase
+        .from('messages')
+        .insert({
+          sender_id: userId,
+          receiver_id: recipientId,
+          content: `${status === 'going' ? 'RSVP\u2019d to' : 'Declined'} ${eventTitle}`,
+          message_type: 'system'
+        })
+        .select()
+        .single()
+
+      if (msgError)
+        throw msgError
+
+      setMessages((prev) => prev.some((m) => m.id === msg.id) ? prev : [...prev, msg])
     } catch (error) {
       Alert.alert('Error', error.message)
     }
@@ -407,6 +441,14 @@ export default function ChatThread() {
                     {rsvpStatus === 'going' ? '✅ Going' : '❌ Declined'}
                   </Text>
                 )}
+              </View>
+            )
+          }
+
+          if (item.message_type === 'system') {
+            return (
+              <View style={appStyles.systemMessageContainer}>
+                <Text style={appStyles.systemMessageText}>{item.content}</Text>
               </View>
             )
           }
