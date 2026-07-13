@@ -24,6 +24,11 @@ export default function ChatThread() {
   const [showDatePicker, setShowDatePicker] = useState(false)
   const [inviteStatuses, setInviteStatuses] = useState({})
 
+  const [showEventModal, setShowEventModal] = useState(false)
+  const [myEvents, setMyEvents] = useState([])
+  const [loadingEvents, setLoadingEvents] = useState(false)
+  const [sendingEventInvite, setSendingEventInvite] = useState(false)
+
   useEffect(() => {
     if (userId && recipientId)
       fetchMessages()
@@ -187,6 +192,55 @@ export default function ChatThread() {
     )
   }
 
+    async function handleOpenEventModal() {
+    setShowEventModal(true)
+
+    try {
+      setLoadingEvents(true)
+
+      const { data, error } = await supabase
+        .from('events')
+        .select('id, title, event_date')
+        .eq('creator_id', userId)
+        .order('event_date', { ascending: true })
+
+      if (error)
+        throw error
+
+      setMyEvents(data || [])
+    } catch (error) {
+      console.error('Error fetching your events:', error)
+    } finally {
+      setLoadingEvents(false)
+    }
+  }
+
+  async function handleSendEventInvite(event) {
+    try {
+      setSendingEventInvite(true)
+
+      const { error } = await supabase
+        .from('messages')
+        .insert({
+          sender_id: userId,
+          receiver_id: recipientId,
+          content: `Invited you to ${event.title}`,
+          message_type: 'event_invite',
+          event_id: event.id
+        })
+
+      if (error)
+        throw error
+
+      setShowEventModal(false)
+      Alert.alert('Invite Sent', `Invited to "${event.title}"`)
+    } catch (error) {
+      Alert.alert('Error', error.message)
+    } finally {
+      setSendingEventInvite(false)
+    }
+  }
+
   return (
   <>
     <KeyboardAvoidingView
@@ -259,12 +313,20 @@ export default function ChatThread() {
         }
       />
 
-      <TouchableOpacity
-        style={appStyles.inviteButton}
-        onPress={() => setShowInviteModal(true)}
-      >
-        <Text style={appStyles.inviteButtonText}>+ Invite to Workout</Text>
-      </TouchableOpacity>
+      <View style={appStyles.inviteButtonRow}>
+        <TouchableOpacity
+          style={[appStyles.inviteButton, { flex: 1, marginRight: 8 }]}
+          onPress={() => setShowInviteModal(true)}
+        >
+          <Text style={appStyles.inviteButtonText}>+ Workout</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[appStyles.inviteButton, { flex: 1, backgroundColor: '#FF9500' }]}
+          onPress={handleOpenEventModal}
+        >
+          <Text style={appStyles.inviteButtonText}>+ Event</Text>
+        </TouchableOpacity>
+      </View>
 
       <View style={appStyles.inputRow}>
         <TextInput
@@ -369,6 +431,43 @@ export default function ChatThread() {
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
     </Modal>
+    <Modal visible={showEventModal} transparent animationType="fade">
+    <View style={appStyles.modalOverlay}>
+      <View style={appStyles.modalContent}>
+        <Text style={appStyles.modalTitle}>Invite to Event</Text>
+
+        {loadingEvents ? (
+          <ActivityIndicator size="small" color="#000" style={{ marginTop: 20 }} />
+        ) : myEvents.length === 0 ? (
+          <Text style={appStyles.fallbackText}>You haven't created any events yet.</Text>
+        ) : (
+          <FlatList
+            data={myEvents}
+            keyExtractor={(item) => item.id}
+            style={{ maxHeight: 250, marginTop: 10 }}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.eventOptionRow}
+                onPress={() => handleSendEventInvite(item)}
+                disabled={sendingEventInvite}
+              >
+                <Text style={appStyles.exerciseName}>{item.title}</Text>
+                <Text style={{ color: '#666', marginTop: 2 }}>
+                  {new Date(item.event_date).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                </Text>
+              </TouchableOpacity>
+            )}
+          />
+        )}
+
+        <View style={appStyles.modalButtonRow}>
+          <TouchableOpacity onPress={() => setShowEventModal(false)}>
+            <Text style={appStyles.modalCancelText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  </Modal>
   </>
-)
+  )
 }

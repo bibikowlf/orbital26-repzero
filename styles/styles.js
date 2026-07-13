@@ -1107,4 +1107,15 @@ inviteCardTitle: {
     fontSize: 14,
     color: '#6B7280',
   },
+  inviteButtonRow: {
+    flexDirection: 'row',
+    marginHorizontal: 15,
+    marginBottom: 8
+  },
+  eventOptionRow: {
+    paddingVertical: 12,
+    paddingHorizontal: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E5E5'
+  }
 })
