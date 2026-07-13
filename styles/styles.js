@@ -5,7 +5,7 @@ export const appStyles = StyleSheet.create({
     marginTop: 40,
     padding: 12,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'stretch',
   },
   verticallySpaced: {
     paddingTop: 4,
@@ -969,5 +969,142 @@ flexOne: {
 inviteCardTitle: {
   fontWeight: 'bold',
   fontSize: 15
-}
+},
+  metricsCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    paddingVertical: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+    marginBottom: 24,
+    marginTop: 10,
+    width: '100%',
+  },
+
+  metricItem: {
+    flex: 1,
+    alignItems: 'center',
+    flexDirection: 'column',
+  },
+
+  metricNumber: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#1F2937',
+  },
+
+  metricLabel: {
+    fontSize: 13,
+    color: '#6B7280',
+    marginTop: 3,
+    fontWeight: '500',
+  },
+
+  metricDivider: {
+    width: 1,
+    height: 32,
+    backgroundColor: '#E5E7EB',
+  },
+
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 14,
+    width: '100%',
+  },
+
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1F2937',
+  },
+
+  addButton: {
+    backgroundColor: '#EEF2FF',
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 20,
+  },
+
+  addButtonText: {
+    color: '#4F46E5',
+    fontWeight: '600',
+    fontSize: 13,
+  },
+
+  chatRow: {
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    padding: 14,
+    borderRadius: 14,
+    alignItems: 'center',
+    marginBottom: 10,
+    width: '100%',
+    alignSelf: 'stretch', 
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.02,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+
+  avatarPlaceholder: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 14,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+
+  avatarText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#4B5563',
+  },
+
+  chatInfo: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+
+  chatHeaderLine: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    marginBottom: 4,
+    width: '100%', 
+  },
+
+  usernameText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+
+  timeText: {
+    fontSize: 11,
+    color: '#9CA3AF',
+  },
+
+  previewText: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
 })

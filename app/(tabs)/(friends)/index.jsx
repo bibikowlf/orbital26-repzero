@@ -124,44 +124,45 @@ export default function FriendsHome() {
   }
 
   return (
-    <View style={[appStyles.container, { paddingHorizontal: 15, paddingTop: 20, justifyContent: 'flex-start' }]}>
+    <View style={[appStyles.container, { paddingHorizontal: 20, paddingTop: 0, justifyContent: 'flex-start' }]}>
 
-      {loading ? (
-        <ActivityIndicator size="small" color="#000" />
-      ) : (
-        <View style={{ flexDirection: 'row', justifyContent: 'space-around', gap: 40 }}>
+      <View style={appStyles.metricsCard}>
+        {loading ? (
+          <ActivityIndicator size="small" color="#4F46E5" style={{ paddingVertical: 10 }} />
+        ) : (
+          <View style={{ flexDirection: 'row', width: '100%', justifyContent: 'space-around', alignItems: 'center' }}>
+            <TouchableOpacity
+              style={appStyles.metricItem}
+              onPress={() => router.push({ pathname: '/follow-list', params: { mode: 'followers' } })}
+            >
+              <Text style={appStyles.metricNumber}>{followerCount}</Text>
+              <Text style={appStyles.metricLabel}>Followers</Text>
+            </TouchableOpacity>
+            
+            <View style={appStyles.metricDivider} />
+            
+            <TouchableOpacity
+              style={appStyles.metricItem}
+              onPress={() => router.push({ pathname: '/follow-list', params: { mode: 'following' } })}
+            >
+              <Text style={appStyles.metricNumber}>{followingCount}</Text>
+              <Text style={appStyles.metricLabel}>Following</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+
+      <View style={appStyles.sectionHeaderRow}>
+        <Text style={appStyles.sectionTitle}>Messages</Text>
         <TouchableOpacity
-          style={{ alignItems: 'center' }}
-          onPress={() => router.push({ pathname: '/follow-list', params: { mode: 'followers' } })}
+          style={appStyles.addButton}
+          onPress={() => router.push('/search-users')}
         >
-          <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{followerCount}</Text>
-          <Text style={{ color: '#666' }}>Followers</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{ alignItems: 'center' }}
-          onPress={() => router.push({ pathname: '/follow-list', params: { mode: 'following' } })}
-        >
-          <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{followingCount}</Text>
-          <Text style={{ color: '#666' }}>Following</Text>
+          <Text style={appStyles.addButtonText}>+ Find Friends</Text>
         </TouchableOpacity>
       </View>
-      )}
 
-      <Spacer />
-
-      <TouchableOpacity
-        style={appStyles.fab}
-        onPress={() => router.push('/search-users')}
-      >
-        <Text>+</Text>
-      </TouchableOpacity>
-
-      <Spacer />
-
-      <Text style={[appStyles.label, { fontSize: 18, fontWeight: 'bold' }]}>Chats</Text>
-      <Spacer />
-
-      {chatsLoading && <ActivityIndicator size="small" color="#000" />}
+      {chatsLoading && <ActivityIndicator size="small" color="#000" style={{ marginVertical: 10 }} />}
 
       {!chatsLoading && chats.length === 0 && (
         <Text style={appStyles.fallbackText}>Follow someone to start chatting.</Text>
@@ -170,26 +171,39 @@ export default function FriendsHome() {
       <FlatList
         data={chats}
         keyExtractor={(item) => item.id}
+        showsVerticalScrollIndicator={false}
         renderItem={({ item }) => {
           const preview = item.lastMessage
             ? (item.lastMessage.message_type === 'invite' ? '🏋️ Workout invite' : item.lastMessage.content)
             : 'Say hi!'
     
-        return (
-          <TouchableOpacity
-            style={{
-              paddingVertical: 14,
-              paddingHorizontal: 4,
-              borderBottomWidth: 1,
-              borderBottomColor: '#E5E5E5'
-            }}
-            onPress={() => router.push({ pathname: '/chat-thread', params: { recipientId: item.id, recipientUsername: item.username } })}
-          >
-            <Text style={appStyles.exerciseName}>{item.username}</Text>
-            <Text style={{ color: '#666', marginTop: 2 }} numberOfLines={1}>{preview}</Text>
-          </TouchableOpacity>
-        )
-      }}
+          return (
+            <TouchableOpacity
+              style={appStyles.chatRow}
+              onPress={() => router.push({ pathname: '/chat-thread', params: { recipientId: item.id, recipientUsername: item.username } })}
+            >
+              <View style={appStyles.avatarPlaceholder}>
+                <Text style={appStyles.avatarText}>
+                  {item.username?.substring(0, 2).toUpperCase() || '??'}
+                </Text>
+              </View>
+              
+              <View style={appStyles.chatInfo}>
+                <View style={appStyles.chatHeaderLine}>
+                  <Text style={appStyles.usernameText}>{item.username}</Text>
+                  {item.lastMessage && (
+                    <Text style={appStyles.timeText}>
+                      {new Date(item.lastMessage.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </Text>
+                  )}
+                </View>
+                <Text style={appStyles.previewText} numberOfLines={1}>
+                  {preview}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          )
+        }}
       />
     </View>
   )
