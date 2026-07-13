@@ -82,6 +82,30 @@ export default function FriendsHome() {
       if (profileError)
         throw profileError
 
+      const { data: allMessages, error: messagesError } = await supabase
+      .from('messages')
+      .select('sender_id, receiver_id, content, message_type, created_at')
+      .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
+      .order('created_at', { ascending: false })
+
+      if (messagesError)
+        throw messagesError
+
+      const lastMessageMap = {};
+      
+      (allMessages || []).forEach((msg) => {
+        const counterpartId = msg.sender_id === userId ? msg.receiver_id : msg.sender_id
+        if (!lastMessageMap[counterpartId]) {
+          lastMessageMap[counterpartId] = msg
+        }
+      })
+
+      const merged = (profiles || []).map((profile) => ({
+        ...profile,
+        lastMessage: lastMessageMap[profile.id] || null
+      }))
+
+
       setChats(profiles || [])
     } catch (error) {
       console.error('Error fetching chats:', error)
@@ -137,7 +161,12 @@ export default function FriendsHome() {
       <FlatList
         data={chats}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
+        renderItem={({ item }) => {
+          const preview = item.lastMessage
+            ? (item.lastMessage.message_type === 'invite' ? '🏋️ Workout invite' : item.lastMessage.content)
+            : 'Say hi!'
+    
+        return (
           <TouchableOpacity
             style={{
               paddingVertical: 14,
@@ -148,8 +177,10 @@ export default function FriendsHome() {
             onPress={() => router.push({ pathname: '/chat-thread', params: { recipientId: item.id, recipientUsername: item.username } })}
           >
             <Text style={appStyles.exerciseName}>{item.username}</Text>
+            <Text style={{ color: '#666', marginTop: 2 }} numberOfLines={1}>{preview}</Text>
           </TouchableOpacity>
-        )}
+        )
+      }}
       />
     </View>
   )
