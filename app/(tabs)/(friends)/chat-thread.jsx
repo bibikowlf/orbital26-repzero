@@ -32,9 +32,13 @@ export default function ChatThread() {
   const [eventDetails, setEventDetails] = useState({})
   const [eventRsvpStatuses, setEventRsvpStatuses] = useState({})
 
+  const [myUsername, setMyUsername] = useState('')
+
   useEffect(() => {
-    if (userId && recipientId)
+    if (userId && recipientId) {
       fetchMessages()
+      fetchMyUsername()
+    }
   }, [userId, recipientId])
 
   useEffect(() => {
@@ -63,6 +67,23 @@ export default function ChatThread() {
       supabase.removeChannel(channel)
     }
   }, [userId, recipientId])
+
+  async function fetchMyUsername() {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', userId)
+        .single()
+
+      if (error)
+        throw error
+
+      setMyUsername(data?.username || 'You')
+    } catch (error) {
+      console.error('Error fetching username:', error)
+    }
+  }
 
   async function fetchMessages() {
     try {
@@ -219,7 +240,7 @@ export default function ChatThread() {
         .insert({
           sender_id: userId,
           receiver_id: recipientId,
-          content: `${status === 'accepted' ? 'Accepted' : 'Declined'} the workout invite`,
+          content: `${myUsername} ${status === 'accepted' ? 'Accepted' : 'Declined'} the workout invite`,
           message_type: 'system'
         })
         .select()
@@ -317,7 +338,7 @@ export default function ChatThread() {
         .insert({
           sender_id: userId,
           receiver_id: recipientId,
-          content: `${status === 'going' ? 'RSVP\u2019d to' : 'Declined'} ${eventTitle}`,
+          content: `${myUsername} ${status === 'going' ? 'RSVP\u2019d to' : 'Declined'} ${eventTitle}`,
           message_type: 'system'
         })
         .select()
