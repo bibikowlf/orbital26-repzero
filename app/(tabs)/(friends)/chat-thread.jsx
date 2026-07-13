@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator, 
   KeyboardAvoidingView, Platform, StyleSheet, Modal, Alert, TouchableWithoutFeedback, Keyboard } from 'react-native'
 import { useLocalSearchParams } from 'expo-router'
@@ -33,13 +33,25 @@ export default function ChatThread() {
   const [eventRsvpStatuses, setEventRsvpStatuses] = useState({})
 
   const [myUsername, setMyUsername] = useState('')
+  const flatListRef = useRef(null)
 
   useEffect(() => {
-    if (userId && recipientId) {
+    if (userId && recipientId) 
       fetchMessages()
-      fetchMyUsername()
-    }
   }, [userId, recipientId])
+
+  useEffect(() => {
+    if (userId && recipientId) 
+      fetchMyUsername()
+  }, [userId, recipientId])
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true })
+      }, 100)
+    }
+  }, [messages])
 
   useEffect(() => {
     if (!userId || !recipientId)
@@ -361,9 +373,11 @@ export default function ChatThread() {
       keyboardVerticalOffset={90}
     >
       <FlatList
+        ref={flatListRef}
         data={messages}
         keyExtractor={(item) => item.id}
         contentContainerStyle={appStyles.messageListContent}
+        onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
         renderItem={({ item }) => {
           const isMine = item.sender_id === userId
 
