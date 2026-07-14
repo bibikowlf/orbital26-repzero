@@ -1,4 +1,4 @@
-/*import React from 'react'
+import React from 'react'
 import { render, screen, fireEvent, waitFor, act, cleanup } from '@testing-library/react-native'
 import { Alert } from 'react-native'
 import Profile from '../../app/(tabs)/(settings)/profile'
@@ -113,7 +113,7 @@ describe('Plan & Log Integration Test', () => {
     
     await act(async () => cleanup())
 
-    await act(async () => render(<GeneratePlan />))
+    /*await act(async () => render(<GeneratePlan />))
     
     await act(async () => fireEvent.press(screen.findByText('AI Generate')))
     await waitFor(() => expect(screen.getByText('Generate')).toBeTruthy())
@@ -136,7 +136,6 @@ describe('Plan & Log Integration Test', () => {
     const confirmImportAction = Alert.alert.mock.calls[0][2].find(btn => btn.text === 'Import')
     await act(async () => confirmImportAction.onPress())
 
-    expect(screen.getByDisplayValue('Squats')).toBeTruthy()
+    expect(screen.getByDisplayValue('Squats')).toBeTruthy()*/
   })
 })
-*/
