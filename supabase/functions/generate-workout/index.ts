@@ -13,7 +13,7 @@ export default {
     }
 
     try {
-      const { profile, notes } = await req.json()
+      const { profile } = await req.json()
 
       // @ts-ignore
       const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
@@ -38,15 +38,10 @@ export default {
           }
         ]
       `
-      if (notes && notes.trim().length > 0) {
-        prompt += `\n\nAdditional user instructions for this specific plan: ${notes.trim()}
-        Prioritize these instructions now while keeping the plan safe, balanced, and structured in the same JSON format.`
-      }
 
-      console.log("FINAL GEMINI PROMPT:\n", prompt);
-
+      //server to server
       const googleResponse = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${GEMINI_API_KEY}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -65,11 +60,7 @@ export default {
         throw new Error(result?.error?.message || "Gemini failure")
       }
 
-      let rawJsonString = result?.candidates?.[0]?.content?.parts?.[0]?.text
-
-      if (!rawJsonString) {
-        throw new Error("Empty response from model processor.")
-      }
+      const rawJsonString = result?.candidates?.[0]?.content?.parts?.[0]?.text
     
       return new Response(rawJsonString, {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
