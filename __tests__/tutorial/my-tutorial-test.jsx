@@ -1,7 +1,8 @@
 import React from 'react'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react-native'
-import WorkoutTutorials from '../app/(tabs)/(tutorial)/tutorial'
-import { supabase } from '../lib/supabase'
+import MyTutorials from '../../app/(tabs)/(settings)/my-tutorials'
+import { supabase } from '../../lib/supabase'
+import { Alert } from 'react-native'
 
 const mockUserSubId = 'mock-user-123'
 const mockTutorial = {
@@ -14,7 +15,7 @@ const mockTutorial = {
 
 let mockActiveChains = {}
 
-jest.mock('../lib/supabase', () => ({
+jest.mock('../../lib/supabase', () => ({
   supabase: {
     from: jest.fn((table) => {
       if (!mockActiveChains[table]) {
@@ -41,17 +42,25 @@ jest.mock('../lib/supabase', () => ({
   }
 }))
 
-jest.mock('../hooks/auth-context', () => ({
+jest.mock('../../hooks/auth-context', () => ({
   useAuthContext: () => ({ claims: { sub: mockUserSubId } }),
 }))
 
-jest.mock('expo-router', () => ({
-  useLocalSearchParams: () => ({ id: 'workout-abc', name: 'Chest Press' }),
-  Stack: { Screen: () => null },
-  router: { navigate: jest.fn() }
-}))
+jest.mock('expo-router', () => {
+  const ReactModule = require('react')
+  return {
+    useFocusEffect: (callback) => {
+      ReactModule.useEffect(() => {
+        callback()
+      }, [callback])
+    },
+    useLocalSearchParams: () => ({ id: 'workout-abc', name: 'Chest Press' }),
+    Stack: { Screen: () => null },
+    router: { navigate: jest.fn() }
+  }
+})
 
-jest.mock('../components/text-info', () => {
+jest.mock('../../components/text-info', () => {
   const { View, Text, TouchableOpacity } = require('react-native')
   return function MockTextInfo({ score, onVotePress, onEditPress, onDeletePress }) {
     return (
@@ -65,43 +74,21 @@ jest.mock('../components/text-info', () => {
   }
 })
 
-describe('WorkoutTutorials Integration Tests', () => {
+describe('MyTutorial Unit Test', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockActiveChains = {}
+    jest.spyOn(Alert, 'alert').mockImplementation(() => {})
   })
 
-  it('adds a new tutorial entry', async () => {
-    const tableBuilder = {
-      insert: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      then: jest.fn().mockImplementation((resolve) => 
-        Promise.resolve(resolve({ data: [{ id: 'new-id-000', content: 'Fresh Muscle Tutorial', score: 0 }], error: null }))
-      )
-    }
-    mockActiveChains['workout_tutorials'] = tableBuilder
-
-    await act(async () => render(<WorkoutTutorials />))
-    await waitFor(() => expect(screen.getByText('Original Form Tutorial Content')).toBeTruthy())
-
-    const input = screen.getByPlaceholderText('Enter tutorial')
-    await act(async () => fireEvent.changeText(input, 'Fresh Muscle Tutorial'))
-    await act(async () => fireEvent.press(screen.getByText('Add')))
-
-    await waitFor(() => {
-      expect(supabase.from).toHaveBeenCalledWith('workout_tutorials')
-      expect(screen.getByText('Fresh Muscle Tutorial')).toBeTruthy()
-    })
-  })
-
-  it('saves edits made to a tutorial after bypassing guard clauses', async () => {
+  it('tutorial is updated after editing', async () => {
     const tableBuilder = {
       upsert: jest.fn().mockReturnThis(),
       then: jest.fn().mockImplementation((resolve) => Promise.resolve(resolve({ error: null })))
     }
     mockActiveChains['workout_tutorials'] = tableBuilder
 
-    await act(async () => render(<WorkoutTutorials />))
+    await act(async () => render(<MyTutorials />))
     await waitFor(() => expect(screen.getByText('Original Form Tutorial Content')).toBeTruthy())
 
     await act(async () => fireEvent.press(screen.getByText('Edit Mock Button')))
@@ -118,7 +105,7 @@ describe('WorkoutTutorials Integration Tests', () => {
     })
   })
 
-  it('toggles voting increments and decrements', async () => {
+  it('vote is added after upvoting', async () => {
     supabase.from.mockImplementation((table) => {
       const builder = {
         select: jest.fn().mockReturnThis(),
@@ -130,7 +117,6 @@ describe('WorkoutTutorials Integration Tests', () => {
             return Promise.resolve(resolve({ data: [mockTutorial], error: null }))
             }
             if (table === 'workout_tutorial_votes') {
-            // 🚀 FORCE EMPTY ARRAY so voted.has('tutorial-999') evaluates to FALSE
             return Promise.resolve(resolve({ data: [], error: null }))
             }
             return Promise.resolve(resolve({ data: [], error: null }))
@@ -139,7 +125,7 @@ describe('WorkoutTutorials Integration Tests', () => {
       return builder
     })
 
-    await act(async () => render(<WorkoutTutorials />))
+    await act(async () => render(<MyTutorials />))
     await waitFor(() => expect(screen.getByText('Score Counter: 10')).toBeTruthy())
 
     const writeBuilder = {
@@ -155,7 +141,40 @@ describe('WorkoutTutorials Integration Tests', () => {
     await waitFor(() => expect(screen.getByText('Score Counter: 11')).toBeTruthy())
   })
 
-  it('removes tutorial node references upon deletion', async () => {
+  it('vote is deleted after retracting upvote', async () => {
+    supabase.from.mockImplementation((table) => {
+      const builder = {
+        select: jest.fn().mockReturnThis(),
+        insert: jest.fn().mockReturnThis(),
+        delete: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        then: jest.fn().mockImplementation((resolve) => {
+          if (table === 'workout_tutorials_with_votes') {
+            return Promise.resolve(resolve({ data: [mockTutorial], error: null }))
+          }
+          if (table === 'workout_tutorial_votes') {
+            return Promise.resolve(resolve({ data: [{ id: 'existing-vote-111', user_id: mockUserSubId, comment_id: 'tutorial-999' }], error: null }))
+          }
+          return Promise.resolve(resolve({ data: [], error: null }))
+        })
+      }
+      mockActiveChains[table] = builder
+      return builder
+    })
+
+    await act(async () => render(<MyTutorials />))
+    await waitFor(() => expect(screen.getByText('Score Counter: 10')).toBeTruthy())
+
+    await act(async () => fireEvent.press(screen.getByText('Vote Mock Button')))
+
+    await waitFor(() => {
+      expect(supabase.from).toHaveBeenCalledWith('workout_tutorial_votes')
+      expect(mockActiveChains['workout_tutorial_votes'].delete).toHaveBeenCalled()
+      expect(screen.getByText('Score Counter: 9')).toBeTruthy()
+    })
+  })
+
+  it('tutorial is deleted after pressing delete button', async () => {
     const tableBuilder = {
       delete: jest.fn().mockReturnThis(),
       eq: jest.fn().mockReturnThis(),
@@ -163,7 +182,7 @@ describe('WorkoutTutorials Integration Tests', () => {
     }
     mockActiveChains['workout_tutorials'] = tableBuilder
 
-    await act(async () => render(<WorkoutTutorials />))
+    await act(async () => render(<MyTutorials />))
     await waitFor(() => expect(screen.getByText('Original Form Tutorial Content')).toBeTruthy())
 
     await act(async () => fireEvent.press(screen.getByText('Delete Mock Button')))
@@ -172,5 +191,21 @@ describe('WorkoutTutorials Integration Tests', () => {
       expect(supabase.from).toHaveBeenCalledWith('workout_tutorials')
       expect(screen.queryByText('Original Form Tutorial Content')).toBeNull()
     })
+  })
+
+  it('tutorial cannot be updated to empty tutorial', async () => {
+    await act(async () => render(<MyTutorials />))
+    await waitFor(() => expect(screen.getByText('Original Form Tutorial Content')).toBeTruthy())
+
+    await act(async () => fireEvent.press(screen.getByText('Edit Mock Button')))
+
+    const input = await screen.findByDisplayValue('Original Form Tutorial Content')
+    await act(async () => fireEvent.changeText(input, ''))
+
+    const submitBtn = screen.getByText(/^Edit$/)
+    await act(async () => fireEvent.press(submitBtn))
+
+    expect(Alert.alert).toHaveBeenCalledWith('Tutorial cannot be empty')
+    expect(supabase.from).not.toHaveBeenCalledWith('workout_tutorials')
   })
 })

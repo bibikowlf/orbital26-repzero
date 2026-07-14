@@ -1,15 +1,15 @@
-import { buildCommentTree } from '../functions/build-comment-tree'
+import { buildCommentTree } from '../../functions/build-comment-tree'
 
 jest.mock('@react-native-async-storage/async-storage', () => 
   require('@react-native-async-storage/async-storage/jest/async-storage-mock')
 )
-jest.mock('../lib/supabase', () => ({
+jest.mock('../../lib/supabase', () => ({
   supabase: {
     from: jest.fn()
   }
 }))
 
-describe('BuildCommentTree Unit Tests', () => {
+describe('BuildCommentTree Unit Test', () => {
   it('should correctly nest a reply under its parent comment', () => {
     const mockComments = [
       { id: 1, content: 'Parent comment', parent_id: null },

@@ -165,6 +165,7 @@ export default function Profile() {
             keyboardType='numeric'
             onChangeText={(text) => setWeight(handleNumericInput(text))}
             style={styles.input}
+            testID='weight-input'
           />
         </View>
 
