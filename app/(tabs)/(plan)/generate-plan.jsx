@@ -4,7 +4,6 @@ import { supabase } from '../../../lib/supabase'
 import { useAuthContext } from '../../../hooks/auth-context'
 import { appStyles } from '../../../styles/styles'
 import Spacer from '../../../components/spacer'
-import { FunctionsHttpError } from '@supabase/supabase-js'
 
 export function addExerciseToDay(plan, dayIndex) {
   const updated = plan.map((day, i) =>
@@ -46,8 +45,6 @@ export default function GeneratePlan() {
   const [fetching, setFetching] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [workoutPlan, setWorkoutPlan] = useState([])
-  const [showRegenModal, setShowRegenModal] = useState(false)
-  const [regenNotes, setRegenNotes] = useState('')
 
   function handleAddExercise(dayIndex) {
     setWorkoutPlan(addExerciseToDay(workoutPlan, dayIndex))
@@ -88,22 +85,8 @@ export default function GeneratePlan() {
     }
   }
 
-  function handleRegeneratePress() {
-    setShowRegenModal(true)
-  }
-
-  function handleCancelRegenModal() {
-    setShowRegenModal(false)
-    setRegenNotes('')
-  }
-
-  function handleConfirmRegenerate() {
-    setShowRegenModal(false)
-    handleGenerateWorkout(regenNotes)
-    setRegenNotes('')
-  }
-
-  async function handleGenerateWorkout(notes) {
+  async function handleGenerateWorkout() {
+    // console.log("API KEY:", process.env.EXPO_PUBLIC_GEMINI_KEY)
     try {
       setLoading(true)
 
@@ -117,53 +100,28 @@ export default function GeneratePlan() {
         throw profileError
 
       const { data: edgeData, error: edgeError } = await supabase.functions.invoke('generate-workout', {
-        body: { profile: profile, notes: notes || null },
-      });
+        body: { profile: profile },
+    });
 
     if (edgeError) 
-      throw edgeError
+      throw edgeError;
 
-      console.log("EDGE DATA RECEIVED:", JSON.stringify(edgeData, null, 2))
+    const rawJsonString = edgeData?.candidates?.[0]?.content?.parts?.[0]?.text
 
-      // Bulletproof Defensive Parsing Strategy
-      let parsedPlan = null;
+    if (!rawJsonString) {
+      throw new Error("Invalid structure data returned from production processor.")
+    }
 
-      if (Array.isArray(edgeData)) {
-        parsedPlan = edgeData;
-      } else if (typeof edgeData === 'string') {
-        let cleanText = edgeData.trim();
-        if (cleanText.startsWith('```')) {
-          cleanText = cleanText.replace(/^```json\s*/i, '').replace(/```$/, '').trim();
-        }
-        parsedPlan = JSON.parse(cleanText);
-      } else if (edgeData && typeof edgeData === 'object') {
-        // Fallback check if it ever returns wrapped in raw Gemini object structure
-        const rawText = edgeData?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (rawText) {
-          let cleanText = rawText.trim();
-          if (cleanText.startsWith('```')) {
-            cleanText = cleanText.replace(/^```json\s*/i, '').replace(/```$/, '').trim();
-          }
-          parsedPlan = JSON.parse(cleanText);
-        }
-      }
+    const parsedPlan = JSON.parse(rawJsonString)
 
-      if (!parsedPlan || !Array.isArray(parsedPlan)) {
-        throw new Error("Invalid structure data returned from production processor.")
-      }
-
-      await savePlanToDatabase(parsedPlan)
-      setWorkoutPlan(parsedPlan)
-      setIsEditing(false)
-      Alert.alert("Success", "Your routine has been generated!")
+    await savePlanToDatabase(parsedPlan)
+    setWorkoutPlan(parsedPlan)
+    setIsEditing(false)
+    Alert.alert("Success", "Your routine has been generated!")
 
     } catch (error) {
-      Alert.alert("Generation Failed", "Please try again later")
+      Alert.alert("Generation Failed", error.message)
       console.error(error)
-      if (error && error instanceof FunctionsHttpError) {
-        const errorMessage = await error.context.json()
-        console.log('Function returned an error', errorMessage)
-      }
     } finally {
       setLoading(false)
     }
@@ -211,7 +169,7 @@ export default function GeneratePlan() {
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <TouchableOpacity 
           style={[appStyles.actionButton, { backgroundColor: '#007AFF' }, loading && appStyles.buttonDisabled]}
-          onPress={handleRegeneratePress}
+          onPress={handleGenerateWorkout}
           disabled={loading}
         >
           <Text style={appStyles.buttonText}>{workoutPlan.length > 0 ? 'AI Regenerate' : 'AI Generate'}</Text>
@@ -296,31 +254,6 @@ export default function GeneratePlan() {
         <Text style={appStyles.fallbackText}>No routine active. Prompt Gemini to map out your week.</Text>
       )}
       <Spacer />
-
-      <Modal visible={showRegenModal} transparent animationType="fade">
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
-          <View style={{ width: '85%', backgroundColor: '#fff', borderRadius: 12, padding: 20 }}>
-            <Text style={[appStyles.label, { fontSize: 18, fontWeight: 'bold' }]}>Any changes for this plan?</Text>
-            <Text style={{ color: '#666', marginTop: 4, marginBottom: 10 }}>Optional — add notes to guide the generation.</Text>
-            <TextInput
-              style={[appStyles.inlineInput, { height: 90, textAlignVertical: 'top' }]}
-              placeholder="e.g. focus more on upper body, avoid squats, shorter sessions this week"
-              value={regenNotes}
-              onChangeText={setRegenNotes}
-              multiline
-              numberOfLines={4}
-            />
-            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 15 }}>
-              <TouchableOpacity onPress={handleCancelRegenModal} style={{ marginRight: 20 }}>
-                <Text style={{ color: '#666' }}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={handleConfirmRegenerate}>
-                <Text style={{ color: '#007AFF', fontWeight: 'bold' }}>{workoutPlan.length > 0 ? 'Regenerate' : 'Generate'}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </ScrollView>
   )
 }

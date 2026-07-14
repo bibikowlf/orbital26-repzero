@@ -32,7 +32,7 @@ export default function FriendsLayout() {
       />
       <Stack.Screen name='invite-inbox' 
         options={{ title: 'Workout Invites', headerLeft: () => <BackButton /> }}
-      />
+      />  
     </Stack>
   )
 }

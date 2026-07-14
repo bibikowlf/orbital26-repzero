@@ -1129,5 +1129,20 @@ inviteCardTitle: {
   systemMessageText: {
     color: '#666',
     fontSize: 12
+  },
+  container: {
+    paddingRight: 16,
+    position: 'relative',
+  },
+  dot: {
+    position: 'absolute',
+    top: -2,
+    right: 12,
+    width: 9,
+    height: 9,
+    borderRadius: 5,
+    backgroundColor: '#e53935',
+    borderWidth: 1.5,
+    borderColor: '#fff',
   }
 })
