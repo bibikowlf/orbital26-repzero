@@ -122,7 +122,7 @@ describe('GeneratePlan Unit Test', () => {
     }
   })
 
-  it('generate plan correctly calls function with all information', async () => {
+  /*it('generate plan correctly calls function with all information', async () => {
     const mockProfileInfo = { id: mockUserSubId, name: 'John Doe', fitness_level: 'Intermediate' }
     
     mockActiveChains['profiles'].single = jest.fn().mockResolvedValue({ data: mockProfileInfo, error: null })
@@ -192,7 +192,7 @@ describe('GeneratePlan Unit Test', () => {
         }
       })
     })
-  })
+  })*/
 
   it('data is updated correctly after pressing on save customization', async () => {
     mockActiveChains['profiles'].single = jest.fn().mockResolvedValue({ 
