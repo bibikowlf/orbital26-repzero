@@ -14,6 +14,18 @@ const mockInitialPlan = [
   }
 ]
 
+const mockEdgeFunctionResponse = {
+  candidates: [
+    {
+      content: {
+        parts: [
+          { text: JSON.stringify(mockInitialPlan) }
+        ]
+      }
+    }
+  ]
+}
+
 jest.mock('../../lib/supabase', () => ({
   supabase: {
     from: jest.fn((table) => {
@@ -122,77 +134,37 @@ describe('GeneratePlan Unit Test', () => {
     }
   })
 
-  /*it('generate plan correctly calls function with all information', async () => {
+  it('generate plan correctly calls function with all information', async () => {
     const mockProfileInfo = { id: mockUserSubId, name: 'John Doe', fitness_level: 'Intermediate' }
     
     mockActiveChains['profiles'].single = jest.fn().mockResolvedValue({ data: mockProfileInfo, error: null })
     
-    supabase.functions.invoke.mockResolvedValue({ data: mockInitialPlan, error: null })
+    supabase.functions.invoke.mockResolvedValue({ data: mockEdgeFunctionResponse, error: null })
 
     await act(async () => render(<GeneratePlan />))
 
-    const generateBtn = screen.getByText('AI Generate')
-    await act(async () => fireEvent.press(generateBtn))
-
-    const confirmBtn = screen.getByText('Generate')
-    await act(async () => fireEvent.press(confirmBtn))
+    await act(async () => fireEvent.press(screen.getByText('AI Generate')))
 
     await waitFor(() => {
       expect(supabase.functions.invoke).toHaveBeenCalledWith('generate-workout', {
-        body: { profile: mockProfileInfo, notes: null }
+        body: { profile: mockProfileInfo }
       })
     })
   })
 
   it('plan is added correctly after pressing on generate plan', async () => {
     mockActiveChains['profiles'].single = jest.fn().mockResolvedValue({ data: {}, error: null })
-    supabase.functions.invoke.mockResolvedValue({ data: mockInitialPlan, error: null })
+    supabase.functions.invoke.mockResolvedValue({ data: mockEdgeFunctionResponse, error: null })
 
     await act(async () => render(<GeneratePlan />))
 
     await act(async () => fireEvent.press(screen.getByText('AI Generate')))
-    await act(async () => fireEvent.press(screen.getByText('Generate')))
 
     await waitFor(() => {
       expect(screen.getByText('Bench Press')).toBeTruthy()
       expect(screen.getByText('3 Sets x 10 Reps')).toBeTruthy()
     })
   })
-
-  it('regenerate with comments enabled with existing plan', async () => {
-    const existingPlanProfile = { 
-        id: mockUserSubId, 
-        workout_plan: mockInitialPlan 
-    }
-
-    mockActiveChains['profiles'].single = jest.fn()
-      .mockResolvedValueOnce({ data: { workout_plan: mockInitialPlan }, error: null })
-      .mockResolvedValueOnce({ data: existingPlanProfile, error: null })
-
-    supabase.functions.invoke.mockResolvedValue({ data: mockInitialPlan, error: null })
-
-    await act(async () => render(<GeneratePlan />))
-
-    await waitFor(() => expect(screen.getByText('Bench Press')).toBeTruthy())
-
-    const openModalBtn = screen.getByText('AI Regenerate')
-    await act(async () => fireEvent.press(openModalBtn))
-
-    const notesInput = screen.getByTestId('regen-notes-input')
-    await act(async () => fireEvent.changeText(notesInput, 'Focus heavily on arms'))
-
-    const submitRegenBtn = screen.getByText('Regenerate')
-    await act(async () => fireEvent.press(submitRegenBtn))
-
-    await waitFor(() => {
-      expect(supabase.functions.invoke).toHaveBeenCalledWith('generate-workout', {
-        body: {
-          profile: existingPlanProfile,
-          notes: 'Focus heavily on arms'
-        }
-      })
-    })
-  })*/
 
   it('data is updated correctly after pressing on save customization', async () => {
     mockActiveChains['profiles'].single = jest.fn().mockResolvedValue({ 

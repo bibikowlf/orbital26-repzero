@@ -5,7 +5,8 @@ import Profile from '../../app/(tabs)/(settings)/profile'
 import GeneratePlan from '../../app/(tabs)/(plan)/generate-plan'
 import ExerciseLog from '../../app/(tabs)/(log)/exercise-log'
 
-const mockDynamicDayName = new Date().toLocaleDateString('en-US', { weekday: 'long' })
+const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+const mockDynamicDayName = dayNames[new Date().getDay()] 
 const mockUserSubId = 'user-123'
 const mockTodayDate = new Date().toISOString().split('T')[0]
 
@@ -25,11 +26,25 @@ jest.mock('../../lib/supabase', () => ({
               exercises: [{ name: 'Squats', sets: 4, reps: '10' }]
             }
           ]
+          
           mockDatabaseStore.profiles[mockUserSubId] = { 
             ...mockDatabaseStore.profiles[mockUserSubId],
             workout_plan: generatedPlan 
           }
-          return Promise.resolve({ data: generatedPlan, error: null })
+
+          const mockEdgeResponse = {
+            candidates: [
+              {
+                content: {
+                  parts: [
+                    { text: JSON.stringify(generatedPlan) }
+                  ]
+                }
+              }
+            ]
+          }
+
+          return Promise.resolve({ data: mockEdgeResponse, error: null })
         }
         return Promise.resolve({ data: null, error: null })
       })
@@ -42,7 +57,7 @@ jest.mock('../../lib/supabase', () => ({
             ...mockDatabaseStore.profiles[mockUserSubId],
             ...payload
           }
-          return Promise.resolve({ error: null })
+          return builder
         }),
         eq: jest.fn().mockImplementation((column, value) => builder),
         single: jest.fn().mockImplementation(() => {
@@ -75,12 +90,12 @@ jest.mock('../../lib/supabase', () => ({
 }))
 
 jest.mock('expo-router', () => {
-  const React = require('react');
-  const { View } = require('react-native');
+  const React = require('react')
+  const { View } = require('react-native')
   return {
     router: { push: jest.fn(), replace: jest.fn(), back: jest.fn() },
     useFocusEffect: (callback) => {
-      React.useEffect(() => { callback(); }, []);
+      React.useEffect(() => callback(), [])
     },
     Stack: Object.assign(({ children }) => React.createElement(View, null, children), { Screen: () => null }),
   }
@@ -104,6 +119,8 @@ describe('Plan & Log Integration Test', () => {
   afterEach(() => cleanup())
 
   it('user fills out profile, generates exercise plan, then imports plan to exercise log', async () => {
+    mockDatabaseStore.profiles[mockUserSubId] = { workout_plan: null }
+
     await act(async () => render(<Profile />))
     
     await act(async () => fireEvent.changeText(screen.getByTestId('weight-input'), '70'))
@@ -113,29 +130,41 @@ describe('Plan & Log Integration Test', () => {
     
     await act(async () => cleanup())
 
-    /*await act(async () => render(<GeneratePlan />))
+    await act(async () => render(<GeneratePlan />))
     
-    await act(async () => fireEvent.press(screen.findByText('AI Generate')))
-    await waitFor(() => expect(screen.getByText('Generate')).toBeTruthy())
-
-    const confirmGenerateBtn = await screen.findByText('Generate')
-    await act(async () => fireEvent.press(confirmGenerateBtn))
+    const generateBtn = await screen.findByText('AI Generate')
+    await act(async () => fireEvent.press(generateBtn))
 
     await waitFor(() => expect(mockDatabaseStore.profiles[mockUserSubId].workout_plan).toHaveLength(1))
     
     await act(async () => cleanup())
 
+    mockDatabaseStore.profiles[mockUserSubId].workout_plan = [
+      {
+        day: mockDynamicDayName,
+        exercises: [{ name: 'Squats', sets: 4, reps: '10' }]
+      }
+    ]
+
     await act(async () => render(<ExerciseLog />))
 
-    const triggerImportModalBtn = await screen.findByText('↓ Import from Workout Plan')
-    await act(async () => fireEvent.press(triggerImportModalBtn))
+    Alert.alert.mockClear() 
 
-    const executeImportActionBtn = await screen.findByText('Import These Exercises')
-    await act(async () => fireEvent.press(executeImportActionBtn))
+    const importBtn = screen.getByText(/Import from Workout Plan/i)
+    await act(async () => fireEvent.press(importBtn))
 
-    const confirmImportAction = Alert.alert.mock.calls[0][2].find(btn => btn.text === 'Import')
-    await act(async () => confirmImportAction.onPress())
+    const confirmImportActionBtn = await screen.findByText('Import These Exercises')
+    await act(async () => fireEvent.press(confirmImportActionBtn))
 
-    expect(screen.getByDisplayValue('Squats')).toBeTruthy()*/
+    let confirmAction
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalled()
+      confirmAction = Alert.alert.mock.calls[0][2].find(btn => btn.text === 'Import')
+      expect(confirmAction).toBeDefined()
+    })
+
+    await act(async () => confirmAction.onPress())
+
+    expect(screen.getByDisplayValue('Squats')).toBeTruthy()
   })
 })
