@@ -29,7 +29,7 @@ export default function SettingsLayout() {
         options={{ title: 'My Tutorials', headerLeft: () => <SettingsButton />, headerRight: () => <NotificationBell/>}}
       />
       <Stack.Screen name='change-password' 
-        options={{ title: 'Change Password', headerLeft: () => <BackButton /> }}
+        options={{ title: 'Change Password', headerLeft: () => <BackButton />  }}
       />
     </Stack>
   )

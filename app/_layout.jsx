@@ -6,6 +6,7 @@ import AuthProvider from '../providers/auth-provider'
 import { useEffect } from 'react'
 import { View, ActivityIndicator } from 'react-native'
 import { appStyles } from '../styles/styles'
+import BackButton from '../components/back-button'
 
 function RootNavigator() {
   const styles = appStyles
@@ -36,6 +37,14 @@ function RootNavigator() {
     <Stack screenOptions={{ headerShown: true }}>
       <Stack.Screen name="(tabs)" options={{headerShown: false}} />
       <Stack.Screen name="login" />
+      <Stack.Screen
+          name="notifications"
+          options={{
+            title: 'Notifications',
+            headerBackVisible: false,
+            headerLeft: () => <BackButton />,
+          }}
+        />
     </Stack>
   )
 }
