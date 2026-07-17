@@ -90,7 +90,7 @@ export default function DiscussionForum() {
   }
 
   return (
-    <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10, flex: 1 }]}>
+    <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10, flex: 1, paddingHorizontal: 16 }]}>
       <TextInput
         style={[styles.input, { alignSelf: 'stretch' }]}
         value={searchQuery}

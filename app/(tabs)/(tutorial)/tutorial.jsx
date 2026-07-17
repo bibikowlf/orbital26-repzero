@@ -197,7 +197,7 @@ export default function WorkoutTutorials() {
   }
 
   return (
-    <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10, flex: 1 }]}>
+    <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10, flex: 1, paddingHorizontal: 16 }]}>
       <Stack.Screen options={{ title: name }}/>
       <View style={styles.row}>
         <TextInput
