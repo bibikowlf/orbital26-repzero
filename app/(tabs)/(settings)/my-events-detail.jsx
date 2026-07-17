@@ -172,6 +172,39 @@ export default function MyEventDetail() {
     )
   }
 
+  async function handleSendMessage() {
+    if (!messageText.trim()) 
+      return Alert.alert('Empty Message', 'Please write a message first.')
+
+    const content = `[${event.title}] ${messageText.trim()}`
+    const rows = attendees
+      .filter(a => a.user_id !== userId)
+      .map(a => ({
+        sender_id: userId,
+        receiver_id: a.user_id,
+        content,
+        message_type: 'text',
+      }))
+
+    if (rows.length === 0) {
+      setMessageModalVisible(false)
+      setMessageText('')
+      return
+    }
+
+    try {
+      const { error } = await supabase.from('messages').insert(rows)
+      if (error) 
+        throw error
+
+      setMessageModalVisible(false)
+      setMessageText('')
+      Alert.alert('Sent', `Message sent to ${rows.length} attendee${rows.length === 1 ? '' : 's'}.`)
+    } catch (error) {
+      Alert.alert('Error', error.message)
+    }
+  }
+
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -374,6 +407,7 @@ export default function MyEventDetail() {
               </TouchableOpacity>
               <TouchableOpacity
                 style={{ flex: 1, paddingVertical: 14, borderRadius: 12, backgroundColor: '#0048ff', alignItems: 'center' }}
+                onPress={handleSendMessage}
               >
                 <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>Send</Text>
               </TouchableOpacity>
