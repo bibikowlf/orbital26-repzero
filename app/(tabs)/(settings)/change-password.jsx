@@ -16,13 +16,9 @@ export default function ChangePassword () {
         current_password: password,
         password: newPassword,
       })
-      if (error) {
-        throw error
-      }
-      const { signouterror } = await supabase.auth.signOut()
-      if (signouterror) {
-        console.error('Error signing out:', signouterror)
-      }
+      if (error) throw error
+      const { error: signouterror } = await supabase.auth.signOut()
+      if (signouterror) console.error('Error signing out:', signouterror)
     } catch (error) {
       Alert.alert(error.message)
     } finally {

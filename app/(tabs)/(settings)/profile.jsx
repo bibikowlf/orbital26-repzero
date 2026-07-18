@@ -290,6 +290,27 @@ export default function Profile() {
         </View>
 
         <View style={styles.verticallySpaced}>
+          <Button 
+            title="Change Password (relative)" 
+            onPress={() => router.navigate('./change-password')} 
+          />
+        </View>
+
+        <View style={styles.verticallySpaced}>
+          <Button 
+            title="Change Password (absolute)" 
+            onPress={() => router.navigate('/(tabs)/(settings)/change-password')} 
+          />
+        </View>
+
+        <View style={styles.verticallySpaced}>
+          <Button 
+            title="Change Password (my-tutorials)" 
+            onPress={() => router.navigate('/my-tutorials')} 
+          />
+        </View>
+
+        <View style={styles.verticallySpaced}>
           <SignOutButton />
         </View>
         <Spacer />
