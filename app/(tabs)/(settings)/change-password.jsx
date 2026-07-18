@@ -40,6 +40,7 @@ export default function ChangePassword () {
             secureTextEntry={true}
             autoCapitalize="none"
             style={styles.input}
+            accessibilityRole="textbox"
         />
       </View>
       <View style={styles.verticallySpaced}>
@@ -50,6 +51,7 @@ export default function ChangePassword () {
             secureTextEntry={true}
             autoCapitalize="none"
             style={styles.input}
+            accessibilityRole="textbox"
         />
       </View>
       <View style={[styles.verticallySpaced, styles.mt20]}>

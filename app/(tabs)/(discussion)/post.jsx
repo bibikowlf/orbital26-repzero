@@ -6,27 +6,19 @@ import { supabase } from '../../../lib/supabase'
 import { useLocalSearchParams, router } from 'expo-router'
 import { useAuthContext } from '../../../hooks/auth-context'
 import Entypo from '@expo/vector-icons/Entypo'
+import Ionicons from '@expo/vector-icons/Ionicons'
 import Comment from '../../../components/comment'
 import Spacer from '../../../components/spacer'
 import TextInfo from '../../../components/text-info'
+import { buildCommentTree } from '../../../functions/build-comment-tree'
 
-export const buildCommentTree = (comments, votes) => {
-  const map = {}
-  const roots = []
-
-  comments.forEach(comment => map[comment.id] = { ...comment, voted: null, replies: []})
-  votes.forEach(vote => {
-    if (map[vote.comment_id]) map[vote.comment_id].voted = vote.id
-  })
-  comments.forEach(comment => {
-    const mappedComment = map[comment.id]
-    if (comment.parent_id) {
-        map[comment.parent_id].replies.push(mappedComment)
-    } else {
-        roots.push(mappedComment)
-    }
-  })
-  return roots
+const CATEGORY_COLORS = {
+  Progress: '#FF9500',
+  Discussion: '#56b2d6',
+  Help: '#d4219b',
+  Motivation: '#34C759',
+  Equipment: '#9900ff', 
+  Other: '#f5120e'
 }
 
 export default function Post() {
@@ -36,8 +28,10 @@ export default function Post() {
   const styles = appStyles
   const { width: windowWidth } = useWindowDimensions()
   const [post, setPost] = useState(null)
+  const [bookmark, setBookmark] = useState(null)
   const [comments, setComments] = useState(null)
   const [votes, setVotes] = useState(null)
+  const [reports, setReports] = useState(null)
   const [replyingTo, setReplyingTo] = useState(null)
   const [newComment, setNewComment] = useState('')
   const [votedPost, setVotedPost] = useState(null)
@@ -60,32 +54,46 @@ export default function Post() {
     try {
       setLoading(true)
 
-      const [commentsResponse, votesResponse, postResponse, postVoteResponse] = await Promise.all([
-        supabase
-          .from('comments_with_votes')
-          .select('*')
-          .eq('post_id', postId),
-        supabase
-          .from('comment_votes')
-          .select('*')
-          .eq('user_id', userId),
-        supabase
-          .from('posts_with_votes')
-          .select('*')
-          .eq('id', postId),
-        supabase
-          .from('post_votes')
-          .select('*')
-          .eq('post_id', postId)
-          .eq('user_id', userId)])
+      const [commentsResponse, votesResponse, postResponse, postVoteResponse, bookmarkResponse, reportResponse] = 
+        await Promise.all([
+          supabase
+            .from('comments_with_votes')
+            .select('*')
+            .eq('post_id', postId),
+          supabase
+            .from('comment_votes')
+            .select('*')
+            .eq('user_id', userId),
+          supabase
+            .from('posts_with_votes')
+            .select('*')
+            .eq('id', postId),
+          supabase
+            .from('post_votes')
+            .select('*')
+            .eq('post_id', postId)
+            .eq('user_id', userId), 
+          supabase
+            .from('bookmarks')
+            .select('*')
+            .eq('user_id', userId)
+            .eq('post_id', postId), 
+          supabase
+            .from('report_comments')
+            .select('*')
+            .eq('user_id', userId)])
       if (commentsResponse.error) throw commentsResponse.error
       if (votesResponse.error) throw votesResponse.error
       if (postResponse.error) throw postResponse.error
       if (postVoteResponse.error) throw postVoteResponse.error
+      if (bookmarkResponse.error) throw bookmarkResponse.error
+      if (reportResponse.error) throw reportResponse.error
       if (commentsResponse.data) setComments(commentsResponse.data)
       if (votesResponse.data) setVotes(votesResponse.data)
       if (postResponse.data) setPost(postResponse.data[0])
       if (postVoteResponse.data && postVoteResponse.data[0]) setVotedPost(postVoteResponse.data[0].id)
+      if (bookmarkResponse.data && bookmarkResponse.data.length > 0) setBookmark(bookmarkResponse.data[0].id)
+      if (reportResponse.data) setReports(new Set(reportResponse.data.map(item => item.comment_id)))
     } catch (error) {
       if (error instanceof Error) Alert.alert(error.message)
     } finally {
@@ -94,9 +102,9 @@ export default function Post() {
   }
 
   const commentTree = useMemo(() => {
-    if (votes === null || comments === null) return []
-    return buildCommentTree(comments, votes)
-  }, [votes, comments])
+    if (comments === null || votes === null || reports === null) return []
+    return buildCommentTree(comments, votes, reports)
+  }, [comments, votes, reports])
 
   const handleAdd = async () => {
     if (!newComment.trim()) {
@@ -275,7 +283,7 @@ export default function Post() {
       if (error instanceof Error) Alert.alert(error.message)
     } finally {
       setLoading(false)
-      router.navigate('/discussion-forum')
+      router.back()
     }
   }
 
@@ -289,6 +297,79 @@ export default function Post() {
         .eq('id', commentId)
       if (error) throw error
       setComments(comments.filter(item => item.id !== commentId))
+    } catch (error) {
+      if (error instanceof Error) Alert.alert(error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleBookmark = async () => {
+    try {
+      setLoading(true)
+
+      if (bookmark) {
+        const { error } = await supabase
+          .from('bookmarks')
+          .delete()
+          .eq('id', bookmark)
+        if (error) throw error
+        setBookmark(null)
+      } else {
+        const { data, error } = await supabase
+          .from('bookmarks')
+          .insert({
+            user_id: userId,
+            post_id: postId
+          })
+          .select()
+        if (error) throw error
+        if (data) setBookmark(data[0])
+      }
+    } catch (error) {
+      if (error instanceof Error) Alert.alert(error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleReportPost = async (reason) => {
+    try {
+      setLoading(true)
+
+      const { error } = await supabase
+        .from('report_posts')
+        .insert({
+          user_id: userId,
+          post_id: postId,
+          reason: reason
+        })
+      if (error) throw error
+    } catch (error) {
+      if (error instanceof Error) Alert.alert(error.message)
+    } finally {
+      setLoading(false)
+      router.back()
+    }
+  }
+
+  const handleReportComment = async (commentId, reason) => {
+    try {
+      setLoading(true)
+
+      const { error } = await supabase
+        .from('report_comments')
+        .insert({
+          user_id: userId,
+          comment_id: commentId,
+          reason: reason
+        })
+      if (error) throw error
+      setReports(prevItem => {
+        const newItem = new Set(prevItem)
+        newItem.add(commentId)
+        return newItem
+      })
     } catch (error) {
       if (error instanceof Error) Alert.alert(error.message)
     } finally {
@@ -315,6 +396,35 @@ export default function Post() {
           style={{ flex: 1 }}
           ListHeaderComponent={
             <View>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View
+                  style={{ paddingHorizontal: 14,
+                    paddingVertical: 6,
+                    borderRadius: 20,
+                    backgroundColor: CATEGORY_COLORS[post.category], 
+                    alignSelf: 'flex-start'}}
+                >
+                  <Text style={{ fontSize: 11, 
+                    fontWeight: '600', 
+                    color: '#fff'}}
+                  >
+                    {post.category}
+                  </Text>
+                </View>
+                <TouchableOpacity 
+                  onPress={handleBookmark}
+                  disabled={loading || userId === post.user_id}
+                  style={{ paddingRight: 12 }}
+                  accessibilityRole="button"
+                >
+                  <Ionicons 
+                    name={bookmark === null ? 'bookmark-outline' : 'bookmark'} 
+                    color={userId === post.user_id ? 'gray' : 'black'}
+                    size={30}
+                  />
+                </TouchableOpacity>
+              </View>
+              <Spacer height={10} />
               <Text style={{color: 'gray', fontSize: 12}}>
                 {post.user_id === userId ? 'You' : '@'+post.username}
               </Text>
@@ -443,6 +553,7 @@ export default function Post() {
                 }} 
                 onDeletePress={handleDeletePost} 
                 onReplyPress={() => setReplyingTo(null)}
+                onReportPress={(reason) => handleReportPost(reason)}
               />
               <Text style={{color: 'gray', fontSize: 12}}>
                 Replying to {replyingTo === null ? 'post' : replyingTo.user_id === userId ? 'yourself' : '@'+replyingTo.username}
@@ -481,6 +592,7 @@ export default function Post() {
               onUpdatePress={(editComment) => handleEditComment(editComment)}
               onDeletePress={(commentId) => handleDeleteComment(commentId)}
               onCancelPress={() => setEditingComment(null)}
+              onReportPress={(commentId, reason) => handleReportComment(commentId, reason)}
             />
           )}
         />

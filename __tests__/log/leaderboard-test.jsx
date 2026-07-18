@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, screen, waitFor, fireEvent, act } from '@testing-library/react-native'
-import ExerciseLog from '../app/(tabs)/(log)/exercise-log'
-import { supabase } from '../lib/supabase'
+import ExerciseLog from '../../app/(tabs)/(log)/exercise-log'
+import { supabase } from '../../lib/supabase'
 
 const mockLeaderboardData = Array.from({ length: 11 }, (_, i) => ({
   id: `user-id-${i + 1}`,
@@ -11,23 +11,21 @@ const mockLeaderboardData = Array.from({ length: 11 }, (_, i) => ({
 
 let mockActiveChains = {}
 
-jest.mock('../lib/supabase', () => {
+jest.mock('../../lib/supabase', () => {
   return {
     supabase: {
       from: jest.fn((table) => {
         if (!mockActiveChains[table]) {
           const builder = {
-            // 🚀 Return the builder instance to support method chaining
             select: jest.fn().mockImplementation(() => builder),
             eq: jest.fn().mockImplementation(() => builder),
             single: jest.fn().mockImplementation(() => builder),
             
-            // Handles final async await resolution
             then: jest.fn().mockImplementation((resolve) => {
               if (table === 'total_minutes_this_week') {
                 return Promise.resolve(resolve({ data: mockLeaderboardData, error: null }))
               }
-              // 🚀 Add a fallback mock response for the 'profiles' query
+
               if (table === 'profiles') {
                 return Promise.resolve(resolve({ 
                   data: { workout_plan: [] }, 
@@ -45,32 +43,31 @@ jest.mock('../lib/supabase', () => {
   }
 })
 
-jest.mock('../hooks/auth-context', () => ({
+jest.mock('../../hooks/auth-context', () => ({
   useAuthContext: () => ({ 
     claims: { sub: 'user-id-5' }
   }),
 }))
 
 jest.mock('expo-router', () => {
-  const actual = jest.requireActual('expo-router')
+  const ReactModule = require('react')
   return {
-    ...actual,
+    router: { navigate: jest.fn() },
     useFocusEffect: (callback) => {
-      const React = require('react')
-      React.useEffect(() => {
+      ReactModule.useEffect(() => {
         callback()
       }, [callback])
-    },
+    }
   }
 })
 
-describe('Leaderboard Integration Tests', () => {
+describe('Leaderboard Unit Test', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockActiveChains = {}
   })
 
-  it('correctly filters, renders ranks 1 through 10, and omits rank 11', async () => {
+  it('leaderboard renders ranks 1 through 10 and omits rank 11', async () => {
     await act(async () => render(<ExerciseLog />))
     await waitFor(() => expect(screen.getByText('Leaderboard')).toBeTruthy())
 

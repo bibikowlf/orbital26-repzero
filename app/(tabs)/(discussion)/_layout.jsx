@@ -20,6 +20,12 @@ export default function DiscussionLayout() {
       <Stack.Screen name='post' 
         options={{ title: 'Discussion', headerLeft: () => <BackButton /> , headerRight: () => <NotificationBell/> }}
       />
+      <Stack.Screen name='my-posts' 
+        options={{ title: 'My Posts', headerLeft: () => <SettingsButton /> }}
+      />
+      <Stack.Screen name='bookmark-posts' 
+        options={{ title: 'Saved Posts', headerLeft: () => <SettingsButton /> }}
+      />
     </Stack>
   )
 }

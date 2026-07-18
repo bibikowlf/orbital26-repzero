@@ -4,10 +4,7 @@ import { appStyles } from '../../../styles/styles'
 import { supabase } from '../../../lib/supabase'
 import { router } from 'expo-router'
 import Spacer from '../../../components/spacer'
-
-export const cleanString = (s) => {
-  return s.toLowerCase().replace(/[^a-z]/g, '')
-}
+import { cleanString } from '../../../functions/clean-string'
 
 export default function WorkoutTutorial() {
   const [workouts, setWorkouts] = useState([])

@@ -9,6 +9,16 @@ import * as ImagePicker from 'expo-image-picker'
 import { decode } from 'base64-arraybuffer'
 import Entypo from '@expo/vector-icons/Entypo'
 
+const CATEGORY_COLORS = {
+  Progress: '#FF9500',
+  Discussion: '#56b2d6',
+  Help: '#d4219b',
+  Motivation: '#34C759',
+  Equipment: '#9900ff', 
+  Other: '#f5120e'
+}
+const CATEGORIES = ['Progress', 'Discussion', 'Help', 'Motivation', 'Equipment', 'Other']
+
 export default function AddPost() {
   const { claims } = useAuthContext()
   const userId = claims?.sub
@@ -16,6 +26,7 @@ export default function AddPost() {
   const [content, setContent] = useState('')
   const [title, setTitle] = useState('')
   const [images, setImages] = useState([])
+  const [category, setCategory] = useState(null)
   const [loading, setLoading] = useState(false)
 
   const addImages = async () => {
@@ -92,14 +103,17 @@ export default function AddPost() {
 
   const handleAdd = async () => {
     if (!title.trim()) {
-        Alert.alert('Invalid Title', 'Title cannot be empty.')
-        return
+      Alert.alert('Invalid Title', 'Title cannot be empty.')
+      return
     } else if (title.length > 50) {
-        Alert.alert('Invalid Title', 'Title must be under 50 characters.')
-        return
+      Alert.alert('Invalid Title', 'Title must be under 50 characters.')
+      return
     } else if (!content.trim()) {
-        Alert.alert('Invalid Content', 'Content cannot be empty')
-        return
+      Alert.alert('Invalid Content', 'Content cannot be empty')
+      return
+    } else if (category === null) {
+      Alert.alert('Invalid Category', 'Please choose a category')
+      return
     }
     try {
       setLoading(true)
@@ -109,7 +123,8 @@ export default function AddPost() {
         .insert({
           title: title,
           content: content,
-          user_id: userId
+          user_id: userId, 
+          category: category
         })
         .select()
       if (error) throw error
@@ -131,6 +146,7 @@ export default function AddPost() {
       setTitle('')
       setContent('')
       setImages([])
+      setCategory(null)
       router.navigate('/discussion-forum')
     }
   }
@@ -156,7 +172,35 @@ export default function AddPost() {
           textAlignVertical='top'
           numberOfLines={1}
           style={styles.input}
+          testID='title-input'
         />
+        <Text style={styles.label}>Category</Text>
+        <ScrollView
+          style={{height: 35, flexGrow: 0, flexShrink: 0}}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 6, gap: 8 }}
+        >
+          {CATEGORIES.map(item => (
+            <TouchableOpacity
+              key={item}
+              onPress={() => category === item ? setCategory(null) : setCategory(item)}
+              style={{ paddingHorizontal: 14,
+                paddingVertical: 6,
+                borderRadius: 20,
+                backgroundColor: category === item
+                  ? (CATEGORY_COLORS[item])
+                  : '#f2f2f2' }}
+            >
+              <Text style={{ fontSize: 13, 
+                fontWeight: '600', 
+                color: category === item ? '#fff' : '#444' }}
+              >
+                {item}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
         <Text style={[styles.label, { marginTop: 6 }]}>Content</Text>
         <TextInput
           value={content}
@@ -166,6 +210,7 @@ export default function AddPost() {
           textAlignVertical='top'
           numberOfLines={10}
           style={styles.input}
+          testID='content-input'
         />
         <View style={[styles.row, { marginVertical: 6, justifyContent: 'space-between' }]}>
           <Text style={styles.label}>Images ({images.length}/10)</Text>
