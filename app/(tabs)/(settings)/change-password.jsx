@@ -16,13 +16,9 @@ export default function ChangePassword () {
         current_password: password,
         password: newPassword,
       })
-      if (error) {
-        throw error
-      }
-      const { signouterror } = await supabase.auth.signOut()
-      if (signouterror) {
-        console.error('Error signing out:', signouterror)
-      }
+      if (error) throw error
+      const { error: signouterror } = await supabase.auth.signOut()
+      if (signouterror) console.error('Error signing out:', signouterror)
     } catch (error) {
       Alert.alert(error.message)
     } finally {
@@ -31,7 +27,7 @@ export default function ChangePassword () {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { padding: 16 }]}>
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Text style={styles.label}>Password</Text>
         <TextInput
@@ -40,7 +36,7 @@ export default function ChangePassword () {
             secureTextEntry={true}
             autoCapitalize="none"
             style={styles.input}
-            accessibilityRole="textbox"
+            testID='password-input'
         />
       </View>
       <View style={styles.verticallySpaced}>
@@ -51,7 +47,7 @@ export default function ChangePassword () {
             secureTextEntry={true}
             autoCapitalize="none"
             style={styles.input}
-            accessibilityRole="textbox"
+            testID='new-password-input'
         />
       </View>
       <View style={[styles.verticallySpaced, styles.mt20]}>

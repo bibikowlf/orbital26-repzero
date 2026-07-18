@@ -153,7 +153,7 @@ export default function AddPost() {
 
   if (loading) {
     return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 16 }]}>
         <ActivityIndicator size="large" color="#000" />
       </View>
     )

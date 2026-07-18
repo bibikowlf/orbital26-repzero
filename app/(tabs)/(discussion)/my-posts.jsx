@@ -75,14 +75,14 @@ export default function MyPosts() {
 
   if (loading) {
     return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 16 }]}>
         <ActivityIndicator size="large" color="#000" />
       </View>
     )
   }
 
   return (
-    <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10, flex: 1, paddingHorizontal: 16 }]}>
+    <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10, flex: 1, padding: 16 }]}>
       <TextInput
         style={[styles.input, { alignSelf: 'stretch' }]}
         value={searchQuery}
