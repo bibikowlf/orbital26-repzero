@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router'
 import { supabase } from '../../../lib/supabase'
 import { useAuthContext } from '../../../hooks/auth-context'
 import { appStyles } from '../../../styles/styles'
+import { createNotification } from '../../../lib/notifications'
 
 const CATEGORY_COLORS = {
   Cardio: '#FF9500',
@@ -42,6 +43,8 @@ export default function MyEventDetail() {
   const [maxAttendees, setMaxAttendees] = useState('')
   const [category, setCategory] = useState(null)
   const [customCategory, setCustomCategory] = useState('')
+  const [originalLocation, setOriginalLocation] = useState('')
+  const [originalEventDateIso, setOriginalEventDateIso] = useState('')
 
   useEffect(() => {
     if (userId && id) fetchEventAndAttendees()
@@ -102,6 +105,8 @@ export default function MyEventDetail() {
     setTitle(eventData.title)
     setDescription(eventData.description)
     setLocation(eventData.location)
+    setOriginalLocation(eventData.location)
+    setOriginalEventDateIso(eventData.event_date)
     setEventDate(`${yyyy}-${mm}-${dd}`)
     setEventTime(`${hh}:${min}`)
     setMaxAttendees(eventData.max_attendees ? String(eventData.max_attendees) : '')
@@ -139,7 +144,29 @@ export default function MyEventDetail() {
         })
         .eq('id', id)
 
-      if (error) throw error
+      if (error) 
+        throw error
+
+      const dateTimeChanged = new Date(originalEventDateIso).getTime() !== combinedDateTime.getTime()
+      const locationChanged = location.trim() !== originalLocation
+
+      if (dateTimeChanged || locationChanged) {
+        const changeParts = []
+        if (dateTimeChanged) changeParts.push('Date/time')
+        if (locationChanged) changeParts.push('Location')
+        const changeText = changeParts.join(' and ')
+
+        attendees.forEach((rsvp) => {
+          createNotification({
+            userId: rsvp.user_id,
+            actorId: userId,
+            type: 'event_updated',
+            message: `${changeText} changed for ${title.trim()}. Please check the update in the Events section`,
+            referenceId: id,
+          })
+        })
+      }
+
       await fetchEventAndAttendees()
       setIsEditing(false)
       Alert.alert('Saved', 'Event updated!')
@@ -160,8 +187,18 @@ export default function MyEventDetail() {
           text: 'Delete',
           style: 'destructive',
           onPress: async () => {
+            attendees.forEach((rsvp) => {
+              createNotification({
+                userId: rsvp.user_id,
+                actorId: userId,
+                type: 'event_cancelled',
+                message: `${event.title} has been cancelled`,
+                referenceId: id,
+              })
+            })
             const { error } = await supabase.from('events').delete().eq('id', id)
-            if (error) return Alert.alert('Error', error.message)
+            if (error) 
+              return Alert.alert('Error', error.message)
             router.back()
           },
         },

@@ -1,6 +1,7 @@
 import { Stack } from 'expo-router'
 import SettingsButton from '../../../components/settings-button'
 import BackButton from '../../../components/back-button'
+import NotificationBell from '../../../components/notification-bell'
 
 export default function TutorialLayout() {
   return (

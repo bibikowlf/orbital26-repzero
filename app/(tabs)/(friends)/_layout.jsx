@@ -1,6 +1,7 @@
 import { Stack } from 'expo-router'
 import SettingsButton from '../../../components/settings-button'
 import BackButton from '../../../components/back-button'
+import NotificationBell from '../../../components/notification-bell'
 
 export default function FriendsLayout() {
   return (
@@ -10,7 +11,7 @@ export default function FriendsLayout() {
         headerLeftContainerStyle: { paddingLeft: 16 } }}
     >
       <Stack.Screen name='index' 
-       options={{ title: 'Friends', headerLeft: () => <SettingsButton /> }}
+       options={{ title: 'Friends', headerLeft: () => <SettingsButton />, headerRight: () => <NotificationBell/> }}
        />
       <Stack.Screen name="search-users" 
         options={{ title: 'Find Friends', headerLeft: () => <BackButton /> }}
@@ -18,20 +19,15 @@ export default function FriendsLayout() {
       <Stack.Screen name='follow-list' 
         options={({ route }) => ({
           title: route.params?.mode === 'followers' ? 'Followers' : 'Following',
-          headerLeft: () => <BackButton />
+          headerLeft: () => <BackButton />,
+          headerRight: () => <NotificationBell/>
         })}
       />
-      <Stack.Screen name='chat-list' 
-        options={{ title: 'Messages', headerLeft: () => <BackButton /> }}
-       />
       <Stack.Screen name='chat-thread' 
         options={({ route }) => ({
           title: route.params?.recipientUsername || 'Chat',
           headerLeft: () => <BackButton />
         })}
-      />
-      <Stack.Screen name='invite-inbox' 
-        options={{ title: 'Workout Invites', headerLeft: () => <BackButton /> }}
       />  
     </Stack>
   )
