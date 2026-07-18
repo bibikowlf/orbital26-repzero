@@ -6,6 +6,7 @@ import { supabase } from '../../../lib/supabase'
 import { useAuthContext } from '../../../hooks/auth-context'
 import { appStyles } from '../../../styles/styles'
 import DateTimePicker from '@react-native-community/datetimepicker'
+import { createNotification } from '../../../lib/notifications'
 
 export default function ChatThread() {
   const { recipientId } = useLocalSearchParams()
@@ -262,6 +263,14 @@ export default function ChatThread() {
         throw msgError
 
       setMessages((prev) => prev.some((m) => m.id === msg.id) ? prev : [...prev, msg])
+
+      createNotification({
+        userId: recipientId,
+        actorId: userId,
+        type: status === 'accepted' ? 'workout_invite_accepted' : 'workout_invite_declined',
+        message: `@${myUsername} ${status === 'accepted' ? 'accepted' : 'declined'} your workout invite`,
+        referenceId: inviteId,
+      })
     } catch (error) {
       Alert.alert('Error', error.message)
     }
