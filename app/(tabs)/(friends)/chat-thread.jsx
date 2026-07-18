@@ -369,8 +369,8 @@ export default function ChatThread() {
   <>
     <KeyboardAvoidingView
       style={appStyles.flexOne}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={90}
+      behavior={'padding'}
+      keyboardVerticalOffset={100}
     >
       <FlatList
         ref={flatListRef}
