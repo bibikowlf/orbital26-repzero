@@ -434,7 +434,7 @@ describe('Post Unit Test', () => {
     }
     mockActiveChains['bookmarks'] = bookmarksBuilder
 
-    const bookmarkBtn = screen.getByRole('button')
+    const bookmarkBtn = screen.getByTestId('bookmark-button')
     await act(async () => fireEvent.press(bookmarkBtn))
 
     expect(supabase.from).toHaveBeenCalledWith('bookmarks')
@@ -463,8 +463,8 @@ describe('Post Unit Test', () => {
     await act(async () => render(<Post />))
     await waitFor(() => expect(screen.getByText('Test Post Title')).toBeTruthy())
 
-    const bookmarkIconText = screen.getByRole('button')
-    await act(async () => fireEvent.press(bookmarkIconText))
+    const bookmarkBtn = screen.getByTestId('bookmark-button')
+    await act(async () => fireEvent.press(bookmarkBtn))
 
     await waitFor(() => {
       expect(supabase.from).toHaveBeenCalledWith('bookmarks')

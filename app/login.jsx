@@ -44,7 +44,7 @@ const Login = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { padding: 16 }]}>
       <Stack.Screen options={{ title: 'Login', headerBackVisible: false, headerTitleAlign: 'center' }}/>
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Text style={styles.label}>Email</Text>

@@ -22,9 +22,8 @@ describe('ChangePassword Unit Test', () => {
   it('password is correctly updated and signs out user after pressing change password button', async () => {
     await act(async () => render(<ChangePassword />))
 
-    const inputs = screen.getAllByRole('textbox')
-    const currentPasswordInput = inputs[0]
-    const newPasswordInput = inputs[1]
+    const currentPasswordInput = screen.getByTestId('password-input')
+    const newPasswordInput = screen.getByTestId('new-password-input')
 
     await act(async () => fireEvent.changeText(currentPasswordInput, 'oldPassword123'))
     await act(async () => fireEvent.changeText(newPasswordInput, 'newSecurePassword456'))
