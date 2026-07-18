@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native'
-import { useRouter, useFocusEffect, useEffect } from 'expo-router'
+import { useRouter, useFocusEffect } from 'expo-router'
 import { appStyles } from '../../../styles/styles'
 import { supabase } from '../../../lib/supabase'
 import { useAuthContext } from '../../../hooks/auth-context'
