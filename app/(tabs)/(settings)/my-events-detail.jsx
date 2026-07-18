@@ -152,8 +152,8 @@ export default function MyEventDetail() {
 
       if (dateTimeChanged || locationChanged) {
         const changeParts = []
-        if (dateTimeChanged) changeParts.push('date/time')
-        if (locationChanged) changeParts.push('location')
+        if (dateTimeChanged) changeParts.push('Date/time')
+        if (locationChanged) changeParts.push('Location')
         const changeText = changeParts.join(' and ')
 
         attendees.forEach((rsvp) => {
@@ -161,7 +161,7 @@ export default function MyEventDetail() {
             userId: rsvp.user_id,
             actorId: userId,
             type: 'event_updated',
-            message: `${changeText} changed for ${title.trim()}`,
+            message: `${changeText} changed for ${title.trim()}. Please check the update in the Events section`,
             referenceId: id,
           })
         })
@@ -187,8 +187,18 @@ export default function MyEventDetail() {
           text: 'Delete',
           style: 'destructive',
           onPress: async () => {
+            attendees.forEach((rsvp) => {
+              createNotification({
+                userId: rsvp.user_id,
+                actorId: userId,
+                type: 'event_cancelled',
+                message: `${event.title} has been cancelled`,
+                referenceId: id,
+              })
+            })
             const { error } = await supabase.from('events').delete().eq('id', id)
-            if (error) return Alert.alert('Error', error.message)
+            if (error) 
+              return Alert.alert('Error', error.message)
             router.back()
           },
         },
