@@ -369,6 +369,14 @@ export default function ChatThread() {
         throw msgError
 
       setMessages((prev) => prev.some((m) => m.id === msg.id) ? prev : [...prev, msg])
+
+      createNotification({
+        userId: recipientId,
+        actorId: userId,
+        type: status === 'going' ? 'event_rsvp_going' : 'event_rsvp_declined',
+        message: `@${myUsername} ${status === 'going' ? 'is going to' : 'declined'} ${eventTitle}`,
+        referenceId: eventId,
+      })
     } catch (error) {
       Alert.alert('Error', error.message)
     }
