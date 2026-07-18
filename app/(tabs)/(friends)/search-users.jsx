@@ -5,6 +5,7 @@ import { supabase } from '../../../lib/supabase'
 import { useAuthContext } from '../../../hooks/auth-context'
 import { appStyles } from '../../../styles/styles'
 import Spacer from '../../../components/spacer'
+import { createNotification } from '../../../lib/notifications'
 
 export function filterOutSelf(results, userId) {
   return results.filter((r) => r.id !== userId)
@@ -19,6 +20,13 @@ export default function SearchUsers() {
   const [followingIds, setFollowingIds] = useState([])
   const [loading, setLoading] = useState(false)
   const [searched, setSearched] = useState(false)
+
+  const [myUsername, setMyUsername] = useState('')
+
+  useEffect(() => {
+    if (userId) fetchFollowingIds()
+    if (userId) fetchMyUsername()
+  }, [userId])
 
   useEffect(() => {
     if (userId)
@@ -80,6 +88,14 @@ export default function SearchUsers() {
         throw error
 
       setFollowingIds((prev) => [...prev, targetId])
+
+      createNotification({
+        userId: targetId,
+        actorId: userId,
+        type: 'new_follower',
+        message: `@${myUsername} started following you`,
+      })
+
     } catch (error) {
       console.error('Error following user:', error)
     }
@@ -100,6 +116,17 @@ export default function SearchUsers() {
     } catch (error) {
       console.error('Error unfollowing user:', error)
     }
+  }
+
+  async function fetchMyUsername() {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('username')
+      .eq('id', userId)
+      .single()
+
+    if (!error && data) 
+      setMyUsername(data.username)
   }
 
   return (
