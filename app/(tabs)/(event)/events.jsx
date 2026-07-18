@@ -1,9 +1,10 @@
 import { useState, useCallback } from 'react'
 import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native'
-import { useRouter, useFocusEffect } from 'expo-router'
+import { useRouter, useFocusEffect, useEffect } from 'expo-router'
 import { appStyles } from '../../../styles/styles'
 import { supabase } from '../../../lib/supabase'
 import { useAuthContext } from '../../../hooks/auth-context'
+import { createNotification } from '../../../lib/notifications'
 
 const CATEGORY_COLORS = {
   Cardio: '#FF9500',
@@ -47,12 +48,28 @@ export default function Events() {
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [sortBy, setSortBy] = useState('date_asc')
   const [activeTab, setActiveTab] = useState('All Events')
+  const [myUsername, setMyUsername] = useState('')
 
   useFocusEffect(
     useCallback(() => {
       if (userId) fetchEvents()
     }, [userId])
   )
+
+  useEffect(() => {
+    if (userId) fetchMyUsername()
+  }, [userId])
+
+  async function fetchMyUsername() {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('username')
+      .eq('id', userId)
+      .single()
+
+    if (!error && data) 
+      setMyUsername(data.username)
+  }
 
   async function handleRsvp(event) {
     if (event.user_rsvp?.[0]?.status === 'going') {
@@ -61,7 +78,8 @@ export default function Events() {
         .delete()
         .eq('event_id', event.id)
         .eq('user_id', userId)
-      if (error) return Alert.alert('Error', error.message)
+      if (error) 
+        return Alert.alert('Error', error.message)
     } else {
       const { error } = await supabase
         .from('event_rsvps')
@@ -69,7 +87,16 @@ export default function Events() {
           { event_id: event.id, user_id: userId, status: 'going' },
           { onConflict: 'event_id,user_id' }
         )
-      if (error) return Alert.alert('Error', error.message)
+      if (error) 
+        return Alert.alert('Error', error.message)
+
+      createNotification({
+        userId: event.creator_id,
+        actorId: userId,
+        type: 'event_rsvp_going',
+        message: `@${myUsername} is going to ${event.title}`,
+        referenceId: event.id,
+      })
     }
     fetchEvents()
   }
