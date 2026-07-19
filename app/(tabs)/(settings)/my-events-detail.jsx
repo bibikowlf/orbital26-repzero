@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, Modal } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, Modal, KeyboardAvoidingView } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { supabase } from '../../../lib/supabase'
 import { useAuthContext } from '../../../hooks/auth-context'
@@ -333,6 +333,12 @@ export default function MyEventDetail() {
   const spotsLeft = event.max_attendees ? event.max_attendees - event.rsvp_count : null
 
   return (
+    <KeyboardAvoidingView
+      style={appStyles.flexOne}
+      behavior={'padding'}
+      keyboardVerticalOffset={200}
+    >
+
     <ScrollView style={{ flex: 1, backgroundColor: '#fff' }} contentContainerStyle={{ padding: 20 }}>
 
       {isEditing ? (
@@ -510,6 +516,12 @@ export default function MyEventDetail() {
         transparent
         onRequestClose={() => setMessageModalVisible(false)}
       >
+
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior= {'padding'}
+        >
+
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}>
           <View style={{ backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20 }}>
             <Text style={appStyles.sectionLabel}>Message Attendees</Text>
@@ -540,8 +552,11 @@ export default function MyEventDetail() {
             </View>
           </View>
         </View>
+        </KeyboardAvoidingView>
       </Modal>
+      
 
     </ScrollView>
+    </KeyboardAvoidingView>
   )
 }
