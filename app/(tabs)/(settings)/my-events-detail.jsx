@@ -48,10 +48,24 @@ export default function MyEventDetail() {
 
   const [messageModalVisible, setMessageModalVisible] = useState(false)
   const [messageText, setMessageText] = useState('')
+  const [friendStatuses, setFriendStatuses] = useState({})
+  const [myUsername, setMyUsername] = useState('')
 
   useEffect(() => {
     if (userId && id) fetchEventAndAttendees()
+    if (userId) fetchMyUsername()
   }, [userId, id])
+
+  async function fetchMyUsername() {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('username')
+      .eq('id', userId)
+      .single()
+
+    if (!error && data) 
+      setMyUsername(data.username)
+  }
 
   async function fetchEventAndAttendees() {
     const { data: eventData, error: eventError } = await supabase
@@ -97,6 +111,8 @@ export default function MyEventDetail() {
     setEvent(loaded)
     setAttendees(attendeesWithProfiles)
     setLoading(false)
+    if (userIds.length > 0) 
+      fetchFriendStatuses(userIds)
 
     const dt = new Date(eventData.event_date)
     const yyyy = dt.getFullYear()
@@ -118,6 +134,26 @@ export default function MyEventDetail() {
     
     setCategory(knownCategory)
     if (knownCategory === 'Other') setCustomCategory(eventData.category)
+  }
+
+  async function fetchFriendStatuses(attendeeIds) {
+    try {
+      const { data, error } = await supabase
+        .from('follows')
+        .select('follower_id, following_id, status')
+        .or(`follower_id.eq.${userId},following_id.eq.${userId}`)
+
+      if (error) throw error
+
+      const statusMap = {}
+      for (const row of (data || [])) {
+        const otherId = row.follower_id === userId ? row.following_id : row.follower_id
+        if (attendeeIds.includes(otherId)) statusMap[otherId] = row.status
+      }
+      setFriendStatuses(statusMap)
+    } catch (error) {
+      console.error('Error fetching friend statuses:', error)
+    }
   }
 
   async function handleSave() {
@@ -239,6 +275,31 @@ export default function MyEventDetail() {
       Alert.alert('Sent', `Message sent to ${rows.length} attendee${rows.length === 1 ? '' : 's'}.`)
     } catch (error) {
       Alert.alert('Error', error.message)
+    }
+  }
+
+  async function handleRequestFriend(attendeeId, attendeeUsername) {
+    try {
+      const { error } = await supabase
+        .from('follows')
+        .insert({ follower_id: userId, following_id: attendeeId, status: 'pending' })
+
+      if (error) throw error
+
+      setFriendStatuses((prev) => ({ ...prev, [attendeeId]: 'pending' }))
+
+      createNotification({
+        userId: attendeeId,
+        actorId: userId,
+        type: 'friend_request',
+        message: `@${myUsername} has requested to follow you`,
+      })
+    } catch (error) {
+      if (error.code === '23505') {
+        fetchFriendStatuses(attendees.map(a => a.user_id))
+        return
+      }
+      console.error('Error sending friend request:', error)
     }
   }
 
@@ -375,17 +436,35 @@ export default function MyEventDetail() {
           {attendees.length === 0 ? (
             <Text style={appStyles.emptyText}>No one has RSVP'd yet.</Text>
           ) : (
-            attendees.map((rsvp, idx) => (
-              <View key={idx} style={appStyles.attendeeRow}>
-                <View style={appStyles.avatarCircle}>
-                  <Text style={appStyles.avatarText}>
-                    {rsvp.profiles?.username?.[0]?.toUpperCase() ?? '?'}
-                  </Text>
+           attendees.map((rsvp, idx) => {
+              const status = friendStatuses[rsvp.user_id]
+              const label = status === 'accepted' ? 'Message' : status === 'pending' ? 'Requested' : 'Request'
+
+              return (
+                <View key={idx} style={appStyles.attendeeRow}>
+                  <View style={appStyles.avatarCircle}>
+                    <Text style={appStyles.avatarText}>
+                      {rsvp.profiles?.username?.[0]?.toUpperCase() ?? '?'}
+                    </Text>
+                  </View>
+                  <Text style={appStyles.attendeeUsername}>@{rsvp.profiles?.username}</Text>
+                  <TouchableOpacity
+                    style={[appStyles.actionButton, { flex: undefined, minWidth: 90, marginLeft: 'auto', backgroundColor: status === 'accepted' ? '#0048ff' : status === 'pending' ? '#C7C7CC' : '#8E8E93' }]}
+                    disabled={status === 'pending'}
+                    onPress={() => {
+                      if (status === 'accepted') {
+                        router.push({ pathname: '/(tabs)/(friends)/chat-thread', params: { recipientId: rsvp.user_id } })
+                      } else if (!status) {
+                        handleRequestFriend(rsvp.user_id, rsvp.profiles?.username)
+                      }
+                    }}
+                  >
+                    <Text style={appStyles.buttonText}>{label}</Text>
+                  </TouchableOpacity>
                 </View>
-                <Text style={appStyles.attendeeUsername}>@{rsvp.profiles?.username}</Text>
-              </View>
-            ))
-          )}
+              )
+            })
+          )}            
 
           {attendees.length > 0 && (
             <TouchableOpacity
