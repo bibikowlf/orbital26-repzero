@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, Modal } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { supabase } from '../../../lib/supabase'
 import { useAuthContext } from '../../../hooks/auth-context'
 import { appStyles } from '../../../styles/styles'
+import { createNotification } from '../../../lib/notifications'
 
 const CATEGORY_COLORS = {
   Cardio: '#FF9500',
@@ -42,6 +43,11 @@ export default function MyEventDetail() {
   const [maxAttendees, setMaxAttendees] = useState('')
   const [category, setCategory] = useState(null)
   const [customCategory, setCustomCategory] = useState('')
+  const [originalLocation, setOriginalLocation] = useState('')
+  const [originalEventDateIso, setOriginalEventDateIso] = useState('')
+
+  const [messageModalVisible, setMessageModalVisible] = useState(false)
+  const [messageText, setMessageText] = useState('')
 
   useEffect(() => {
     if (userId && id) fetchEventAndAttendees()
@@ -102,6 +108,8 @@ export default function MyEventDetail() {
     setTitle(eventData.title)
     setDescription(eventData.description)
     setLocation(eventData.location)
+    setOriginalLocation(eventData.location)
+    setOriginalEventDateIso(eventData.event_date)
     setEventDate(`${yyyy}-${mm}-${dd}`)
     setEventTime(`${hh}:${min}`)
     setMaxAttendees(eventData.max_attendees ? String(eventData.max_attendees) : '')
@@ -139,7 +147,29 @@ export default function MyEventDetail() {
         })
         .eq('id', id)
 
-      if (error) throw error
+      if (error) 
+        throw error
+
+      const dateTimeChanged = new Date(originalEventDateIso).getTime() !== combinedDateTime.getTime()
+      const locationChanged = location.trim() !== originalLocation
+
+      if (dateTimeChanged || locationChanged) {
+        const changeParts = []
+        if (dateTimeChanged) changeParts.push('Date/time')
+        if (locationChanged) changeParts.push('Location')
+        const changeText = changeParts.join(' and ')
+
+        attendees.forEach((rsvp) => {
+          createNotification({
+            userId: rsvp.user_id,
+            actorId: userId,
+            type: 'event_updated',
+            message: `${changeText} changed for ${title.trim()}. Please check the update in the Events section`,
+            referenceId: id,
+          })
+        })
+      }
+
       await fetchEventAndAttendees()
       setIsEditing(false)
       Alert.alert('Saved', 'Event updated!')
@@ -160,13 +190,56 @@ export default function MyEventDetail() {
           text: 'Delete',
           style: 'destructive',
           onPress: async () => {
+            attendees.forEach((rsvp) => {
+              createNotification({
+                userId: rsvp.user_id,
+                actorId: userId,
+                type: 'event_cancelled',
+                message: `${event.title} has been cancelled`,
+                referenceId: id,
+              })
+            })
             const { error } = await supabase.from('events').delete().eq('id', id)
-            if (error) return Alert.alert('Error', error.message)
+            if (error) 
+              return Alert.alert('Error', error.message)
             router.back()
           },
         },
       ]
     )
+  }
+
+  async function handleSendMessage() {
+    if (!messageText.trim()) 
+      return Alert.alert('Empty Message', 'Please write a message first.')
+
+    const content = `[${event.title}] ${messageText.trim()}`
+    const rows = attendees
+      .filter(a => a.user_id !== userId)
+      .map(a => ({
+        sender_id: userId,
+        receiver_id: a.user_id,
+        content,
+        message_type: 'text',
+      }))
+
+    if (rows.length === 0) {
+      setMessageModalVisible(false)
+      setMessageText('')
+      return
+    }
+
+    try {
+      const { error } = await supabase.from('messages').insert(rows)
+      if (error) 
+        throw error
+
+      setMessageModalVisible(false)
+      setMessageText('')
+      Alert.alert('Sent', `Message sent to ${rows.length} attendee${rows.length === 1 ? '' : 's'}.`)
+    } catch (error) {
+      Alert.alert('Error', error.message)
+    }
   }
 
   if (loading) {
@@ -314,6 +387,17 @@ export default function MyEventDetail() {
             ))
           )}
 
+          {attendees.length > 0 && (
+            <TouchableOpacity
+              style={{ marginTop: 16, paddingVertical: 14, borderRadius: 12, borderWidth: 1.5, borderColor: '#0048ff', alignItems: 'center' }}
+              onPress={() => setMessageModalVisible(true)}
+            >
+              <Text style={{ color: '#0048ff', fontWeight: '700', fontSize: 15 }}>Message Attendees</Text>
+            </TouchableOpacity>
+          )}
+
+          <View style={{ flexDirection: 'row', gap: 12, marginTop: 16, marginBottom: 16 }}></View>
+
           <View style={{ flexDirection: 'row', gap: 12, marginTop: 32, marginBottom: 16 }}>
             <TouchableOpacity
               style={{ flex: 1, paddingVertical: 14, borderRadius: 12, borderWidth: 1.5, borderColor: '#0048ff', alignItems: 'center' }}
@@ -330,6 +414,45 @@ export default function MyEventDetail() {
           </View>
         </>
       )}
+
+      <Modal
+        visible={messageModalVisible}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setMessageModalVisible(false)}
+      >
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}>
+          <View style={{ backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20 }}>
+            <Text style={appStyles.sectionLabel}>Message Attendees</Text>
+            <Text style={{ color: '#888', fontSize: 13, marginBottom: 12 }}>
+              This will be sent to all {event.rsvp_count} attendee{event.rsvp_count === 1 ? '' : 's'} individually.
+            </Text>
+            <TextInput
+              style={[appStyles.input, { height: 100 }]}
+              value={messageText}
+              onChangeText={setMessageText}
+              placeholder="e.g. Meeting point changed to the west entrance"
+              placeholderTextColor="#888"
+              multiline
+            />
+            <View style={{ flexDirection: 'row', gap: 12, marginTop: 16 }}>
+              <TouchableOpacity
+                style={{ flex: 1, paddingVertical: 14, borderRadius: 12, borderWidth: 1.5, borderColor: '#888', alignItems: 'center' }}
+                onPress={() => { setMessageModalVisible(false); setMessageText('') }}
+              >
+                <Text style={{ color: '#888', fontWeight: '700', fontSize: 15 }}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{ flex: 1, paddingVertical: 14, borderRadius: 12, backgroundColor: '#0048ff', alignItems: 'center' }}
+                onPress={handleSendMessage}
+              >
+                <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>Send</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
     </ScrollView>
   )
 }

@@ -1,5 +1,6 @@
 import { Stack } from 'expo-router'
 import SettingsButton from '../../../components/settings-button'
+import NotificationBell from '../../../components/notification-bell'
 
 export default function PlanLayout() {
   return (
@@ -10,7 +11,7 @@ export default function PlanLayout() {
     >
       <Stack.Screen name='index' />
       <Stack.Screen name='generate-plan' 
-        options={{ title: 'Plan', headerLeft: () => <SettingsButton /> }}
+        options={{ title: 'Plan', headerLeft: () => <SettingsButton />, headerRight: () => <NotificationBell/> }}
       />
     </Stack>
   )

@@ -1,5 +1,6 @@
 import { Stack } from 'expo-router'
 import SettingsButton from '../../../components/settings-button'
+import NotificationBell from '../../../components/notification-bell'
 
 export default function LogLayout() {
   return (
@@ -10,7 +11,7 @@ export default function LogLayout() {
     >
       <Stack.Screen name='index' />
       <Stack.Screen name='exercise-log' 
-        options={{ title: 'Log', headerLeft: () => <SettingsButton /> }}
+        options={{ title: 'Log', headerLeft: () => <SettingsButton />, headerRight: () => <NotificationBell/> }}
       />
     </Stack>
   )

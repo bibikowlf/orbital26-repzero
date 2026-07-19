@@ -6,6 +6,7 @@ import AuthProvider from '../providers/auth-provider'
 import { useEffect } from 'react'
 import { View, ActivityIndicator } from 'react-native'
 import { appStyles } from '../styles/styles'
+import BackButton from '../components/back-button'
 
 function RootNavigator() {
   const styles = appStyles
@@ -27,7 +28,7 @@ function RootNavigator() {
 
   if (isLoading) {
     return (
-      <View style={[styles.container, { flex: 1, backgroundColor: '#F2F2F2'}]}>
+      <View style={[styles.container, { flex: 1, backgroundColor: '#F2F2F2', padding: 16}]}>
         <ActivityIndicator size="large" color="#000" />
       </View>
     )
@@ -36,6 +37,14 @@ function RootNavigator() {
     <Stack screenOptions={{ headerShown: true }}>
       <Stack.Screen name="(tabs)" options={{headerShown: false}} />
       <Stack.Screen name="login" />
+      <Stack.Screen
+          name="notifications"
+          options={{
+            title: 'Notifications',
+            headerBackVisible: false,
+            headerLeft: () => <BackButton />,
+          }}
+        />
     </Stack>
   )
 }

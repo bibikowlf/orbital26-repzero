@@ -1,6 +1,7 @@
 import { Stack } from 'expo-router'
 import SettingsButton from '../../../components/settings-button'
 import BackButton from '../../../components/back-button'
+import NotificationBell from '../../../components/notification-bell'
 
 export default function DiscussionLayout() {
   return (
@@ -11,13 +12,13 @@ export default function DiscussionLayout() {
     >
       <Stack.Screen name='index' />
       <Stack.Screen name='discussion-forum' 
-        options={{ title: 'Discussion', headerLeft: () => <SettingsButton /> }}
+        options={{ title: 'Discussion', headerLeft: () => <SettingsButton />, headerRight: () => <NotificationBell/>}}
       />
       <Stack.Screen name='add-post' 
-        options={{ title: 'Add Post', headerLeft: () => <BackButton /> }}
+        options={{ title: 'Add Post', headerLeft: () => <BackButton />}}
       />
       <Stack.Screen name='post' 
-        options={{ title: 'Discussion', headerLeft: () => <BackButton /> }}
+        options={{ title: 'Discussion', headerLeft: () => <BackButton /> , headerRight: () => <NotificationBell/> }}
       />
       <Stack.Screen name='my-posts' 
         options={{ title: 'My Posts', headerLeft: () => <SettingsButton /> }}

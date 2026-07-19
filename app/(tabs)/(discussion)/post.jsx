@@ -379,7 +379,7 @@ export default function Post() {
 
   if (loading || !post) {
     return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 16 }]}>
         <ActivityIndicator size="large" color="#000" />
       </View>
     )
@@ -388,7 +388,7 @@ export default function Post() {
   return (
     <KeyboardAvoidingView behavior='padding' style={{ flex: 1 }}>
       <View style={[styles.container, 
-        { alignItems: 'stretch', width: '100%', marginTop: 0, flex: 1 }]}>
+        { alignItems: 'stretch', width: '100%', marginTop: 0, flex: 1, padding: 16 }]}>
         <FlatList
           data={commentTree}
           extraData={[comments, votes, editingComment]}
@@ -415,7 +415,7 @@ export default function Post() {
                   onPress={handleBookmark}
                   disabled={loading || userId === post.user_id}
                   style={{ paddingRight: 12 }}
-                  accessibilityRole="button"
+                  testID='bookmark-button'
                 >
                   <Ionicons 
                     name={bookmark === null ? 'bookmark-outline' : 'bookmark'} 
