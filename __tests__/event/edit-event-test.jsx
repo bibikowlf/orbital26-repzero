@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabase'
 import { Alert } from 'react-native'
 
 let mockUpdateTrigger = jest.fn()
+const mockBackRouter = jest.fn()
 
 const mockEventId = 'event-789'
 const mockUserId = 'user-123'
@@ -40,6 +41,7 @@ const mockQueryBuilder = {
     return mockQueryBuilder
   }),
   single: jest.fn().mockReturnThis(),
+  delete: jest.fn().mockReturnThis(),
 
   then: function (onFulfilled) {
     const lastTableQueried = supabase.from.mock.results.slice(-1)[0]?.value?._tableName
@@ -68,7 +70,7 @@ jest.mock('../../lib/supabase', () => ({
 
 jest.mock('expo-router', () => ({
   useLocalSearchParams: () => ({ id: mockEventId }),
-  useRouter: () => ({ back: jest.fn() })
+  useRouter: () => ({ back: mockBackRouter })
 }))
 
 jest.mock('../../hooks/auth-context', () => ({
@@ -96,7 +98,34 @@ describe('EditEvent Unit Test', () => {
     await act(async () => fireEvent.press(saveBtn))
   }
 
-  it('Event is updated after editing', async () => {
+  it('event is deleted after pressing delete', async () => {
+    const cancelBtn = screen.getByText('Cancel')
+    await act(async () => fireEvent.press(cancelBtn))
+
+    let caughtButtonsArray = []
+    jest.spyOn(Alert, 'alert').mockImplementation((title, message, buttons) => {
+      caughtButtonsArray = buttons
+    })
+
+    const rootDeleteBtn = screen.getByText('Delete')
+    await act(async () => fireEvent.press(rootDeleteBtn))
+
+    expect(Alert.alert).toHaveBeenCalledWith(
+      'Delete Event',
+      expect.any(String),
+      expect.any(Array)
+    )
+
+    const activeConfirmAction = caughtButtonsArray.find(btn => btn.style === 'destructive')
+    expect(activeConfirmAction).toBeDefined()
+    await act(async () => await activeConfirmAction.onPress())
+
+    expect(supabase.from).toHaveBeenCalledWith('events')
+    expect(mockQueryBuilder.delete).toBeDefined()
+    expect(mockBackRouter).toHaveBeenCalled()
+  })
+
+  it('event is updated after editing', async () => {
     await act(async () => fireEvent.changeText(screen.getByPlaceholderText('Event title'), 'Updated Gym Session'))
     await act(async () => fireEvent.changeText(screen.getByPlaceholderText("What's the plan?"), 'Lifting heavy weights.'))
 
@@ -111,7 +140,7 @@ describe('EditEvent Unit Test', () => {
     expect(Alert.alert).toHaveBeenCalledWith('Saved', 'Event updated!')
   })
 
-  it('Event cannot be updated to empty title', async () => {
+  it('event cannot be updated to empty title', async () => {
     await act(async () => fireEvent.changeText(screen.getByPlaceholderText('Event title'), ''))
 
     await submitForm()
@@ -120,7 +149,7 @@ describe('EditEvent Unit Test', () => {
     expect(mockUpdateTrigger).not.toHaveBeenCalled()
   })
 
-  it('Event cannot be updated to empty description', async () => {
+  it('event cannot be updated to empty description', async () => {
     await act(async () => fireEvent.changeText(screen.getByPlaceholderText("What's the plan?"), ''))
 
     await submitForm()
@@ -129,14 +158,14 @@ describe('EditEvent Unit Test', () => {
     expect(mockUpdateTrigger).not.toHaveBeenCalled()
   })
 
-  it('Event cannot be updated to empty location', async () => {
+  it('event cannot be updated to empty location', async () => {
     await act(async () => fireEvent.changeText(screen.getByPlaceholderText('e.g. East Coast Park'), ''))
     await submitForm()
     expect(Alert.alert).toHaveBeenCalledWith('Missing Field', 'Please enter a location.')
     expect(mockUpdateTrigger).not.toHaveBeenCalled()
   })
 
-  it('Event cannot be updated to empty date', async () => {
+  it('event cannot be updated to empty date', async () => {
     await act(async () => fireEvent.changeText(screen.getByPlaceholderText('e.g. 2025-06-20'), ''))
 
     await submitForm()
@@ -145,7 +174,7 @@ describe('EditEvent Unit Test', () => {
     expect(mockUpdateTrigger).not.toHaveBeenCalled()
   })
 
-  it('Event cannot be updated to empty time', async () => {
+  it('event cannot be updated to empty time', async () => {
     await act(async () => fireEvent.changeText(screen.getByPlaceholderText('e.g. 07:00'), ''))
 
     await submitForm()
@@ -154,7 +183,7 @@ describe('EditEvent Unit Test', () => {
     expect(mockUpdateTrigger).not.toHaveBeenCalled()
   })
 
-  it('Event cannot be updated to empty custom category', async () => {
+  it('event cannot be updated to empty custom category', async () => {
     const otherChip = screen.getByText('Other')
     await act(async () => fireEvent.press(otherChip))
 
@@ -166,7 +195,7 @@ describe('EditEvent Unit Test', () => {
     expect(mockUpdateTrigger).not.toHaveBeenCalled()
   })
 
-  it('Event cannot be updated to invalid date or time', async () => {
+  it('event cannot be updated to invalid date or time', async () => {
     await act(async () => fireEvent.changeText(screen.getByPlaceholderText('e.g. 2025-06-20'), 'invalid-date-format'))
 
     await submitForm()
