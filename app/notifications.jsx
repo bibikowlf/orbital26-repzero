@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import { useAuthContext } from '../hooks/auth-context'
 import { appStyles } from '../styles/styles'
 import BackButton from '../components/back-button'
+import { createNotification } from '../lib/notifications'
 
 function timeAgo(dateStr) {
   const diffMs = Date.now() - new Date(dateStr).getTime()
@@ -52,6 +53,69 @@ export default function Notifications() {
     }
   }
 
+  async function handleAcceptRequest(notification) {
+    try {
+      const { error } = await supabase
+        .from('follows')
+        .update({ status: 'accepted' })
+        .eq('follower_id', notification.actor_id)
+        .eq('following_id', userId)
+
+      if (error) throw error
+
+      const { data: requesterProfile } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', notification.actor_id)
+        .single()
+
+      const { error: updateError } = await supabase
+        .from('notifications')
+        .update({
+          type: 'friend_request_accepted',
+          message: `You and @${requesterProfile?.username} are now friends!`,
+        })
+        .eq('id', notification.id)
+
+      if (updateError) throw updateError
+
+      createNotification({
+        userId: notification.actor_id,
+        actorId: userId,
+        type: 'friend_request_accepted',
+        message: `Your friend request was accepted. You are now friends!`,
+      })
+
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n.id === notification.id
+            ? { ...n, type: 'friend_request_accepted', message: `You and @${requesterProfile?.username} are now friends!` }
+            : n
+        )
+      )
+    } catch (error) {
+      console.log('Error accepting friend request:', error)
+    }
+  }
+
+  async function handleDeclineRequest(notification) {
+    try {
+      const { error } = await supabase
+        .from('follows')
+        .delete()
+        .eq('follower_id', notification.actor_id)
+        .eq('following_id', userId)
+
+      if (error) throw error
+
+      await supabase.from('notifications').delete().eq('id', notification.id)
+
+      setNotifications((prev) => prev.filter((n) => n.id !== notification.id))
+    } catch (error) {
+      console.log('Error declining friend request:', error)
+    }
+  }
+
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -85,6 +149,23 @@ export default function Notifications() {
         >
           <Text style={{ fontSize: 14, color: '#000' }}>{item.message}</Text>
           <Text style={{ fontSize: 12, color: '#888', marginTop: 4 }}>{timeAgo(item.created_at)}</Text>
+
+          {item.type === 'friend_request' && (
+            <View style={{ flexDirection: 'row', marginTop: 10 }}>
+              <TouchableOpacity
+                style={{ paddingVertical: 8, paddingHorizontal: 16, borderRadius: 8, backgroundColor: '#34C759', marginRight: 8 }}
+                onPress={() => handleAcceptRequest(item)}
+              >
+                <Text style={{ color: '#fff', fontWeight: '600' }}>Accept</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{ paddingVertical: 8, paddingHorizontal: 16, borderRadius: 8, backgroundColor: '#FF3B30' }}
+                onPress={() => handleDeclineRequest(item)}
+              >
+                <Text style={{ color: '#fff', fontWeight: '600' }}>Decline</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       )}
     />

@@ -124,9 +124,6 @@ export default function SearchUsers() {
       const { error } = await supabase
         .from('follows')
         .delete()
-        const { error } = await supabase
-        .from('follows')
-        .delete()
         .or(`and(follower_id.eq.${userId},following_id.eq.${targetId}),and(follower_id.eq.${targetId},following_id.eq.${userId})`)
 
       if (error)
