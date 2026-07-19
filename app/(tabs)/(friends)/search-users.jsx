@@ -17,9 +17,10 @@ export default function SearchUsers() {
 
   const [query, setQuery] = useState('')
   const [results, setResults] = useState([])
-  const [followingIds, setFollowingIds] = useState([])
+  const [followStatuses, setFollowStatuses] = useState({})
   const [loading, setLoading] = useState(false)
   const [searched, setSearched] = useState(false)
+  const [myUsername, setMyUsername] = useState('')
 
   const [myUsername, setMyUsername] = useState('')
 
@@ -30,10 +31,23 @@ export default function SearchUsers() {
 
   useEffect(() => {
     if (userId)
-      fetchFollowingIds()
+      fetchFollowStatuses()
+    if (userId) 
+      fetchMyUsername()
   }, [userId])
 
-  async function fetchFollowingIds() {
+  async function fetchMyUsername() {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('username')
+      .eq('id', userId)
+      .single()
+
+    if (!error && data) 
+      setMyUsername(data.username)
+  }
+
+  async function fetchFollowStatuses() {
     try {
       let { data, error } = await supabase
         .from('follows')
@@ -43,9 +57,11 @@ export default function SearchUsers() {
       if (error)
         throw error
 
-      setFollowingIds((data || []).map((row) => row.following_id))
+      const statusMap = {}
+      (data || []).forEach((row) => { statusMap[row.following_id] = row.status })
+      setFollowStatuses(statusMap)
     } catch (error) {
-      console.error('Error fetching following ids:', error)
+      console.error('Error fetching follow statuses:', error)
     }
   }
 
@@ -82,11 +98,12 @@ export default function SearchUsers() {
     try {
       const { error } = await supabase
         .from('follows')
-        .insert({ follower_id: userId, following_id: targetId })
+        .insert({ follower_id: userId, following_id: targetId, status: 'pending' })
 
       if (error)
         throw error
 
+<<<<<<< Updated upstream
       setFollowingIds((prev) => [...prev, targetId])
 
       createNotification({
@@ -96,8 +113,17 @@ export default function SearchUsers() {
         message: `@${myUsername} started following you`,
       })
 
+=======
+      setFollowStatuses((prev) => ({ ...prev, [targetId]: 'pending' }))
+      createNotification({
+        userId: targetId,
+        actorId: userId,
+        type: 'friend_request',
+        message: `@${myUsername} has requested to follow you`,
+      })
+>>>>>>> Stashed changes
     } catch (error) {
-      console.error('Error following user:', error)
+      console.error('Error sending friend request', error)
     }
   }
 
@@ -112,7 +138,11 @@ export default function SearchUsers() {
       if (error)
         throw error
 
-      setFollowingIds((prev) => prev.filter((id) => id !== targetId))
+      setFollowStatuses((prev) => {
+        const next = { ...prev }
+        delete next[targetId]
+        return next
+      })
     } catch (error) {
       console.error('Error unfollowing user:', error)
     }
@@ -160,7 +190,9 @@ export default function SearchUsers() {
         data={results}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => {
-          const isFollowing = followingIds.includes(item.id)
+          const status = followStatuses[item.id]
+          const label = status === 'accepted' ? 'Friends' : status === 'pending' ? 'Requested' : 'Add Friend'
+          const bgColor = status === 'accepted' ? '#8E8E93' : status === 'pending' ? '#C7C7CC' : '#007AFF'
           return (
             <View style={{
               flexDirection: 'row',
@@ -179,7 +211,7 @@ export default function SearchUsers() {
                     width: 90,
                     alignItems: 'center'
                 }]}
-                onPress={() => isFollowing ? handleUnfollow(item.id) : handleFollow(item.id)}
+                onPress={() => status ? handleUnfollow(item.id) : handleFollow(item.id)}
                 >
                 <Text style={appStyles.buttonText}>{isFollowing ? 'Unfollow' : 'Follow'}</Text>
                 </TouchableOpacity>
