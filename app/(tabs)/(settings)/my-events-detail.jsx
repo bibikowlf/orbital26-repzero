@@ -249,6 +249,16 @@ export default function MyEventDetail() {
     if (!messageText.trim()) 
       return Alert.alert('Empty Message', 'Please write a message first.')
 
+    const recipients = attendees.filter(a => a.user_id !== userId)
+
+    const notFriendsYet = recipients.some(a => friendStatuses[a.user_id] !== 'accepted')
+    if (notFriendsYet) {
+      return Alert.alert(
+        'Not Everyone Is a Friend',
+        'You are not friends with everyone to message them. Send friend requests to all attendees first.'
+      )
+    }
+
     const content = `[${event.title}] ${messageText.trim()}`
     const rows = attendees
       .filter(a => a.user_id !== userId)
