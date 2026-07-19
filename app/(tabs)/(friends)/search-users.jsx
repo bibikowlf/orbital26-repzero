@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView } from 'react-native'
+import { useFocusEffect } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import { supabase } from '../../../lib/supabase'
 import { useAuthContext } from '../../../hooks/auth-context'
@@ -22,19 +23,14 @@ export default function SearchUsers() {
   const [searched, setSearched] = useState(false)
   const [myUsername, setMyUsername] = useState('')
 
-  const [myUsername, setMyUsername] = useState('')
-
-  useEffect(() => {
-    if (userId) fetchFollowingIds()
-    if (userId) fetchMyUsername()
-  }, [userId])
-
-  useEffect(() => {
-    if (userId)
-      fetchFollowStatuses()
-    if (userId) 
-      fetchMyUsername()
-  }, [userId])
+  useFocusEffect(
+    useCallback(() => {
+      if (userId) {
+        fetchFollowStatuses()
+        fetchMyUsername()
+      }
+    }, [userId])
+  )
 
   async function fetchMyUsername() {
     const { data, error } = await supabase
@@ -57,8 +53,11 @@ export default function SearchUsers() {
       if (error)
         throw error
 
-      const statusMap = {}
-      (data || []).forEach((row) => { statusMap[row.following_id] = row.status })
+      const statusMap = {};
+      for (const row of (data || [])) {
+        const otherId = row.follower_id === userId ? row.following_id : row.follower_id
+        statusMap[row.following_id] = row.status
+      }
       setFollowStatuses(statusMap)
     } catch (error) {
       console.error('Error fetching follow statuses:', error)
@@ -103,17 +102,6 @@ export default function SearchUsers() {
       if (error)
         throw error
 
-<<<<<<< Updated upstream
-      setFollowingIds((prev) => [...prev, targetId])
-
-      createNotification({
-        userId: targetId,
-        actorId: userId,
-        type: 'new_follower',
-        message: `@${myUsername} started following you`,
-      })
-
-=======
       setFollowStatuses((prev) => ({ ...prev, [targetId]: 'pending' }))
       createNotification({
         userId: targetId,
@@ -121,19 +109,25 @@ export default function SearchUsers() {
         type: 'friend_request',
         message: `@${myUsername} has requested to follow you`,
       })
->>>>>>> Stashed changes
     } catch (error) {
+      if (error.code === '23505') {
+        fetchFollowStatuses()
+        return
+      }
       console.error('Error sending friend request', error)
     }
   }
 
   async function handleUnfollow(targetId) {
+    const previousStatus = followStatuses[targetId]
     try {
       const { error } = await supabase
         .from('follows')
         .delete()
-        .eq('follower_id', userId)
-        .eq('following_id', targetId)
+        const { error } = await supabase
+        .from('follows')
+        .delete()
+        .or(`and(follower_id.eq.${userId},following_id.eq.${targetId}),and(follower_id.eq.${targetId},following_id.eq.${userId})`)
 
       if (error)
         throw error
@@ -143,23 +137,22 @@ export default function SearchUsers() {
         delete next[targetId]
         return next
       })
+
+      if (previousStatus === 'accepted') {
+        createNotification({
+          userId: targetId,
+          actorId: userId,
+          type: 'unfriended',
+          message: `@${myUsername} unfriended you`,
+        })
+      }
     } catch (error) {
       console.error('Error unfollowing user:', error)
     }
   }
 
-  async function fetchMyUsername() {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('username')
-      .eq('id', userId)
-      .single()
-
-    if (!error && data) 
-      setMyUsername(data.username)
-  }
-
   return (
+    <KeyboardAvoidingView>
     <View style={{ flex: 1, paddingHorizontal: 15, paddingTop: 12 }}>
       <View style={{
         flexDirection: 'row',
@@ -207,18 +200,19 @@ export default function SearchUsers() {
               <Text style={appStyles.exerciseName}>{item.username}</Text>
               <TouchableOpacity
                 style={[appStyles.actionButton, {
-                    backgroundColor: isFollowing ? '#8E8E93' : '#007AFF',
+                    backgroundColor: bgColor,
                     width: 90,
                     alignItems: 'center'
                 }]}
                 onPress={() => status ? handleUnfollow(item.id) : handleFollow(item.id)}
                 >
-                <Text style={appStyles.buttonText}>{isFollowing ? 'Unfollow' : 'Follow'}</Text>
+                <Text style={appStyles.buttonText}>{label}</Text>
                 </TouchableOpacity>
             </View>
           )
         }}
       />
     </View>
+    </KeyboardAvoidingView>
   )
 }
