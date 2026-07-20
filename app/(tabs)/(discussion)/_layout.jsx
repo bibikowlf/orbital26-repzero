@@ -18,7 +18,7 @@ export default function DiscussionLayout() {
         options={{ title: 'Add Post', headerLeft: () => <BackButton />}}
       />
       <Stack.Screen name='post' 
-        options={{ title: 'Discussion', headerLeft: () => <BackButton /> , headerRight: () => <NotificationBell/> }}
+        options={{ title: 'Discussion', headerLeft: () => <BackButton /> }}
       />
       <Stack.Screen name='my-posts' 
         options={{ title: 'My Posts', headerLeft: () => <SettingsButton /> }}
