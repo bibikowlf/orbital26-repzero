@@ -1,0 +1,229 @@
+import React from 'react'
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react-native'
+import MyEventDetail from '../../app/(tabs)/(settings)/my-events-detail'
+import { supabase } from '../../lib/supabase'
+import { Alert } from 'react-native'
+
+let mockUpdateTrigger = jest.fn()
+const mockBackRouter = jest.fn()
+
+const mockEventId = 'event-789'
+const mockUserId = 'user-123'
+
+const mockInitialEvent = {
+  id: mockEventId,
+  title: 'Original Title',
+  description: 'Original Description',
+  location: 'Original Location',
+  event_date: '2026-08-20T08:00:00+08:00',
+  category: 'Cardio',
+  max_attendees: 10,
+  event_rsvps: [{ count: 2 }]
+}
+
+const mockInitialRsvps = [
+  { user_id: 'attendee-1', status: 'going', created_at: '2026-01-01' },
+  { user_id: 'attendee-2', status: 'going', created_at: '2026-01-02' }
+]
+
+const mockProfiles = [
+  { id: 'attendee-1', username: 'runner1' },
+  { id: 'attendee-2', username: 'runner2' }
+]
+
+let mockActiveBuilderRef = null
+
+jest.mock('../../lib/supabase', () => {
+  const createMockQueryBuilder = (tableName) => {
+    const builder = {
+      _tableName: tableName,
+      _isSingle: false,
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      order: jest.fn().mockReturnThis(),
+      in: jest.fn().mockReturnThis(),
+      or: jest.fn().mockReturnThis(),
+      update: jest.fn((data) => {
+        mockUpdateTrigger(data)
+        return builder
+      }),
+      single: jest.fn(function () {
+        this._isSingle = true
+        return this
+      }),
+      delete: jest.fn().mockReturnThis(),
+
+      then: function (onFulfilled) {
+        let resolvedPayload = { data: null, error: null }
+
+        if (this._tableName === 'events') {
+          resolvedPayload = { data: mockInitialEvent, error: null }
+        } else if (this._tableName === 'event_rsvps') {
+          resolvedPayload = { data: mockInitialRsvps, error: null }
+        } else if (this._tableName === 'profiles') {
+          if (this._isSingle) {
+            resolvedPayload = { data: { username: 'host_user' }, error: null }
+          } else {
+            resolvedPayload = { data: mockProfiles, error: null }
+          }
+        } else if (this._tableName === 'follows') {
+          resolvedPayload = {
+            data: [
+              { follower_id: mockUserId, following_id: 'attendee-1', status: 'accepted' },
+              { follower_id: mockUserId, following_id: 'attendee-2', status: 'accepted' }
+            ],
+            error: null
+          }
+        }
+
+        return Promise.resolve(resolvedPayload).then(onFulfilled)
+      }
+    }
+    return builder
+  }
+
+  return {
+    supabase: {
+      from: jest.fn((tableName) => {
+        mockActiveBuilderRef = createMockQueryBuilder(tableName)
+        return mockActiveBuilderRef
+      })
+    }
+  }
+})
+
+jest.mock('expo-router', () => ({
+  useLocalSearchParams: () => ({ id: mockEventId }),
+  useRouter: () => ({ back: mockBackRouter })
+}))
+
+jest.mock('../../hooks/auth-context', () => ({
+  useAuthContext: () => ({ claims: { sub: mockUserId } }),
+}))
+
+jest.mock('../../lib/notifications', () => ({
+  createNotification: jest.fn()
+}))
+
+describe('EditEvent Unit Test', () => {
+  beforeEach(async () => {
+    jest.clearAllMocks()
+    jest.spyOn(Alert, 'alert').mockImplementation(() => {})
+    mockUpdateTrigger.mockReturnValue({ error: null })
+
+    await act(async () => render(<MyEventDetail />))
+
+    const editBtn = screen.getByText('Edit')
+    await act(async () => fireEvent.press(editBtn))
+  })
+
+  const submitForm = async () => {
+    const saveBtn = screen.getByText('Save')
+    await act(async () => fireEvent.press(saveBtn))
+  }
+
+  it('event is deleted after pressing delete', async () => {
+    const cancelBtn = screen.getByText('Cancel')
+    await act(async () => fireEvent.press(cancelBtn))
+
+    let caughtButtonsArray = []
+    jest.spyOn(Alert, 'alert').mockImplementation((title, message, buttons) => {
+      caughtButtonsArray = buttons
+    })
+
+    const rootDeleteBtn = screen.getByText('Delete')
+    await act(async () => fireEvent.press(rootDeleteBtn))
+
+    expect(Alert.alert).toHaveBeenCalledWith(
+      'Delete Event',
+      expect.any(String),
+      expect.any(Array)
+    )
+
+    const activeConfirmAction = caughtButtonsArray.find(btn => btn.style === 'destructive')
+    expect(activeConfirmAction).toBeDefined()
+    await act(async () => await activeConfirmAction.onPress())
+
+    expect(supabase.from).toHaveBeenCalledWith('events')
+    expect(mockBackRouter).toHaveBeenCalled()
+  })
+
+  it('event is updated after editing', async () => {
+    await act(async () => fireEvent.changeText(screen.getByPlaceholderText('Event title'), 'Updated Gym Session'))
+    await act(async () => fireEvent.changeText(screen.getByPlaceholderText("What's the plan?"), 'Lifting heavy weights.'))
+
+    await submitForm()
+
+    expect(mockUpdateTrigger).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Updated Gym Session',
+        description: 'Lifting heavy weights.'
+      })
+    )
+    expect(Alert.alert).toHaveBeenCalledWith('Saved', 'Event updated!')
+  })
+
+  it('event cannot be updated to empty title', async () => {
+    await act(async () => fireEvent.changeText(screen.getByPlaceholderText('Event title'), ''))
+
+    await submitForm()
+
+    expect(Alert.alert).toHaveBeenCalledWith('Missing Field', 'Please enter a title.')
+    expect(mockUpdateTrigger).not.toHaveBeenCalled()
+  })
+
+  it('event cannot be updated to empty description', async () => {
+    await act(async () => fireEvent.changeText(screen.getByPlaceholderText("What's the plan?"), ''))
+
+    await submitForm()
+
+    expect(Alert.alert).toHaveBeenCalledWith('Missing Field', 'Please enter a description.')
+    expect(mockUpdateTrigger).not.toHaveBeenCalled()
+  })
+
+  it('event cannot be updated to empty location', async () => {
+    await act(async () => fireEvent.changeText(screen.getByPlaceholderText('e.g. East Coast Park'), ''))
+    await submitForm()
+    expect(Alert.alert).toHaveBeenCalledWith('Missing Field', 'Please enter a location.')
+    expect(mockUpdateTrigger).not.toHaveBeenCalled()
+  })
+
+  it('event cannot be updated to empty date', async () => {
+    await act(async () => fireEvent.changeText(screen.getByPlaceholderText('e.g. 2025-06-20'), ''))
+
+    await submitForm()
+
+    expect(Alert.alert).toHaveBeenCalledWith('Missing Field', 'Please enter a date (YYYY-MM-DD).')
+    expect(mockUpdateTrigger).not.toHaveBeenCalled()
+  })
+
+  it('event cannot be updated to empty time', async () => {
+    await act(async () => fireEvent.changeText(screen.getByPlaceholderText('e.g. 07:00'), ''))
+
+    await submitForm()
+
+    expect(Alert.alert).toHaveBeenCalledWith('Missing Field', 'Please enter a time (HH:MM).')
+    expect(mockUpdateTrigger).not.toHaveBeenCalled()
+  })
+
+  it('event cannot be updated to empty custom category', async () => {
+    const otherChip = screen.getByText('Other')
+    await act(async () => fireEvent.press(otherChip))
+
+    await act(async () => fireEvent.changeText(screen.getByPlaceholderText('e.g. Pilates, Boxing'), ''))
+    
+    await submitForm()
+
+    expect(Alert.alert).toHaveBeenCalledWith('Missing Field', 'Please specify your custom category.')
+    expect(mockUpdateTrigger).not.toHaveBeenCalled()
+  })
+
+  it('event cannot be updated to invalid date or time', async () => {
+    await act(async () => fireEvent.changeText(screen.getByPlaceholderText('e.g. 2025-06-20'), 'invalid-date-format'))
+
+    await submitForm()
+    
+    expect(Alert.alert).toHaveBeenCalledWith('Invalid Format', 'Invalid date or time.')
+    expect(mockUpdateTrigger).not.toHaveBeenCalled()
+  })
+})
