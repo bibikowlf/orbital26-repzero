@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView } from 'react-native'
 import { useFocusEffect } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
@@ -149,7 +149,10 @@ export default function SearchUsers() {
   }
 
   return (
-    <KeyboardAvoidingView>
+    <KeyboardAvoidingView
+      style={appStyles.flexOne}
+      behavior={'padding'}
+    >
     <View style={{ flex: 1, paddingHorizontal: 15, paddingTop: 12 }}>
       <View style={{
         flexDirection: 'row',
@@ -179,6 +182,8 @@ export default function SearchUsers() {
       <FlatList
         data={results}
         keyExtractor={(item) => item.id}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingBottom: 300 }}
         renderItem={({ item }) => {
           const status = followStatuses[item.id]
           const label = status === 'accepted' ? 'Friends' : status === 'pending' ? 'Requested' : 'Add Friend'
