@@ -13,6 +13,9 @@ export default function FriendsLayout() {
       <Stack.Screen name='index' 
        options={{ title: 'Friends', headerLeft: () => <SettingsButton />, headerRight: () => <NotificationBell/> }}
        />
+       <Stack.Screen name="chat-list" 
+  options={{ title: 'Messages', headerLeft: () => <BackButton />, headerRight: () => <NotificationBell/> }}
+/>
       <Stack.Screen name="search-users" 
         options={{ title: 'Find Friends', headerLeft: () => <BackButton /> }}
       />
@@ -29,6 +32,9 @@ export default function FriendsLayout() {
           headerLeft: () => <BackButton />
         })}
       />  
+      <Stack.Screen name="invite-inbox" 
+  options={{ title: 'Invites', headerLeft: () => <BackButton /> }}
+/>
     </Stack>
   )
 }
