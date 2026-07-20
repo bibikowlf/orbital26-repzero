@@ -34,15 +34,18 @@ function RootNavigator() {
     )
   }
   return (
-    <Stack screenOptions={{ headerShown: true }}>
-      <Stack.Screen name="(tabs)" options={{headerShown: false}} />
-      <Stack.Screen name="login" />
+    <Stack screenOptions={{ headerShown: true, 
+      headerTitleAlign: 'center',
+      headerBackVisible: false,
+      headerLeftContainerStyle: { paddingLeft: 16 } }}
+    >
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="login" options={{ title: 'Login' }} />
       <Stack.Screen
           name="notifications"
           options={{
             title: 'Notifications',
-            headerBackVisible: false,
-            headerLeft: () => <BackButton />,
+            headerLeft: () => <BackButton />
           }}
         />
     </Stack>
