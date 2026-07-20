@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView } from 'react-native'
+import { useFocusEffect } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import { supabase } from '../../../lib/supabase'
 import { useAuthContext } from '../../../hooks/auth-context'
@@ -17,23 +18,32 @@ export default function SearchUsers() {
 
   const [query, setQuery] = useState('')
   const [results, setResults] = useState([])
-  const [followingIds, setFollowingIds] = useState([])
+  const [followStatuses, setFollowStatuses] = useState({})
   const [loading, setLoading] = useState(false)
   const [searched, setSearched] = useState(false)
-
   const [myUsername, setMyUsername] = useState('')
 
-  useEffect(() => {
-    if (userId) fetchFollowingIds()
-    if (userId) fetchMyUsername()
-  }, [userId])
+  useFocusEffect(
+    useCallback(() => {
+      if (userId) {
+        fetchFollowStatuses()
+        fetchMyUsername()
+      }
+    }, [userId])
+  )
 
-  useEffect(() => {
-    if (userId)
-      fetchFollowingIds()
-  }, [userId])
+  async function fetchMyUsername() {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('username')
+      .eq('id', userId)
+      .single()
 
-  async function fetchFollowingIds() {
+    if (!error && data) 
+      setMyUsername(data.username)
+  }
+
+  async function fetchFollowStatuses() {
     try {
       let { data, error } = await supabase
         .from('follows')
@@ -43,9 +53,14 @@ export default function SearchUsers() {
       if (error)
         throw error
 
-      setFollowingIds((data || []).map((row) => row.following_id))
+      const statusMap = {};
+      for (const row of (data || [])) {
+        const otherId = row.follower_id === userId ? row.following_id : row.follower_id
+        statusMap[row.following_id] = row.status
+      }
+      setFollowStatuses(statusMap)
     } catch (error) {
-      console.error('Error fetching following ids:', error)
+      console.error('Error fetching follow statuses:', error)
     }
   }
 
@@ -82,54 +97,59 @@ export default function SearchUsers() {
     try {
       const { error } = await supabase
         .from('follows')
-        .insert({ follower_id: userId, following_id: targetId })
+        .insert({ follower_id: userId, following_id: targetId, status: 'pending' })
 
       if (error)
         throw error
 
-      setFollowingIds((prev) => [...prev, targetId])
-
+      setFollowStatuses((prev) => ({ ...prev, [targetId]: 'pending' }))
       createNotification({
         userId: targetId,
         actorId: userId,
-        type: 'new_follower',
-        message: `@${myUsername} started following you`,
+        type: 'friend_request',
+        message: `@${myUsername} has requested to follow you`,
       })
-
     } catch (error) {
-      console.error('Error following user:', error)
+      if (error.code === '23505') {
+        fetchFollowStatuses()
+        return
+      }
+      console.error('Error sending friend request', error)
     }
   }
 
   async function handleUnfollow(targetId) {
+    const previousStatus = followStatuses[targetId]
     try {
       const { error } = await supabase
         .from('follows')
         .delete()
-        .eq('follower_id', userId)
-        .eq('following_id', targetId)
+        .or(`and(follower_id.eq.${userId},following_id.eq.${targetId}),and(follower_id.eq.${targetId},following_id.eq.${userId})`)
 
       if (error)
         throw error
 
-      setFollowingIds((prev) => prev.filter((id) => id !== targetId))
+      setFollowStatuses((prev) => {
+        const next = { ...prev }
+        delete next[targetId]
+        return next
+      })
+
+      if (previousStatus === 'accepted') {
+        createNotification({
+          userId: targetId,
+          actorId: userId,
+          type: 'unfriended',
+          message: `@${myUsername} unfriended you`,
+        })
+      }
     } catch (error) {
       console.error('Error unfollowing user:', error)
     }
   }
 
-  async function fetchMyUsername() {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('username')
-      .eq('id', userId)
-      .single()
-
-    if (!error && data) 
-      setMyUsername(data.username)
-  }
-
   return (
+    <KeyboardAvoidingView>
     <View style={{ flex: 1, paddingHorizontal: 15, paddingTop: 12 }}>
       <View style={{
         flexDirection: 'row',
@@ -160,7 +180,9 @@ export default function SearchUsers() {
         data={results}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => {
-          const isFollowing = followingIds.includes(item.id)
+          const status = followStatuses[item.id]
+          const label = status === 'accepted' ? 'Friends' : status === 'pending' ? 'Requested' : 'Add Friend'
+          const bgColor = status === 'accepted' ? '#8E8E93' : status === 'pending' ? '#C7C7CC' : '#007AFF'
           return (
             <View style={{
               flexDirection: 'row',
@@ -175,18 +197,19 @@ export default function SearchUsers() {
               <Text style={appStyles.exerciseName}>{item.username}</Text>
               <TouchableOpacity
                 style={[appStyles.actionButton, {
-                    backgroundColor: isFollowing ? '#8E8E93' : '#007AFF',
+                    backgroundColor: bgColor,
                     width: 90,
                     alignItems: 'center'
                 }]}
-                onPress={() => isFollowing ? handleUnfollow(item.id) : handleFollow(item.id)}
+                onPress={() => status ? handleUnfollow(item.id) : handleFollow(item.id)}
                 >
-                <Text style={appStyles.buttonText}>{isFollowing ? 'Unfollow' : 'Follow'}</Text>
+                <Text style={appStyles.buttonText}>{label}</Text>
                 </TouchableOpacity>
             </View>
           )
         }}
       />
     </View>
+    </KeyboardAvoidingView>
   )
 }
