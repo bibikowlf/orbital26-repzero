@@ -31,42 +31,66 @@ const mockProfiles = [
   { id: 'attendee-2', username: 'runner2' }
 ]
 
-const mockQueryBuilder = {
-  select: jest.fn().mockReturnThis(),
-  eq: jest.fn().mockReturnThis(),
-  order: jest.fn().mockReturnThis(),
-  in: jest.fn().mockReturnThis(),
-  update: jest.fn((data) => {
-    mockUpdateTrigger(data)
-    return mockQueryBuilder
-  }),
-  single: jest.fn().mockReturnThis(),
-  delete: jest.fn().mockReturnThis(),
+let mockActiveBuilderRef = null
 
-  then: function (onFulfilled) {
-    const lastTableQueried = supabase.from.mock.results.slice(-1)[0]?.value?._tableName
+jest.mock('../../lib/supabase', () => {
+  const createMockQueryBuilder = (tableName) => {
+    const builder = {
+      _tableName: tableName,
+      _isSingle: false,
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      order: jest.fn().mockReturnThis(),
+      in: jest.fn().mockReturnThis(),
+      or: jest.fn().mockReturnThis(),
+      update: jest.fn((data) => {
+        mockUpdateTrigger(data)
+        return builder
+      }),
+      single: jest.fn(function () {
+        this._isSingle = true
+        return this
+      }),
+      delete: jest.fn().mockReturnThis(),
 
-    let resolvedPayload = { data: null, error: null }
-    if (lastTableQueried === 'events') {
-      resolvedPayload = { data: mockInitialEvent, error: null }
-    } else if (lastTableQueried === 'event_rsvps') {
-      resolvedPayload = { data: mockInitialRsvps, error: null }
-    } else if (lastTableQueried === 'profiles') {
-      resolvedPayload = { data: mockProfiles, error: null }
+      then: function (onFulfilled) {
+        let resolvedPayload = { data: null, error: null }
+
+        if (this._tableName === 'events') {
+          resolvedPayload = { data: mockInitialEvent, error: null }
+        } else if (this._tableName === 'event_rsvps') {
+          resolvedPayload = { data: mockInitialRsvps, error: null }
+        } else if (this._tableName === 'profiles') {
+          if (this._isSingle) {
+            resolvedPayload = { data: { username: 'host_user' }, error: null }
+          } else {
+            resolvedPayload = { data: mockProfiles, error: null }
+          }
+        } else if (this._tableName === 'follows') {
+          resolvedPayload = {
+            data: [
+              { follower_id: mockUserId, following_id: 'attendee-1', status: 'accepted' },
+              { follower_id: mockUserId, following_id: 'attendee-2', status: 'accepted' }
+            ],
+            error: null
+          }
+        }
+
+        return Promise.resolve(resolvedPayload).then(onFulfilled)
+      }
     }
-
-    return Promise.resolve(resolvedPayload).then(onFulfilled)
+    return builder
   }
-}
 
-jest.mock('../../lib/supabase', () => ({
-  supabase: {
-    from: jest.fn((tableName) => {
-      mockQueryBuilder._tableName = tableName
-      return mockQueryBuilder
-    })
+  return {
+    supabase: {
+      from: jest.fn((tableName) => {
+        mockActiveBuilderRef = createMockQueryBuilder(tableName)
+        return mockActiveBuilderRef
+      })
+    }
   }
-}))
+})
 
 jest.mock('expo-router', () => ({
   useLocalSearchParams: () => ({ id: mockEventId }),
@@ -121,7 +145,6 @@ describe('EditEvent Unit Test', () => {
     await act(async () => await activeConfirmAction.onPress())
 
     expect(supabase.from).toHaveBeenCalledWith('events')
-    expect(mockQueryBuilder.delete).toBeDefined()
     expect(mockBackRouter).toHaveBeenCalled()
   })
 
