@@ -11,25 +11,19 @@ export default function SettingsLayout() {
         headerLeftContainerStyle: { paddingLeft: 16 } }}
     >
       <Stack.Screen name='profile' 
-        options={{ title: 'Profile', headerLeft: () => <SettingsButton />, headerRight: () => <NotificationBell/>}}
+        options={{ title: 'Profile', headerLeft: () => <SettingsButton />, headerRight: () => <NotificationBell/> }}
       />
       <Stack.Screen name='my-events' 
-        options={{ title: 'My Events', headerLeft: () => <SettingsButton />, headerRight: () => <NotificationBell/>}}
+        options={{ title: 'My Events', headerLeft: () => <SettingsButton /> }}
       />
       <Stack.Screen name='my-events-detail' 
-        options={{ title: 'Event Details', headerLeft: () => <BackButton />, headerRight: () => <NotificationBell/> }}
-      />
-      <Stack.Screen name='my-posts' 
-        options={{ title: 'My Posts', headerLeft: () => <SettingsButton />, headerRight: () => <NotificationBell/> }}
-      />
-      <Stack.Screen name='my-posts-detail' 
-        options={{ title: 'Discussion', headerLeft: () => <BackButton />, headerRight: () => <NotificationBell/> }}
+        options={{ title: 'Event Details', headerLeft: () => <BackButton /> }}
       />
       <Stack.Screen name='my-tutorials' 
-        options={{ title: 'My Tutorials', headerLeft: () => <SettingsButton />, headerRight: () => <NotificationBell/>}}
+        options={{ title: 'My Tutorials', headerLeft: () => <SettingsButton /> }}
       />
       <Stack.Screen name='change-password' 
-        options={{ title: 'Change Password', headerLeft: () => <BackButton />  }}
+        options={{ title: 'Change Password', headerLeft: () => <BackButton /> }}
       />
     </Stack>
   )
