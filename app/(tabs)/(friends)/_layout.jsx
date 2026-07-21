@@ -13,14 +13,16 @@ export default function FriendsLayout() {
       <Stack.Screen name='index' 
        options={{ title: 'Friends', headerLeft: () => <SettingsButton />, headerRight: () => <NotificationBell/> }}
        />
+       <Stack.Screen name="chat-list" 
+        options={{ title: 'Messages', headerLeft: () => <BackButton /> }}
+      />
       <Stack.Screen name="search-users" 
         options={{ title: 'Find Friends', headerLeft: () => <BackButton /> }}
       />
       <Stack.Screen name='follow-list' 
         options={({ route }) => ({
           title: route.params?.mode === 'followers' ? 'Followers' : 'Following',
-          headerLeft: () => <BackButton />,
-          headerRight: () => <NotificationBell/>
+          headerLeft: () => <BackButton />
         })}
       />
       <Stack.Screen name='chat-thread' 
@@ -29,6 +31,9 @@ export default function FriendsLayout() {
           headerLeft: () => <BackButton />
         })}
       />  
+      <Stack.Screen name="invite-inbox" 
+        options={{ title: 'Invites', headerLeft: () => <BackButton /> }}
+      />
     </Stack>
   )
 }
