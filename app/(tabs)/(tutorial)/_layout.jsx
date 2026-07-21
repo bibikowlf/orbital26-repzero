@@ -12,7 +12,7 @@ export default function TutorialLayout() {
     >
       <Stack.Screen name='index' />
       <Stack.Screen name='workout-tutorial' 
-        options={{ title: 'Tutorial', headerLeft: () => <SettingsButton />, headerRight: () => <NotificationBell/>}}
+        options={{ title: 'Tutorial', headerLeft: () => <SettingsButton />, headerRight: () => <NotificationBell/> }}
       />
       <Stack.Screen name='tutorial' 
         options={{ headerLeft: () => <BackButton />}}

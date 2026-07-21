@@ -12,10 +12,10 @@ export default function DiscussionLayout() {
     >
       <Stack.Screen name='index' />
       <Stack.Screen name='discussion-forum' 
-        options={{ title: 'Discussion', headerLeft: () => <SettingsButton />, headerRight: () => <NotificationBell/>}}
+        options={{ title: 'Discussion', headerLeft: () => <SettingsButton />, headerRight: () => <NotificationBell/> }}
       />
       <Stack.Screen name='add-post' 
-        options={{ title: 'Add Post', headerLeft: () => <BackButton />}}
+        options={{ title: 'Add Post', headerLeft: () => <BackButton /> }}
       />
       <Stack.Screen name='post' 
         options={{ title: 'Discussion', headerLeft: () => <BackButton /> }}
