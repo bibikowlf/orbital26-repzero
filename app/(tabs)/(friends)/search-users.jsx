@@ -202,8 +202,9 @@ export default function SearchUsers() {
               <Text style={appStyles.exerciseName}>{item.username}</Text>
               <TouchableOpacity
                 style={[appStyles.actionButton, {
+                    flex: undefined,
                     backgroundColor: bgColor,
-                    width: 90,
+                    width: 150,
                     alignItems: 'center'
                 }]}
                 onPress={() => status ? handleUnfollow(item.id) : handleFollow(item.id)}
