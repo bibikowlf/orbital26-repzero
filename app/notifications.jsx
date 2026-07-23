@@ -60,8 +60,16 @@ export default function Notifications() {
         .update({ status: 'accepted' })
         .eq('follower_id', notification.actor_id)
         .eq('following_id', userId)
+        .select()
 
       if (error) throw error
+
+      if (!updated || updated.length === 0) {
+        await supabase.from('notifications').delete().eq('id', notification.id)
+        setNotifications(prev => prev.filter(n => n.id !== notification.id))
+        Alert.alert('Request no longer available', 'This friend request was cancelled.')
+        return
+      }
 
       const { data: requesterProfile } = await supabase
         .from('profiles')
@@ -83,7 +91,7 @@ export default function Notifications() {
         userId: notification.actor_id,
         actorId: userId,
         type: 'friend_request_accepted',
-        message: `Your friend request was accepted. You are now friends!`,
+        message: `@${myProfile.username} request was accepted. You are now friends!`,
       })
 
       setNotifications((prev) =>
