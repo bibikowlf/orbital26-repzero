@@ -90,30 +90,46 @@ export default function Profile() {
   }
 
   async function updateProfile({ username, height, weight, year, gender, frequency, time, exp, focus, illness, info }) {
+    if (!username.trim()) return Alert.alert('Missing Field', 'Please enter your username.')
+    if (height === 0) return Alert.alert('Missing Field', 'Please enter your height')
+    if (weight === 0) return Alert.alert('Missing Field', 'Please enter your weight.')
+    if (year === 0) return Alert.alert('Missing Field', 'Please enter your year of birth.')
+    if (frequency === 0) return Alert.alert('Missing Field', 'Please enter your number of sessions.')
+    if (time === 0) return Alert.alert('Missing Field', 'Please enter your time per session.')
+
     try {
       setLoading(true)
 
-      const updates = {
-        id: userId,
-        username: username,
-        height_cm: height,
-        weight_kg: weight,
-        birth_year: year,
-        gender: gender,
-        gym_frequency: frequency,
-        time_per_session: time,
-        gym_exp: exp,
-        focus_area: focus,
-        illness: illness,
-        add_info: info,
-        updated_at: new Date(),
+      const { data, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('username', username)
+      
+      if (profileError) throw profileError
+      if (!data || data.length === 0 || data[0].id === userId) {
+        const updates = {
+          id: userId,
+          username: username,
+          height_cm: height,
+          weight_kg: weight,
+          birth_year: year,
+          gender: gender,
+          gym_frequency: frequency,
+          time_per_session: time,
+          gym_exp: exp,
+          focus_area: focus,
+          illness: illness,
+          add_info: info,
+          updated_at: new Date(),
+        }
+
+        const { error } = await supabase.from('profiles').upsert(updates)
+
+        if (error) throw error
+        refreshProfile()
+      } else {
+        Alert.alert('Invalid Field', 'This username is already taken.')
       }
-
-      const { error } = await supabase.from('profiles').upsert(updates)
-
-      if (error) throw error
-
-      refreshProfile()
     } catch (error) {
       if (error instanceof Error) Alert.alert(error.message)
     } finally {
@@ -137,29 +153,31 @@ export default function Profile() {
 
         {/* USERNAME */}
         <View style={styles.verticallySpaced}>
-          <Text style={styles.label}>Username</Text>
+          <Text style={styles.label}>Username *</Text>
           <TextInput
             value={username ?? ''}
             onChangeText={(text) => setUsername(text)}
             autoCapitalize="none"
             style={styles.input}
+            testID='username-input'
           />
         </View>
 
         {/* HEIGHT */}
         <View style={styles.verticallySpaced}>
-          <Text style={styles.label}>Height (cm)</Text>
+          <Text style={styles.label}>Height (cm) *</Text>
           <TextInput
             value={height?.toString() ?? '0'}
             keyboardType='numeric'
             onChangeText={(text) => setHeight(handleNumericInput(text))}
             style={styles.input}
+            testID='height-input'
           />
         </View>
 
         {/* WEIGHT*/}
         <View style={styles.verticallySpaced}>
-          <Text style={styles.label}>Weight (kg)</Text>
+          <Text style={styles.label}>Weight (kg) *</Text>
           <TextInput
             value={weight?.toString() ?? '0'}
             keyboardType='numeric'
@@ -169,9 +187,11 @@ export default function Profile() {
           />
         </View>
 
+        <Spacer height={10} />
+
         {/* BIRTH YEAR */}
         <View style={styles.inputContainer}>
-          <Text style={styles.fieldLabel}>Year of birth</Text>
+          <Text style={styles.fieldLabel}>Year of birth *</Text>
           <Dropdown
             style={styles.dropdown}
             mode="modal"
@@ -206,7 +226,7 @@ export default function Profile() {
 
         {/* GYM FREQUENCY */}
         <View style={styles.inputContainer}>
-          <Text style={styles.fieldLabel}>Number of gym sessions every week</Text>
+          <Text style={styles.fieldLabel}>Number of gym sessions every week *</Text>
           <Dropdown
             style={styles.dropdown}
             placeholderStyle={styles.placeholderStyle}
@@ -222,13 +242,14 @@ export default function Profile() {
         </View>
 
         {/* SESSION TIME */}
-        <View style={styles.verticallySpaced}>
-          <Text style={styles.label}>Average time per session (minutes)</Text>
+        <View style={[styles.verticallySpaced, { paddingTop: 0 }]}>
+          <Text style={styles.label}>Average time per session (minutes) *</Text>
           <TextInput
             value={time?.toString() ?? '0'}
             keyboardType='numeric'
             onChangeText={(text) => setTime(handleNumericInput(text))}
             style={styles.input}
+            testID='time-input'
           />
         </View>
 

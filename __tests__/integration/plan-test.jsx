@@ -109,6 +109,22 @@ jest.mock('../../functions/numeric-input', () => ({
   handleNumericInput: (val) => val
 }))
 
+jest.mock('react-native-element-dropdown', () => {
+  const { TextInput } = require('react-native')
+  return {
+    Dropdown: ({ placeholder, value, onChange }) => (
+      <TextInput
+        placeholder={placeholder}
+        value={String(value)}
+        onChangeText={(text) => {
+          const numericValue = parseInt(text, 10)
+          onChange({ value: isNaN(numericValue) ? text : numericValue })
+        }}
+      />
+    )
+  }
+})
+
 describe('Plan & Log Integration Test', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -123,7 +139,17 @@ describe('Plan & Log Integration Test', () => {
 
     await act(async () => render(<Profile />))
     
+    await act(async () => fireEvent.changeText(screen.getByTestId('username-input'), 'username'))
+    await act(async () => fireEvent.changeText(screen.getByTestId('height-input'), '170'))
     await act(async () => fireEvent.changeText(screen.getByTestId('weight-input'), '70'))
+    await act(async () => fireEvent.changeText(screen.getByTestId('time-input'), '60'))
+
+    const birthYearDropdown = screen.getByPlaceholderText('Select year of birth')
+    await act(async () => fireEvent(birthYearDropdown, 'onChange', { label: '2000', value: 2000 }))
+
+    const frequencyDropdown = screen.getByPlaceholderText('Select number of sessions')
+    await act(async () => fireEvent(frequencyDropdown, 'onChange', { label: '5', value: 5 }))
+
     await act(async () => fireEvent.press(screen.getByText('Update')))
 
     await waitFor(() => expect(mockDatabaseStore.profiles[mockUserSubId].weight_kg).toBe('70'))
