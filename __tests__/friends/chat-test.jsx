@@ -271,11 +271,8 @@ describe('ChatThread Unit Test', () => {
           }),
         ])
       )
-
       expect(screen.getByText('✅ Going')).toBeTruthy()
-
       expect(screen.getByText('testuser RSVP’d to Community Run')).toBeTruthy()
-
       expect(createNotification).toHaveBeenCalledWith({
         userId: mockRecipientId,
         actorId: mockCurrentUserId,

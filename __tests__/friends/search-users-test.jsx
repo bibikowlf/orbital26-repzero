@@ -147,14 +147,12 @@ describe('SearchUsers Unit Test', () => {
           }),
         ])
       )
-
       expect(createNotification).toHaveBeenCalledWith({
         userId: 'target-user-456',
         actorId: mockUserSubId,
         type: 'friend_request',
         message: '@my_username has requested to follow you',
       })
-
       expect(screen.getByText('Requested')).toBeTruthy()
     })
   })
