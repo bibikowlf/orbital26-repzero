@@ -10,21 +10,24 @@ import BackButton from '../components/back-button'
 
 function RootNavigator() {
   const styles = appStyles
-  const { isLoading, isLoggedIn } = useAuthContext()
+  const { claims, isLoading, isLoggedIn } = useAuthContext()
   const segments = useSegments()
+  const username = claims?.user_metadata?.username
 
   useEffect(() => {
-    if (isLoading) {
-      return
-    }
+    if (isLoading) return
 
-    const inLogin = segments.length > 0 && segments[0] === 'login'
-    if (inLogin && isLoggedIn) {
-      router.replace('/')
-    } else if (!inLogin && !isLoggedIn) {
+    const inLogin = segments.includes('login')
+    const inProfile = segments.includes('profile')
+
+    if (!inLogin && !isLoggedIn) {
       router.replace('/login')
+    } else if ((!username || username.trim() === '') && !inProfile) {
+      router.replace('/profile')
+    } else if (inLogin && isLoggedIn) {
+      router.replace('/')
     }
-  }, [isLoading, isLoggedIn])
+  }, [username, isLoading, isLoggedIn])
 
   if (isLoading) {
     return (
