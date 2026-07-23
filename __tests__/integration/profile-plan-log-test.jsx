@@ -125,7 +125,7 @@ jest.mock('react-native-element-dropdown', () => {
   }
 })
 
-describe('Plan & Log Integration Test', () => {
+describe('Profile & Plan & Log Integration Test', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     jest.spyOn(Alert, 'alert').mockImplementation(() => {})
