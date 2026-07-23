@@ -5,6 +5,7 @@ export const AuthContext = createContext({
   profile: undefined,
   isLoading: true,
   isLoggedIn: false,
+  refreshProfile: () => { return }
 })
 
 export const useAuthContext = () => useContext(AuthContext)

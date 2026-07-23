@@ -32,7 +32,7 @@ for (let i = 1950; i <= 2025; i++) {
 }
 
 export default function Profile() {
-  const { claims } = useAuthContext()
+  const { claims, refreshProfile } = useAuthContext()
   const userId = claims?.sub
   const email = claims?.email
 
@@ -109,13 +109,13 @@ export default function Profile() {
         updated_at: new Date(),
       }
 
-      let { error } = await supabase.from('profiles').upsert(updates)
+      const { error } = await supabase.from('profiles').upsert(updates)
 
-      if (error) {
-        throw error
-      }
+      if (error) throw error
+
+      refreshProfile()
     } catch (error) {
-      Alert.alert(error.message)
+      if (error instanceof Error) Alert.alert(error.message)
     } finally {
       setLoading(false)
     }

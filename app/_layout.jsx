@@ -10,24 +10,29 @@ import BackButton from '../components/back-button'
 
 function RootNavigator() {
   const styles = appStyles
-  const { claims, isLoading, isLoggedIn } = useAuthContext()
+  const { profile, isLoading, isLoggedIn } = useAuthContext()
   const segments = useSegments()
-  const username = claims?.user_metadata?.username
 
   useEffect(() => {
     if (isLoading) return
 
     const inLogin = segments.includes('login')
     const inProfile = segments.includes('profile')
+    const username = profile?.username
+    const hasUsername = username != undefined && username.trim() != ''
 
-    if (!inLogin && !isLoggedIn) {
-      router.replace('/login')
-    } else if ((!username || username.trim() === '') && !inProfile) {
-      router.replace('/profile')
-    } else if (inLogin && isLoggedIn) {
-      router.replace('/')
+    if (!isLoggedIn) {
+      if (!inLogin) setTimeout(() => router.replace('/login'), 0)
+    } else {
+      if (!inProfile) {
+        if (!hasUsername) {
+          setTimeout(() => router.replace('/profile'), 0)
+        } else if (inLogin) {
+          setTimeout(() => router.replace('/'), 0)
+        }
+      }
     }
-  }, [username, isLoading, isLoggedIn])
+  }, [isLoading, isLoggedIn, profile?.username, segments])
 
   if (isLoading) {
     return (
@@ -42,6 +47,7 @@ function RootNavigator() {
       headerBackVisible: false,
       headerLeftContainerStyle: { paddingLeft: 16 } }}
     >
+      <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="login" options={{ title: 'Login' }} />
       <Stack.Screen
