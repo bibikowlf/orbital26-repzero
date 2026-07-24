@@ -112,6 +112,7 @@ export default function Events() {
       `)
       .eq('user_rsvp.user_id', userId)
       .neq('creator_id', userId)
+      .gte('event_date', new Date().toISOString())
       .order('event_date', { ascending: true })
 
     if (error) console.error(error)
