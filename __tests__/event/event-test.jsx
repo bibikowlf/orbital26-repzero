@@ -37,7 +37,6 @@ const mockEventsData = [
   }
 ]
 
-let mockSelectImplementation = jest.fn()
 let mockUpsertImplementation = jest.fn()
 let mockDeleteImplementation = jest.fn()
 
@@ -45,6 +44,7 @@ const mockQueryBuilder = {
   select: jest.fn().mockReturnThis(),
   eq: jest.fn().mockReturnThis(),
   neq: jest.fn().mockReturnThis(),
+  gte: jest.fn().mockReturnThis(), // Added missing chained method
   order: jest.fn().mockReturnThis(),
   single: jest.fn().mockResolvedValue({ data: { username: 'my_test_user' }, error: null }),
   
@@ -84,7 +84,7 @@ jest.mock('../../lib/notifications', () => ({
 
 describe('Events Function Unit Test', () => {
   test('formatEventDate formats day and time string', () => {
-    const { day, time } = formatEventDate('2025-06-20T07:00:00+08:00')
+    const { day, time } = formatEventDate('2026-08-20T07:00:00+08:00')
     expect(typeof day).toBe('string')
     expect(typeof time).toBe('string')
     expect(day.length).toBeGreaterThan(0)
@@ -98,21 +98,21 @@ describe('Events Function Unit Test', () => {
         id: '1',
         title: 'Morning Run',
         category: 'Cardio',
-        event_date: '2025-06-20T07:00:00+08:00',
+        event_date: '2026-08-20T07:00:00+08:00',
         user_rsvp: [{ status: 'going' }],
       },
       {
         id: '2',
         title: 'Push Day',
         category: 'Strength',
-        event_date: '2025-06-22T10:00:00+08:00',
+        event_date: '2026-08-22T10:00:00+08:00',
         user_rsvp: [],
       },
       {
         id: '3',
         title: 'Yoga Session',
         category: 'Flexibility',
-        event_date: '2025-06-18T08:00:00+08:00',
+        event_date: '2026-08-18T08:00:00+08:00',
         user_rsvp: [],
       },
     ]
@@ -149,7 +149,6 @@ describe('Events Unit Test', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     jest.spyOn(Alert, 'alert').mockImplementation(() => {})
-    mockSelectImplementation.mockResolvedValue({ data: mockEventsData, error: null })
   })
 
   it('events are filtered based on category', async () => {
