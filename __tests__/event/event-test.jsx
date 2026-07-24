@@ -44,7 +44,7 @@ const mockQueryBuilder = {
   select: jest.fn().mockReturnThis(),
   eq: jest.fn().mockReturnThis(),
   neq: jest.fn().mockReturnThis(),
-  gte: jest.fn().mockReturnThis(), // Added missing chained method
+  gte: jest.fn().mockReturnThis(),
   order: jest.fn().mockReturnThis(),
   single: jest.fn().mockResolvedValue({ data: { username: 'my_test_user' }, error: null }),
   
