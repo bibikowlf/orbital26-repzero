@@ -90,12 +90,12 @@ export default function Profile() {
   }
 
   async function updateProfile({ username, height, weight, year, gender, frequency, time, exp, focus, illness, info }) {
-    if (!username.trim()) return Alert.alert('Missing Field', 'Please enter your username.')
-    if (height === 0) return Alert.alert('Missing Field', 'Please enter your height')
-    if (weight === 0) return Alert.alert('Missing Field', 'Please enter your weight.')
-    if (year === 0) return Alert.alert('Missing Field', 'Please enter your year of birth.')
-    if (frequency === 0) return Alert.alert('Missing Field', 'Please enter your number of sessions.')
-    if (time === 0) return Alert.alert('Missing Field', 'Please enter your time per session.')
+    if (!username || !username.trim()) return Alert.alert('Missing Field', 'Please enter your username.')
+    if (!height || height === 0) return Alert.alert('Missing Field', 'Please enter your height')
+    if (!weight || weight === 0) return Alert.alert('Missing Field', 'Please enter your weight.')
+    if (!year || year === 0) return Alert.alert('Missing Field', 'Please enter your year of birth.')
+    if (!frequency || frequency === 0) return Alert.alert('Missing Field', 'Please enter your number of sessions.')
+    if (!time || time === 0) return Alert.alert('Missing Field', 'Please enter your time per session.')
 
     try {
       setLoading(true)
