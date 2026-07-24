@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { View, Text, FlatList, TouchableOpacity } from 'react-native'
+import { View, Text, FlatList, TouchableOpacity, Alert } from 'react-native'
 import { useFocusEffect } from '@react-navigation/native'
 import { supabase } from '../lib/supabase'
 import { useAuthContext } from '../hooks/auth-context'
@@ -60,13 +60,27 @@ export default function Notifications() {
         .update({ status: 'accepted' })
         .eq('follower_id', notification.actor_id)
         .eq('following_id', userId)
+        .select()
 
       if (error) throw error
+
+      if (!updated || updated.length === 0) {
+        await supabase.from('notifications').delete().eq('id', notification.id)
+        setNotifications(prev => prev.filter(n => n.id !== notification.id))
+        Alert.alert('Request no longer available', 'This friend request was cancelled.')
+        return
+      }
 
       const { data: requesterProfile } = await supabase
         .from('profiles')
         .select('username')
         .eq('id', notification.actor_id)
+        .single()
+
+      const { data: myProfile } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', userId)
         .single()
 
       const { error: updateError } = await supabase
@@ -83,7 +97,7 @@ export default function Notifications() {
         userId: notification.actor_id,
         actorId: userId,
         type: 'friend_request_accepted',
-        message: `Your friend request was accepted. You are now friends!`,
+        message: `@${myProfile.username} accepted your friend request. You are now friends!`,
       })
 
       setNotifications((prev) =>

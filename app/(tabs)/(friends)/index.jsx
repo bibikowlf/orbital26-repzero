@@ -11,8 +11,7 @@ export default function FriendsHome() {
   const { claims } = useAuthContext()
   const userId = claims?.sub
 
-  const [followerCount, setFollowerCount] = useState(0)
-  const [followingCount, setFollowingCount] = useState(0)
+  const [friendCount, setFriendCount] = useState(0)
   const [loading, setLoading] = useState(false)
   const [chatsLoading, setChatsLoading] = useState(false)
   const [chats, setChats] = useState([])
@@ -30,26 +29,18 @@ export default function FriendsHome() {
     try {
       setLoading(true)
 
-      const { count: followers, error: followerError } = await supabase
+      const { count, error } = await supabase
         .from('follows')
         .select('*', { count: 'exact', head: true })
-        .eq('following_id', userId)
+        .eq('status', 'accepted')
+        .or(`follower_id.eq.${userId},following_id.eq.${userId}`)
 
-      if (followerError)
-        throw followerError
+      if (error)
+        throw error
 
-      const { count: following, error: followingError } = await supabase
-        .from('follows')
-        .select('*', { count: 'exact', head: true })
-        .eq('follower_id', userId)
-
-      if (followingError)
-        throw followingError
-
-      setFollowerCount(followers || 0)
-      setFollowingCount(following || 0)
+      setFriendCount(count || 0)
     } catch (error) {
-      console.error('Error fetching follow counts:', error)
+      console.error('Error fetching friend count:', error)
     } finally {
       setLoading(false)
     }
@@ -61,13 +52,16 @@ export default function FriendsHome() {
 
       const { data: followRows, error: followError } = await supabase
         .from('follows')
-        .select('following_id')
-        .eq('follower_id', userId)
+        .select('follower_id, following_id')
+        .eq('status', 'accepted')
+        .or(`follower_id.eq.${userId},following_id.eq.${userId}`)
 
       if (followError)
         throw followError
 
-      const ids = (followRows || []).map((row) => row.following_id)
+      const ids = (followRows || []).map((row) =>
+        row.follower_id === userId ? row.following_id : row.follower_id
+      )
 
       if (ids.length === 0) {
         setChats([])
@@ -130,25 +124,13 @@ export default function FriendsHome() {
         {loading ? (
           <ActivityIndicator size="small" color="#4F46E5" style={{ paddingVertical: 10 }} />
         ) : (
-          <View style={{ flexDirection: 'row', width: '100%', justifyContent: 'space-around', alignItems: 'center' }}>
-            <TouchableOpacity
-              style={appStyles.metricItem}
-              onPress={() => router.push({ pathname: '/follow-list', params: { mode: 'followers' } })}
-            >
-              <Text style={appStyles.metricNumber}>{followerCount}</Text>
-              <Text style={appStyles.metricLabel}>Followers</Text>
-            </TouchableOpacity>
-            
-            <View style={appStyles.metricDivider} />
-            
-            <TouchableOpacity
-              style={appStyles.metricItem}
-              onPress={() => router.push({ pathname: '/follow-list', params: { mode: 'following' } })}
-            >
-              <Text style={appStyles.metricNumber}>{followingCount}</Text>
-              <Text style={appStyles.metricLabel}>Following</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={[appStyles.metricItem, { width: '100%', alignItems: 'center' }]}
+            onPress={() => router.push('/follow-list')}
+          >
+            <Text style={appStyles.metricNumber}>{friendCount}</Text>
+            <Text style={appStyles.metricLabel}>Friends</Text>
+          </TouchableOpacity>
         )}
       </View>
 
@@ -165,7 +147,7 @@ export default function FriendsHome() {
       {chatsLoading && <ActivityIndicator size="small" color="#000" style={{ marginVertical: 10 }} />}
 
       {!chatsLoading && chats.length === 0 && (
-        <Text style={appStyles.fallbackText}>Follow someone to start chatting.</Text>
+        <Text style={appStyles.fallbackText}>Add a friend to start chatting.</Text>
       )}
 
       <FlatList

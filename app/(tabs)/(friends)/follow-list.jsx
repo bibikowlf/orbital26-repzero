@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react'
 import { View, Text, FlatList, ActivityIndicator } from 'react-native'
-import { useLocalSearchParams } from 'expo-router'
-import { supabase } from '../../../lib/supabase'
 import { useAuthContext } from '../../../hooks/auth-context'
+import { supabase } from '../../../lib/supabase'
 import { appStyles } from '../../../styles/styles'
 
 export default function FollowList() {
-  const { mode } = useLocalSearchParams()
   const { claims } = useAuthContext()
   const userId = claims?.sub
 
@@ -16,24 +14,24 @@ export default function FollowList() {
   useEffect(() => {
     if (userId)
       fetchList()
-  }, [userId, mode])
+  }, [userId])
 
   async function fetchList() {
     try {
       setLoading(true)
 
-      const column = mode === 'followers' ? 'following_id' : 'follower_id'
-      const targetColumn = mode === 'followers' ? 'follower_id' : 'following_id'
-
       const { data: followRows, error: followError } = await supabase
         .from('follows')
-        .select(targetColumn)
-        .eq(column, userId)
+        .select('follower_id, following_id')
+        .eq('status', 'accepted')
+        .or(`follower_id.eq.${userId},following_id.eq.${userId}`)
 
       if (followError)
         throw followError
 
-      const ids = (followRows || []).map((row) => row[targetColumn])
+      const ids = (followRows || []).map((row) =>
+        row.follower_id === userId ? row.following_id : row.follower_id
+      )
 
       if (ids.length === 0) {
         setUsers([])
@@ -50,7 +48,7 @@ export default function FollowList() {
 
       setUsers(profiles || [])
     } catch (error) {
-      console.error('Error fetching follow list:', error)
+      console.error('Error fetching friends list:', error)
     } finally {
       setLoading(false)
     }
@@ -67,9 +65,7 @@ export default function FollowList() {
   return (
     <View style={{ flex: 1, paddingHorizontal: 15, paddingTop: 12 }}>
       {users.length === 0 && (
-        <Text style={appStyles.fallbackText}>
-          {mode === 'followers' ? 'No followers yet.' : 'Not following anyone yet.'}
-        </Text>
+        <Text style={appStyles.fallbackText}>No friends yet.</Text>
       )}
 
       <FlatList
