@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { View, Text, FlatList, TouchableOpacity } from 'react-native'
+import { View, Text, FlatList, TouchableOpacity, Alert } from 'react-native'
 import { useFocusEffect } from '@react-navigation/native'
 import { supabase } from '../lib/supabase'
 import { useAuthContext } from '../hooks/auth-context'
@@ -77,6 +77,12 @@ export default function Notifications() {
         .eq('id', notification.actor_id)
         .single()
 
+      const { data: myProfile } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', userId)
+        .single()
+
       const { error: updateError } = await supabase
         .from('notifications')
         .update({
@@ -91,7 +97,7 @@ export default function Notifications() {
         userId: notification.actor_id,
         actorId: userId,
         type: 'friend_request_accepted',
-        message: `@${myProfile.username} request was accepted. You are now friends!`,
+        message: `@${myProfile.username} accepted your friend request. You are now friends!`,
       })
 
       setNotifications((prev) =>
