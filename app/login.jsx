@@ -18,6 +18,8 @@ const Login = () => {
   )
 
   async function signInWithEmail() {
+    if (!email || !email.trim()) return Alert.alert('Missing Field', 'Please fill in your email.')
+    if (!password || !password.trim()) return Alert.alert('Missing Field', 'Please fill in your password.')
     setLoading(true)
     const { error } = await supabase.auth.signInWithPassword({
       email: email,
@@ -31,6 +33,8 @@ const Login = () => {
   }
 
   async function signUpWithEmail() {
+    if (!email || !email.trim()) return Alert.alert('Missing Field', 'Please fill in your email.')
+    if (!password || !password.trim()) return Alert.alert('Missing Field', 'Please fill in your password.')
     setLoading(true)
     const { error } = await supabase.auth.signUp({
       email: email,

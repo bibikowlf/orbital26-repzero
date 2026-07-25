@@ -51,17 +51,17 @@ jest.mock('../../lib/supabase', () => ({
           mockFollowsDatabase.push(...rows)
           return Promise.resolve({ data: rows, error: null })
         }),
-        delete: jest.fn().mockImplementation(() => ({
-          or: jest.fn().mockImplementation(() => {
-            mockFollowsDatabase = []
-            return Promise.resolve({ data: null, error: null })
-          }),
-          eq: jest.fn().mockImplementation(() => {
-            mockFollowsDatabase = []
-            return Promise.resolve({ data: null, error: null })
-          }),
-          then: (resolve) => Promise.resolve(resolve({ data: null, error: null })),
-        })),
+        delete: jest.fn().mockImplementation(() => {
+          const deleteChain = {
+            or: jest.fn().mockImplementation(() => {
+              mockFollowsDatabase = []
+              return Promise.resolve({ data: null, error: null })
+            }),
+            eq: jest.fn().mockImplementation(() => deleteChain),
+            then: (resolve) => Promise.resolve(resolve({ data: null, error: null })),
+          }
+          return deleteChain
+        }),
         or: jest.fn().mockImplementation(() => ({
           then: (resolve) => Promise.resolve(resolve({ data: mockFollowsDatabase, error: null })),
         })),

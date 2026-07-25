@@ -14,17 +14,7 @@ const mockInitialPlan = [
   }
 ]
 
-const mockEdgeFunctionResponse = {
-  candidates: [
-    {
-      content: {
-        parts: [
-          { text: JSON.stringify(mockInitialPlan) }
-        ]
-      }
-    }
-  ]
-}
+const mockEdgeFunctionResponse = mockInitialPlan
 
 jest.mock('../../lib/supabase', () => ({
   supabase: {

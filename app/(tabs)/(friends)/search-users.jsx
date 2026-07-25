@@ -47,7 +47,7 @@ export default function SearchUsers() {
     try {
       let { data, error } = await supabase
         .from('follows')
-        .select('following_id')
+        .select('following_id, status')
         .eq('follower_id', userId)
 
       if (error)
