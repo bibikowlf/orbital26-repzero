@@ -118,7 +118,7 @@ export default function FriendsHome() {
   }
 
   return (
-    <View style={[appStyles.container, { paddingHorizontal: 20, paddingTop: 0, justifyContent: 'flex-start' }]}>
+    <View style={[appStyles.container, { flex: 1, paddingHorizontal: 20, paddingTop: 0, justifyContent: 'flex-start' }]}>
 
       <View style={appStyles.metricsCard}>
         {loading ? (
@@ -154,6 +154,7 @@ export default function FriendsHome() {
         data={chats}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
+        style={{ flex: 1 }}
         renderItem={({ item }) => {
           const preview = item.lastMessage
             ? (item.lastMessage.message_type === 'invite' ? '🏋️ Workout invite' : item.lastMessage.content)
