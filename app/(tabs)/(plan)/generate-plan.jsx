@@ -86,46 +86,53 @@ export default function GeneratePlan() {
   }
 
   async function handleGenerateWorkout() {
-    // console.log("API KEY:", process.env.EXPO_PUBLIC_GEMINI_KEY)
     try {
       setLoading(true)
 
-      let { data: profile, error: profileError } = await supabase
+      // 1. Fetch user profile
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single()
 
-      if (profileError) 
-        throw profileError
+      if (profileError) throw profileError
 
-      const { data: edgeData, error: edgeError } = await supabase.functions.invoke('generate-workout', {
-        body: { profile: profile },
-    });
+      // 2. Invoke Edge Function
+      const { data: workoutPlan, error: edgeError } = await supabase.functions.invoke('generate-workout', {
+        body: { profile },
+      })
 
-    if (edgeError) 
-      throw edgeError;
+      // Handle Edge Function Error
+      if (edgeError) {
+        console.log('--- SUPABASE FUNCTION ERROR ---')
+        console.error(edgeError)
+        
+        if (edgeError.context) {
+          const errorBody = await edgeError.context.json().catch(() => null)
+          console.log('Edge Function Error Body:', errorBody)
+          throw new Error(errorBody?.error || edgeError.message)
+        }
+        throw edgeError
+      }
 
-    const rawJsonString = edgeData?.candidates?.[0]?.content?.parts?.[0]?.text
+      if (!workoutPlan || !Array.isArray(workoutPlan)) {
+        throw new Error("Received invalid workout structure from server.")
+      }
 
-    if (!rawJsonString) {
-      throw new Error("Invalid structure data returned from production processor.")
-    }
-
-    const parsedPlan = JSON.parse(rawJsonString)
-
-    await savePlanToDatabase(parsedPlan)
-    setWorkoutPlan(parsedPlan)
-    setIsEditing(false)
-    Alert.alert("Success", "Your routine has been generated!")
+      await savePlanToDatabase(workoutPlan)
+      setWorkoutPlan(workoutPlan)
+      setIsEditing(false)
+      Alert.alert("Success", "Your routine has been generated!")
 
     } catch (error) {
-      Alert.alert("Generation Failed", error.message)
-      console.error(error)
+      console.error('Generation Failed Error:', error)
+      Alert.alert("Generation Failed", error.message || String(error))
     } finally {
       setLoading(false)
     }
   }
+
 
   async function savePlanToDatabase(planData) {
     let { error } = await supabase
