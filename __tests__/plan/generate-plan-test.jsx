@@ -14,17 +14,7 @@ const mockInitialPlan = [
   }
 ]
 
-const mockEdgeFunctionResponse = {
-  candidates: [
-    {
-      content: {
-        parts: [
-          { text: JSON.stringify(mockInitialPlan) }
-        ]
-      }
-    }
-  ]
-}
+const mockEdgeFunctionResponse = mockInitialPlan
 
 jest.mock('../../lib/supabase', () => ({
   supabase: {
@@ -130,7 +120,8 @@ describe('GeneratePlan Unit Test', () => {
       eq: jest.fn().mockReturnThis(),
       single: jest.fn().mockImplementation(() => Promise.resolve({ data: { workout_plan: [] }, error: null })),
       update: jest.fn().mockReturnThis(),
-      then: jest.fn().mockImplementation((res) => res({ data: { workout_plan: [] }, error: null }))
+      then: jest.fn().mockImplementation((res) => 
+        Promise.res(res({ data: { workout_plan: [] }, error: null })))
     }
   })
 

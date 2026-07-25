@@ -145,15 +145,17 @@ export default function ChatThread() {
 
         const { data: rsvps, error: rsvpError } = await supabase
           .from('event_rsvps')
-          .select('event_id, status')
-          .eq('user_id', userId)
+          .select('event_id, status, user_id')
           .in('event_id', eventIds)
 
         if (rsvpError)
           throw rsvpError
 
         const rsvpMap = {}
-        rsvps.forEach((r) => { rsvpMap[r.event_id] = r.status })
+        (rsvps || [])
+          .filter((r) => r.user_id === userId)
+          .forEach((r) => { rsvpMap[r.event_id] = r.status })
+
         setEventRsvpStatuses(rsvpMap)
       }
     } catch (error) {
