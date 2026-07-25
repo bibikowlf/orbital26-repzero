@@ -98,12 +98,10 @@ export default function GeneratePlan() {
 
       if (profileError) throw profileError
 
-      // 2. Invoke Edge Function
       const { data: workoutPlan, error: edgeError } = await supabase.functions.invoke('generate-workout', {
         body: { profile },
       })
 
-      // Handle Edge Function Error
       if (edgeError) {
         console.log('--- SUPABASE FUNCTION ERROR ---')
         console.error(edgeError)
@@ -132,7 +130,6 @@ export default function GeneratePlan() {
       setLoading(false)
     }
   }
-
 
   async function savePlanToDatabase(planData) {
     let { error } = await supabase
