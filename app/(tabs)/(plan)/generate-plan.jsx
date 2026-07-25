@@ -53,10 +53,12 @@ export default function GeneratePlan() {
 
   function handleDeleteExercise(dayIndex, exerciseIndex) {
     setWorkoutPlan(deleteExerciseFromDay(workoutPlan, dayIndex, exerciseIndex))
+    setIsEditing(true)
   }
 
   function handleUpdateExercise(dayIndex, exerciseIndex, field, value) {
     setWorkoutPlan(updateExerciseField(workoutPlan, dayIndex, exerciseIndex, field, value))
+    setIsEditing(true)
   }
 
   useEffect(() => {
@@ -165,32 +167,45 @@ export default function GeneratePlan() {
   }
 
   return (
-    <ScrollView style={{ paddingHorizontal: 15, paddingTop: 20 }}>
-      <Text style={[appStyles.label, { fontSize: 22, fontWeight: 'bold' }]}>AI Workout Suite</Text>
-      <Text style={{ color: '#666', marginTop: 4 }}>Review, refine, or rewrite your customized routine split.</Text>
+    <ScrollView style={{ paddingHorizontal: 15, paddingTop: 24 }}>
+      <Text style={[appStyles.label, { fontSize: 25, fontWeight: 'bold' }]}>Your AI Workout Suite</Text>
+      <Text style={{ color: '#888', fontSize: 14, marginTop: 6, lineHeight: 20 }}>
+        {workoutPlan.length > 0
+          ? 'Generated specifically for you. You can review, modify or regenerate your customized routine split.'
+          : 'Let AI build your week, tailored for your profile.'}
+      </Text>
       <Spacer />
 
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 10 }}>
         <TouchableOpacity 
-          style={[appStyles.actionButton, { backgroundColor: '#007AFF' }, loading && appStyles.buttonDisabled]}
-          onPress={handleGenerateWorkout}
+          style={[appStyles.actionButton, { flex: 1, backgroundColor: '#007AFF' }, loading && appStyles.buttonDisabled]}
+          onPress={() => {
+            if (workoutPlan.length > 0) {
+              Alert.alert("Regenerate Plan?", "This will replace your current workout plan. Continue?", [
+                { text: "Cancel", style: "cancel" },
+                { text: "Regenerate", style: "destructive", onPress: handleGenerateWorkout },
+              ])
+            } else {
+              handleGenerateWorkout()
+            }
+          }}
           disabled={loading}
         >
-          <Text style={appStyles.buttonText}>{workoutPlan.length > 0 ? 'AI Regenerate' : 'AI Generate'}</Text>
+          <Text style={appStyles.buttonText}>{workoutPlan.length > 0 ? 'Regenerate' : 'Generate Plan'}</Text>
         </TouchableOpacity>
 
         {workoutPlan.length > 0 && (
           <TouchableOpacity 
-            style={[appStyles.actionButton, { backgroundColor: isEditing ? '#34C759' : '#5856D6' }]}
+            disabled={loading}
+            style={[appStyles.actionButton, { flex: 1, backgroundColor: isEditing ? '#34C759' : '#5856D6' }]}
             onPress={isEditing ? handleSaveEdits : () => setIsEditing(true)}
           >
-            <Text style={appStyles.buttonText}>{isEditing ? 'Save Customizations' : 'Modify Items'}</Text>
+            <Text style={appStyles.buttonText}>{isEditing ? 'Save Changes' : 'Modify'}</Text>
           </TouchableOpacity>
         )}
       </View>
 
       <Spacer/>
-
       {workoutPlan.length > 0 ? (
         workoutPlan.map((dayItem, dayIdx) => (
           <View key={dayIdx} style={appStyles.dayContainer}>
