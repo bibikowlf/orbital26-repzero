@@ -71,6 +71,7 @@ export default function FollowList() {
       <FlatList
         data={users}
         keyExtractor={(item) => item.id}
+        style={{ flex: 1 }}
         renderItem={({ item }) => (
           <View style={{
             paddingVertical: 14,
