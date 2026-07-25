@@ -129,6 +129,15 @@ export default function SearchUsers() {
       if (error)
         throw error
 
+      if (previousStatus === 'pending') {
+        await supabase
+          .from('notifications')
+          .delete()
+          .eq('user_id', targetId)
+          .eq('actor_id', userId)
+          .eq('type', 'friend_request')
+      }
+      
       setFollowStatuses((prev) => {
         const next = { ...prev }
         delete next[targetId]
