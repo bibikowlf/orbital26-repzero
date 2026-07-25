@@ -172,7 +172,7 @@ export default function GeneratePlan() {
       <Text style={{ color: '#888', fontSize: 14, marginTop: 6, lineHeight: 20 }}>
         {workoutPlan.length > 0
           ? 'Generated specifically for you. You can review, modify or regenerate your customized routine split.'
-          : 'Let AI build your week, tailored for your profile.'}
+          : 'Get a workout routine tailored for your profile in seconds.'}
       </Text>
       <Spacer />
 
@@ -270,7 +270,7 @@ export default function GeneratePlan() {
           </View>
         ))
       ) : (
-        <Text style={appStyles.fallbackText}>No routine active. Prompt Gemini to map out your week.</Text>
+        <Text style={appStyles.fallbackText}>No routine active. Generate a plan to map out your week.</Text>
       )}
       <Spacer />
     </ScrollView>
