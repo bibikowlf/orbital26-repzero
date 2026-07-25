@@ -158,7 +158,7 @@ describe('Profile & Plan & Log Integration Test', () => {
 
     await act(async () => render(<GeneratePlan />))
     
-    const generateBtn = await screen.findByText('AI Generate')
+    const generateBtn = await screen.findByText('Generate Plan')
     await act(async () => fireEvent.press(generateBtn))
 
     await waitFor(() => expect(mockDatabaseStore.profiles[mockUserSubId].workout_plan).toHaveLength(1))

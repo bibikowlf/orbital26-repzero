@@ -120,7 +120,8 @@ describe('GeneratePlan Unit Test', () => {
       eq: jest.fn().mockReturnThis(),
       single: jest.fn().mockImplementation(() => Promise.resolve({ data: { workout_plan: [] }, error: null })),
       update: jest.fn().mockReturnThis(),
-      then: jest.fn().mockImplementation((res) => res({ data: { workout_plan: [] }, error: null }))
+      then: jest.fn().mockImplementation((res) => 
+        Promise.res(res({ data: { workout_plan: [] }, error: null })))
     }
   })
 
@@ -133,7 +134,7 @@ describe('GeneratePlan Unit Test', () => {
 
     await act(async () => render(<GeneratePlan />))
 
-    await act(async () => fireEvent.press(screen.getByText('AI Generate')))
+    await act(async () => fireEvent.press(screen.getByText('Generate Plan')))
 
     await waitFor(() => {
       expect(supabase.functions.invoke).toHaveBeenCalledWith('generate-workout', {
@@ -148,7 +149,7 @@ describe('GeneratePlan Unit Test', () => {
 
     await act(async () => render(<GeneratePlan />))
 
-    await act(async () => fireEvent.press(screen.getByText('AI Generate')))
+    await act(async () => fireEvent.press(screen.getByText('Generate Plan')))
 
     await waitFor(() => {
       expect(screen.getByText('Bench Press')).toBeTruthy()
@@ -169,11 +170,11 @@ describe('GeneratePlan Unit Test', () => {
     )
 
     await act(async () => render(<GeneratePlan />))
-    await waitFor(() => expect(screen.getByText('Modify Items')).toBeTruthy())
+    await waitFor(() => expect(screen.getByText('Modify')).toBeTruthy())
 
-    await act(async () => fireEvent.press(screen.getByText('Modify Items')))
+    await act(async () => fireEvent.press(screen.getByText('Modify')))
 
-    await act(async () => fireEvent.press(screen.getByText('Save Customizations')))
+    await act(async () => fireEvent.press(screen.getByText('Save Changes')))
 
     await waitFor(() => expect(Alert.alert).toHaveBeenCalledWith('Saved', expect.any(String)))
   })
