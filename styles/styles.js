@@ -313,6 +313,7 @@ export const appStyles = StyleSheet.create({
     borderTopRightRadius: 20,
     padding: 20,
     maxHeight: '80%',
+    marginTop: 'auto',
   },
   modalTitle: {
     fontSize: 18,

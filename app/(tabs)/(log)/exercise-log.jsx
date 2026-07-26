@@ -23,7 +23,6 @@ export function getWeekRangeLabel(weekDays) {
   const endMonth = monthNames[endDate.getMonth()]
   const year = endDate.getFullYear()
 
-  // if week spans two months
   if (startMonth !== endMonth) {
     return `${startMonth} ${startDate.getDate()} – ${endMonth} ${endDate.getDate()}, ${year}`
   } else {
@@ -71,7 +70,7 @@ export default function ExerciseLog() {
   const [activeTab, setActiveTab] = useState('Log') 
 
   const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split('T')[0]  // defaults to today (YYYY-MM-DD)
+    new Date().toISOString().split('T')[0]
   )
   const [exercises, setExercises] = useState([])
   const [notes, setNotes] = useState('')
@@ -80,6 +79,7 @@ export default function ExerciseLog() {
 
   const [workoutPlan, setWorkoutPlan] = useState([])
   const [showImport, setshowImport] = useState(false)
+  const [selectedImportDay, setSelectedImportDay] = useState(null)
 
   const [isEditing, setIsEditing] = useState(true)
   const [hasExistingLog, setHasExistingLog] = useState(false)
@@ -90,11 +90,6 @@ export default function ExerciseLog() {
   const weekDays = getCurrentWeekDays(weekOffset)
   const currentYear = new Date(weekDays[0]?.dateString).getFullYear()
   const currentMonth = new Date(weekDays[0]?.dateString).getMonth()
-
-  const selectedDay = weekDays.find(d => d.dateString === selectedDate)?.fullName
-  const matchingPlanDay = workoutPlan.find(
-    (planDay) => planDay.day?.toLowerCase().includes(selectedDay?.toLowerCase())
-  )
 
   useEffect(() => {
     if (userId && activeTab === 'Log') 
@@ -147,6 +142,7 @@ export default function ExerciseLog() {
       Alert.alert('No Workout Plan', 'You have not generated a workout plan yet.')
       return
     }
+    setSelectedImportDay(workoutPlan[0] ?? null)
     setshowImport(true)
   }
 
@@ -477,7 +473,7 @@ export default function ExerciseLog() {
             ) : null}
 
             {!isEditing && notes ? (
-              <View style={appStyles.notesDisplay}>
+              <View style={appStyles.notesDisplays}>
                 <Text style={appStyles.notesLabel}>Notes</Text>
                 <Text style={appStyles.notesText}>{notes}</Text>
               </View>
@@ -493,35 +489,59 @@ export default function ExerciseLog() {
                 <View style={appStyles.modalContainer}>
                   <Text style={appStyles.modalTitle}>Import from Workout Plan</Text>
                   <Text style={appStyles.modalSubtitle}>
-                    Showing plan for {selectedDay}
+                    Choose a day to import
                   </Text>
 
-                  {matchingPlanDay ? (
-                    <View style={appStyles.planDayCard}>
-                      <Text style={appStyles.planDayTitle}>{matchingPlanDay.day}</Text>
-                      <Text style={appStyles.planDayMeta}>
-                        {matchingPlanDay.exercises?.length} exercises
-                      </Text>
-                      {matchingPlanDay.exercises?.map((ex, exIdx) => (
-                        <Text key={exIdx} style={appStyles.planExerciseItem}>
-                          • {ex.name} — {ex.sets} sets x {ex.reps} reps
+                  <ScrollView
+                    style={{ maxHeight: 160 }}
+                    howsVerticalScrollIndicator={false}
+                    contentContainerStyle={{ gap: 8, paddingVertical: 8 }}
+                  >
+                    {workoutPlan.map((planDay, idx) => {
+                      const isSelected = selectedImportDay?.day === planDay.day
+                      return (
+                        <TouchableOpacity
+                          key={idx}
+                          onPress={() => setSelectedImportDay(planDay)}
+                          style={{
+                            alignSelf: 'flex-start',
+                            paddingHorizontal: 16,
+                            paddingVertical: 8,
+                            borderRadius: 20,
+                            backgroundColor: isSelected ? '#0048ff' : '#f2f2f2',
+                          }}
+                        >
+                          <Text style={{ color: isSelected ? '#fff' : '#444', fontWeight: '600' }}>
+                            {planDay.day}
+                          </Text>
+                        </TouchableOpacity>
+                      )
+                    })}
+                  </ScrollView>
+
+                  {selectedImportDay ? (
+                    <ScrollView style={{ maxHeight: 260 }}>
+                      <View style={appStyles.planDayCard}>
+                        <Text style={appStyles.planDayTitle}>{selectedImportDay.day}</Text>
+                        <Text style={appStyles.planDayMeta}>
+                          {selectedImportDay.exercises?.length} exercises
                         </Text>
-                      ))}
-                      <TouchableOpacity
-                        style={appStyles.importConfirmButton}
-                        onPress={() => importDay(matchingPlanDay)}
-                      >
-                        <Text style={appStyles.importConfirmText}>Import These Exercises</Text>
-                      </TouchableOpacity>
-                    </View>
+                        {selectedImportDay.exercises?.map((ex, exIdx) => (
+                          <Text key={exIdx} style={appStyles.planExerciseItem}>
+                            • {ex.name} — {ex.sets} sets x {ex.reps} reps
+                          </Text>
+                        ))}
+                        <TouchableOpacity
+                          style={appStyles.importConfirmButton}
+                          onPress={() => importDay(selectedImportDay)}
+                        >
+                          <Text style={appStyles.importConfirmText}>Import These Exercises</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </ScrollView>
                   ) : (
                     <View style={appStyles.emptyState}>
-                      <Text style={appStyles.emptyStateText}>
-                        No workout plan exists for {selectedDay}.
-                      </Text>
-                      <Text style={appStyles.emptyStateSubtext}>
-                        This is a rest day or your plan does not include {selectedDay}.
-                      </Text>
+                      <Text style={appStyles.emptyStateText}>No days found in your workout plan.</Text>
                     </View>
                   )}
 

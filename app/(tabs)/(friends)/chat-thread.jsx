@@ -151,7 +151,7 @@ export default function ChatThread() {
         if (rsvpError)
           throw rsvpError
 
-        const rsvpMap = {}
+        const rsvpMap = {};
         (rsvps || [])
           .filter((r) => r.user_id === userId)
           .forEach((r) => { rsvpMap[r.event_id] = r.status })

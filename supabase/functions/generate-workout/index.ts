@@ -114,10 +114,14 @@ export default {
         - Do NOT wrap the response in markdown code blocks like \`\`\`json or \`\`\`.
         - Do NOT include introductory text, conversational chatter, or concluding remarks.
 
+        CRITICAL: Label each day generically as "Day 1", "Day 2", "Day 3", etc. — one entry per session, in order.
+        Do NOT use weekday names (e.g. "Monday") or split names in the day label itself (e.g. "Push Day"). 
+        Put any split name inside the day's exercises or leave it implicit.
+
         EXPECTED JSON SCHEMA:
         [
           {
-            "day": "Day 1: Upper Body - Push Focus",
+            "day": "Day 1",
             "exercises": [
               {
                 "name": "Barbell Bench Press",
