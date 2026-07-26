@@ -18,7 +18,7 @@ export default function FriendsLayout() {
       />
       <Stack.Screen name='follow-list' 
         options={({ route }) => ({
-          title: route.params?.mode === 'followers' ? 'Followers' : 'Following',
+          title: 'Friends',
           headerLeft: () => <BackButton />
         })}
       />

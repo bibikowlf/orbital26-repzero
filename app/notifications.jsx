@@ -55,7 +55,7 @@ export default function Notifications() {
 
   async function handleAcceptRequest(notification) {
     try {
-      const { error } = await supabase
+      const { data: updated, error } = await supabase
         .from('follows')
         .update({ status: 'accepted' })
         .eq('follower_id', notification.actor_id)
