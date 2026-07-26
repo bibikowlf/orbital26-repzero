@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity, Alert } from 'react-native'
+import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity, Alert, KeyboardAvoidingView } from 'react-native'
 import { appStyles } from '../../../styles/styles'
 import { supabase } from '../../../lib/supabase'
 import { useLocalSearchParams, Stack } from 'expo-router'
@@ -197,97 +197,99 @@ export default function WorkoutTutorials() {
   }
 
   return (
-    <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10, flex: 1, padding: 16 }]}>
-      <Stack.Screen options={{ title: name }}/>
-      <View style={styles.row}>
-        <TextInput
-          style={[styles.input, { flex: 1, marginRight: 10 }]}
-          placeholder='Enter tutorial'
-          value={newTutorial}
-          onChangeText={setNewTutorial}
-          multiline={true}
-          textAlignVertical='top'
-        />
-        <TouchableOpacity
-          style={[styles.button,
-            loading && styles.buttonDisabled, 
-            { width: 60 }]}
-          onPress={handleAdd}
-          disabled={loading}
-        >
-          <Text style={styles.buttonText}>Add</Text>
-        </TouchableOpacity>
-      </View>
-
-      <FlatList
-        data={tutorials}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View
-            style={[styles.actionButton, 
-              loading && styles.buttonDisabled,
-              { backgroundColor: '#fff', 
-                flex: 0, 
-                alignSelf: 'stretch', 
-                alignItems: 'baseline',
-                borderWidth: 1, 
-                borderColor: '#ced4da', 
-                marginBottom: 8,
-                padding: 12 }]}
+    <KeyboardAvoidingView behavior='padding' style={{ flex: 1 }}>
+      <View style={[styles.container, { alignItems: 'stretch', width: '100%', marginTop: 10, flex: 1, padding: 16 }]}>
+        <Stack.Screen options={{ title: name }}/>
+        <View style={styles.row}>
+          <TextInput
+            style={[styles.input, { flex: 1, marginRight: 10 }]}
+            placeholder='Enter tutorial'
+            value={newTutorial}
+            onChangeText={setNewTutorial}
+            multiline={true}
+            textAlignVertical='top'
+          />
+          <TouchableOpacity
+            style={[styles.button,
+              loading && styles.buttonDisabled, 
+              { width: 60 }]}
+            onPress={handleAdd}
+            disabled={loading}
           >
-            {(editing === null || editing.id !== item.id) ? (
-              <Text style={{ fontSize: 16, marginBottom: 6, color: 'black' }}>{item.content}</Text>
-            ): (
-              <View style={{ marginBottom: 6, width: '100%' }}>
-                <TextInput 
-                  value={editTutorial}
-                  onChangeText={(text) => setEditTutorial(text)}
-                  autoCapitalize='none'
-                  multiline={true}
-                  textAlignVertical='top'
-                  numberOfLines={10}
-                  style={[styles.input, { alignSelf: 'stretch', width: '100%'}]}
-                />
-                <View style={{ flexDirection: 'row', gap: 10 }}>
-                  <TouchableOpacity
-                    style={[styles.actionButton, 
-                      { backgroundColor: '#007AFF', marginTop: 10 }, 
-                      loading && styles.buttonDisabled]}
-                    onPress={handleEdit}
-                    disabled={loading}
-                  >
-                    <Text style={styles.buttonText}>Edit</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[styles.actionButton, 
-                      { backgroundColor: '#007AFF', marginTop: 10 }, 
-                      loading && styles.buttonDisabled]}
-                    onPress={() => setEditing(null)}
-                    disabled={loading}
-                  >
-                    <Text style={styles.buttonText}>Cancel</Text>
-                  </TouchableOpacity>
+            <Text style={styles.buttonText}>Add</Text>
+          </TouchableOpacity>
+        </View>
+
+        <FlatList
+          data={tutorials}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <View
+              style={[styles.actionButton, 
+                loading && styles.buttonDisabled,
+                { backgroundColor: '#fff', 
+                  flex: 0, 
+                  alignSelf: 'stretch', 
+                  alignItems: 'baseline',
+                  borderWidth: 1, 
+                  borderColor: '#ced4da', 
+                  marginBottom: 8,
+                  padding: 12 }]}
+            >
+              {(editing === null || editing.id !== item.id) ? (
+                <Text style={{ fontSize: 16, marginBottom: 6, color: 'black' }}>{item.content}</Text>
+              ): (
+                <View style={{ marginBottom: 6, width: '100%' }}>
+                  <TextInput 
+                    value={editTutorial}
+                    onChangeText={(text) => setEditTutorial(text)}
+                    autoCapitalize='none'
+                    multiline={true}
+                    textAlignVertical='top'
+                    numberOfLines={10}
+                    style={[styles.input, { alignSelf: 'stretch', width: '100%'}]}
+                  />
+                  <View style={{ flexDirection: 'row', gap: 10 }}>
+                    <TouchableOpacity
+                      style={[styles.actionButton, 
+                        { backgroundColor: '#007AFF', marginTop: 10 }, 
+                        loading && styles.buttonDisabled]}
+                      onPress={handleEdit}
+                      disabled={loading}
+                    >
+                      <Text style={styles.buttonText}>Edit</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.actionButton, 
+                        { backgroundColor: '#007AFF', marginTop: 10 }, 
+                        loading && styles.buttonDisabled]}
+                      onPress={() => setEditing(null)}
+                      disabled={loading}
+                    >
+                      <Text style={styles.buttonText}>Cancel</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
-            )}
-            <TextInfo 
-              marginBottom={0}
-              isAuthor={item.user_id === userId} 
-              canReply={false} 
-              score={item.score} 
-              loading={loading} 
-              editing={editing !== null && editing.id === item.id}
-              hasVoted={voted.has(item.id)} 
-              onVotePress={() => handleVote({ commentId: item.id })} 
-              onEditPress={() => {
-                setEditTutorial(item.content)
-                setEditing(item)
-              }}
-              onDeletePress={() => handleDelete(item.id)} 
-            />
-          </View>
-        )}
-      />
-    </View>
+              )}
+              <TextInfo 
+                marginBottom={0}
+                isAuthor={item.user_id === userId} 
+                canReply={false} 
+                score={item.score} 
+                loading={loading} 
+                editing={editing !== null && editing.id === item.id}
+                hasVoted={voted.has(item.id)} 
+                onVotePress={() => handleVote({ commentId: item.id })} 
+                onEditPress={() => {
+                  setEditTutorial(item.content)
+                  setEditing(item)
+                }}
+                onDeletePress={() => handleDelete(item.id)} 
+              />
+            </View>
+          )}
+        />
+      </View>
+    </KeyboardAvoidingView>
   )
 }
