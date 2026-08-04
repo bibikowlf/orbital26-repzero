@@ -32,17 +32,10 @@ jest.mock('../../lib/supabase', () => ({
             workout_plan: generatedPlan 
           }
 
-          const mockEdgeResponse = {
-            candidates: [
-              {
-                content: {
-                  parts: [
-                    { text: JSON.stringify(generatedPlan) }
-                  ]
-                }
-              }
-            ]
-          }
+          const mockEdgeResponse = [{
+            day: 'Monday',
+            exercises: [{ name: 'Bench Press', sets: 3, reps: '10', notes: 'Chest focus' }]
+          }]
 
           return Promise.resolve({ data: mockEdgeResponse, error: null })
         }

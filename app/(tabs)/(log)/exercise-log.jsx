@@ -267,7 +267,7 @@ export default function ExerciseLog() {
     try {
       setLeaderboardLoading(true)
       const { data, error } = await supabase
-        .from('total_minutes_this_week')
+        .from('leaderboard_score')
         .select('*')
       if (error) {
         throw error
