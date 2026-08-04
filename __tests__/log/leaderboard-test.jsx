@@ -22,7 +22,7 @@ jest.mock('../../lib/supabase', () => {
             single: jest.fn().mockImplementation(() => builder),
             
             then: jest.fn().mockImplementation((resolve) => {
-              if (table === 'total_minutes_this_week') {
+              if (table === 'leaderboard_score') {
                 return Promise.resolve(resolve({ data: mockLeaderboardData, error: null }))
               }
 

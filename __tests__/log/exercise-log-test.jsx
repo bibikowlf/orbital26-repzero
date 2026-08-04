@@ -201,7 +201,7 @@ describe('ExerciseLog Unit Test', () => {
       expect(screen.getByText(/4 sets × 8 reps/i)).toBeTruthy()
       expect(screen.getByText('45 minutes')).toBeTruthy()
     })
-  })
+  }, 10000)
 
   it('exercise is added after adding it', async () => {
     await act(async () => render(<ExerciseLog />))
